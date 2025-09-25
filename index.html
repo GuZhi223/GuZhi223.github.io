@@ -1,65 +1,1008 @@
-<!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>输入验证</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>班级查寝人员安排表</title> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #f0f5ff 0%, #e6f0ff 100%);
+      color: #333;
+      line-height: 1.6;
+      padding: 30px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      width: 95%;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      grid-template-rows: auto auto auto;
+      gap: 30px;
+      grid-template-areas:
+        "header header"
+        "schedule calendar"
+        "rules calendar";
+    }
+    
+    header {
+      grid-area: header;
+      text-align: center;
+      padding: 40px 0;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+      border-radius: 20px;
+      color: white;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="rgba(255,255,255,0.05)" width="50" height="50" x="25" y="25"/></svg>');
+      background-size: 100px;
+      opacity: 0.3;
+    }
+    
+    h1 {
+      font-size: 3.2rem;
+      margin-bottom: 15px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      position: relative;
+      z-index: 2;
+    }
+    
+    .subtitle {
+      font-size: 1.4rem;
+      opacity: 0.9;
+      font-weight: 300;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .date-display {
+      background: rgba(255, 255, 255, 0.2);
+      display: inline-block;
+      padding: 10px 25px;
+      border-radius: 30px;
+      margin-top: 20px;
+      font-size: 1.2rem;
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(5px);
+    }
+    
+    .schedule-section {
+      grid-area: schedule;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+    }
+    
+    .boys::before {
+      background: linear-gradient(90deg, #3498db 0%, #1a5276 100%);
+    }
+    
+    .girls::before {
+      background: linear-gradient(90deg, #e84393 0%, #a53770 100%);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f4f8;
+    }
+    
+    .card-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 25px;
+      font-size: 28px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .boys .card-icon {
+      background: linear-gradient(135deg, #3498db 0%, #1a5276 100%);
+      color: white;
+    }
+    
+    .girls .card-icon {
+      background: linear-gradient(135deg, #e84393 0%, #a53770 100%);
+      color: white;
+    }
+    
+    .card-title {
+      font-size: 2.2rem;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+    
+    .schedule-list {
+      list-style: none;
+    }
+    
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      padding: 18px 0;
+      border-bottom: 1px solid #f0f4f8;
+      transition: background 0.3s;
+    }
+    
+    .schedule-item:hover {
+      background: rgba(240, 244, 248, 0.5);
+    }
+    
+    .schedule-item:last-child {
+      border-bottom: none;
+    }
+    
+    .person-name {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-right: 20px;
+      min-width: 140px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .person-name i {
+      margin-right: 10px;
+    }
+    
+    .boys .person-name {
+      color: #2980b9;
+    }
+    
+    .girls .person-name {
+      color: #e84393;
+    }
+    
+    .schedule-dates {
+      color: #555;
+      font-size: 1.3rem;
+      line-height: 1.7;
+    }
+    
+    .calendar-section {
+      grid-area: calendar;
+      background: white;
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .calendar-header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #f0f4f8;
+    }
+    
+    .calendar-title {
+      font-size: 2.2rem;
+      color: #2c3e50;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+    
+    .calendar-title i {
+      margin-right: 15px;
+      color: #4b6cb7;
+    }
+    
+    .calendar-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .calendar-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 10px;
+    }
+    
+    .calendar-nav button {
+      background: #f0f4f8;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 18px;
+      color: #4b6cb7;
+    }
+    
+    .calendar-nav button:hover {
+      background: #4b6cb7;
+      color: white;
+    }
+    
+    .current-month {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .calendar {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+    }
+    
+    .calendar-day-header {
+      text-align: center;
+      padding: 15px 0;
+      font-weight: 600;
+      color: #4b6cb7;
+      font-size: 1.2rem;
+    }
+    
+    .calendar-day {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 15px 10px;
+      text-align: center;
+      min-height: 120px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    
+    .calendar-day:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      border-color: #e0e7ff;
+    }
+    
+    .day-number {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.1rem;
+      color: #7f8c8d;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .today .day-number {
+      background: #ff6b6b;
+      color: white;
+    }
+    
+    .duty-person {
+      margin-top: auto;
+      padding-top: 10px;
+      font-size: 0.95rem;
+      min-height: 60px; /* 确保所有格子高度一致 */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .no-duty {
+      color: #95a5a6;
+      font-size: 0.9rem;
+      font-style: italic;
+      padding: 5px;
+    }
+    
+    .boys-duty {
+      color: #2980b9;
+      font-weight: 500;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .girls-duty {
+      color: #e84393;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .weekend {
+      background: #f9f7ff;
+    }
+    
+    .weekend .day-number {
+      color: #9b59b6;
+    }
+    
+    .other-month {
+      background: #f5f7fa;
+      opacity: 0.6;
+    }
+    
+    .other-month .day-number {
+      color: #aaa;
+    }
+    
+    .rules-section {
+      grid-area: rules;
+      background: white;
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+    
+    .rules-title {
+      font-size: 2.2rem;
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+    
+    .rules-title i {
+      margin-right: 15px;
+      color: #4b6cb7;
+    }
+    
+    .rules-list {
+      list-style: none;
+    }
+    
+    .rules-list li {
+      padding: 18px 0;
+      border-bottom: 1px solid #f0f4f8;
+      display: flex;
+      align-items: flex-start;
+    }
+    
+    .rules-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .rules-list li i {
+      color: #4b6cb7;
+      margin-right: 20px;
+      font-size: 1.5rem;
+      margin-top: 5px;
+      min-width: 30px;
+    }
+    
+    .rule-content {
+      font-size: 1.3rem;
+      color: #555;
+      line-height: 1.7;
+    }
+    
+    .highlight {
+      background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    
+    footer {
+      grid-column: 1 / -1;
+      text-align: center;
+      margin-top: 30px;
+      padding: 25px;
+      color: #7f8c8d;
+      font-size: 1.1rem;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 1200px) {
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "header"
+          "schedule"
+          "calendar"
+          "rules";
+      }
+      
+      .schedule-section {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style> 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+ </head> 
+ <body id="v1"> 
+  <div id="v2" class="container"> 
+   <header id="v3"> 
+    <h1 id="v4">班级查寝人员安排表</h1> 
+    <p id="v5" class="subtitle">2025-2026学年第一学期查寝轮值安排</p> 
+   </header> 
+   <div id="v8" class="schedule-section"> 
+   </div> 
+   <div id="v41" class="calendar-section"> 
+    <div id="v42" class="calendar-header"> 
+     <h2 id="v43" class="calendar-title"> <i id="v44" class="fas fa-calendar-check"></i> 查寝日历 </h2> 
+    </div> 
+    <div id="v45" class="calendar-container"> 
+     <div id="v46" class="calendar-nav"> 
+      <button id="prev-month"><i id="v47" class="fas fa-chevron-left"></i></button> 
+      <div class="current-month" id="current-month">
+       2025年9月
+      </div> 
+      <button id="next-month"><i id="v48" class="fas fa-chevron-right"></i></button> 
+     </div> 
+     <div class="calendar" id="calendar-grid">
+      <div class="calendar-day-header">
+       周一
+      </div>
+      <div class="calendar-day-header">
+       周二
+      </div>
+      <div class="calendar-day-header">
+       周三
+      </div>
+      <div class="calendar-day-header">
+       周四
+      </div>
+      <div class="calendar-day-header">
+       周五
+      </div>
+      <div class="calendar-day-header">
+       周六
+      </div>
+      <div class="calendar-day-header">
+       周日
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        1
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        2
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        3
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        4
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        5
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        6
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        7
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        8
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        9
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        10
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        11
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        12
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        13
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        14
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        15
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        16
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        17
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        18
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        19
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        20
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        21
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        22
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        23
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        24
+       </div>
+       <div class="duty-person">
+        <div class="no-duty"> 
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day today">
+       <div class="day-number">
+        25
+       </div>
+       <div class="duty-person">
+        <div class="boys-duty">
+         <i class="fas fa-male"></i> 林维钢
+        </div>
+        <div class="girls-duty">
+         <i class="fas fa-female"></i> 浮佳怡
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        26
+       </div>
+       <div class="duty-person">
+        <div class="boys-duty">
+         <i class="fas fa-male"></i> 侯鑫磊
+        </div>
+        <div class="girls-duty">
+         <i class="fas fa-female"></i> 赵冉
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        27
+       </div>
+       <div class="duty-person">
+        <div class="boys-duty">
+         <i class="fas fa-male"></i> 林维钢
+        </div>
+        <div class="girls-duty">
+         <i class="fas fa-female"></i> 周柯辰
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day weekend">
+       <div class="day-number">
+        28
+       </div>
+       <div class="duty-person">
+        <div class="boys-duty">
+         <i class="fas fa-male"></i> 侯鑫磊
+        </div>
+        <div class="girls-duty">
+         <i class="fas fa-female"></i> 浮佳怡
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        29
+       </div>
+       <div class="duty-person">
+        <div class="boys-duty">
+         <i class="fas fa-male"></i> 林维钢
+        </div>
+        <div class="girls-duty">
+         <i class="fas fa-female"></i> 赵冉
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day">
+       <div class="day-number">
+        30
+       </div>
+       <div class="duty-person">
+        <div class="boys-duty">
+         <i class="fas fa-male"></i> 侯鑫磊
+        </div>
+        <div class="girls-duty">
+         <i class="fas fa-female"></i> 周柯辰
+        </div>
+       </div>
+      </div>
+      <div class="calendar-day other-month"></div>
+      <div class="calendar-day other-month"></div>
+      <div class="calendar-day other-month"></div>
+      <div class="calendar-day other-month"></div>
+      <div class="calendar-day other-month"></div>
+     </div> 
+    </div> 
+   </div> 
+   <div id="v49" class="rules-section"> 
+    <h2 id="v50" class="rules-title"> <i id="v51" class="fas fa-clipboard-list"></i> 查寝安排规则说明 </h2> 
+    <ul id="v52" class="rules-list"> 
+     <li id="v53"> <i id="v54" class="fas fa-sync-alt"></i> 
+      <div id="v55" class="rule-content"> 
+       <strong id="v56">男生轮换规则：</strong> 林维钢和侯鑫磊两人轮换，每人负责一天，从2025年9月25日（林维钢）开始轮换。 
+      </div> </li> 
+     <li id="v57"> <i id="v58" class="fas fa-sync-alt"></i> 
+      <div id="v59" class="rule-content"> 
+       <strong id="v60">女生轮换规则：</strong> 浮佳怡、赵冉、周柯辰三人轮换，每人负责一天，从2025年9月25日（浮佳怡）开始轮换。 
+      </div> </li> 
+     <li id="v61"> <i id="v62" class="fas fa-calendar-day"></i> 
+      <div id="v63" class="rule-content"> 
+       <strong id="v64">查寝时间：</strong> 每天晚上 
+       <span id="v65" class="highlight">22:05</span> 进行查寝，请按时到岗。 
+      </div> </li> 
+     <li id="v66"> <i id="v67" class="fas fa-clipboard-check"></i> 
+      <div id="v68" class="rule-content"> 
+       <strong id="v69">查寝内容：</strong> 记录未归学生，询问学生有无学习生活各类问题。 
+      </div> </li> 
+     <li id="v70"> <i id="v71" class="fas fa-exclamation-triangle"></i> 
+      <div id="v72" class="rule-content"> 
+       <strong id="v73">注意事项：</strong> 如遇特殊情况需要调班，请提前一天向班长报备并协调换班事宜。 
+      </div> </li> 
+     <li id="v74"> <i id="v75" class="fas fa-file-signature"></i> 
+      <div id="v76" class="rule-content"> 
+       <strong id="v77">记录要求：</strong> 查寝完毕后22:15在班委群汇报。 
+      </div> </li> 
+    </ul> 
+   </div> 
+   <footer id="v78"> 
+    <p id="v79">大一班级查寝安排表 © 2025 | 最后更新：2025年9月25日</p> 
+    <p id="v80">班长制表 | 辅导员审核</p> 
+   </footer> 
+  </div> 
+  <script>
+    // 查寝人员数据
+    const dutyData = {
+      boys: ['林维钢', '侯鑫磊'],
+      girls: ['浮佳怡', '赵冉', '周柯辰']
+    };
+    
+    // 起始日期：2025年9月25日（林维钢和浮佳怡）
+    const startDate = new Date(2025, 8, 25); // 月份从0开始，9月是8
+    
+    // 当前显示的月份和年份
+    let currentMonth = 8; // 9月
+    let currentYear = 2025;
+    
+    // DOM元素
+    const calendarGrid = document.getElementById('calendar-grid');
+    const currentMonthDisplay = document.getElementById('current-month');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      renderCalendar(currentYear, currentMonth);
+      setupEventListeners();
+    });
+    
+    // 设置事件监听器
+    function setupEventListeners() {
+      prevMonthBtn.addEventListener('click', function() {
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
         }
-        .container {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        renderCalendar(currentYear, currentMonth);
+      });
+      
+      nextMonthBtn.addEventListener('click', function() {
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
         }
-        input {
-            margin: 10px;
-            padding: 8px;
-            width: 200px;
+        renderCalendar(currentYear, currentMonth);
+      });
+    }
+    
+    // 渲染日历
+    function renderCalendar(year, month) {
+      // 更新月份显示
+      const monthNames = ["1月", "2月", "3月", "4月", "5月", "6月", 
+                         "7月", "8月", "9月", "10月", "11月", "12月"];
+      currentMonthDisplay.textContent = `${year}年${monthNames[month]}`;
+      
+      // 清空日历网格
+      calendarGrid.innerHTML = '';
+      
+      // 添加星期标题
+      const dayNames = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+      dayNames.forEach(day => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = day;
+        calendarGrid.appendChild(dayHeader);
+      });
+      
+      // 获取当月第一天和最后一天
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      
+      // 计算第一天是星期几（0=周日, 1=周一...6=周六）
+      let firstDayIndex = firstDay.getDay();
+      // 调整：周一为0，周日为6
+      firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1;
+      
+      // 添加上个月的空白格子
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day other-month';
+        calendarGrid.appendChild(emptyDay);
+      }
+      
+      // 添加当月的每一天
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const date = new Date(year, month, day);
+        const isToday = date.getTime() === today.getTime();
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        if (isToday) dayElement.classList.add('today');
+        if (isWeekend) dayElement.classList.add('weekend');
+        
+        // 添加日期数字
+        const dayNumber = document.createElement('div');
+        dayNumber.className = 'day-number';
+        dayNumber.textContent = day;
+        dayElement.appendChild(dayNumber);
+        
+        // 添加查寝人员容器（确保每个格子高度一致）
+        const dutyPerson = document.createElement('div');
+        dutyPerson.className = 'duty-person';
+        
+        // 计算查寝人员（仅当日期在起始日期之后）
+        if (date >= startDate) {
+          const daysDiff = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+          
+          // 计算男生查寝人员
+          const boyIndex = daysDiff % dutyData.boys.length;
+          const boyName = dutyData.boys[boyIndex];
+          
+          // 计算女生查寝人员
+          const girlIndex = daysDiff % dutyData.girls.length;
+          const girlName = dutyData.girls[girlIndex];
+          
+          // 添加查寝人员信息
+          const boysDuty = document.createElement('div');
+          boysDuty.className = 'boys-duty';
+          boysDuty.innerHTML = `<i class="fas fa-male"></i> ${boyName}`;
+          
+          const girlsDuty = document.createElement('div');
+          girlsDuty.className = 'girls-duty';
+          girlsDuty.innerHTML = `<i class="fas fa-female"></i> ${girlName}`;
+          
+          dutyPerson.appendChild(boysDuty);
+          dutyPerson.appendChild(girlsDuty);
+        } else {
+          // 添加占位内容，确保所有格子高度一致
+          const noDuty = document.createElement('div');
+          noDuty.className = 'no-duty';
+          noDuty.textContent = ' ';
+          dutyPerson.appendChild(noDuty);
+          dutyPerson.appendChild(noDuty);
         }
-        button {
-            padding: 8px 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <p>请输入我名字的最后一个字获取我的手机号</p>
-        <input type="text" id="inputField" placeholder="请输入文本">
-        <button onclick="checkInput()">确定</button>
-    </div>
-
-    <script>
-        function checkInput() {
-            // 获取输入框的值
-            const inputText = document.getElementById('inputField').value;
-            
-            // 定义正确密码
-            const correctText = "钢";
-            
-            // 验证输入内容
-            if (inputText === correctText) {
-                alert("验证成功！\n我的手机号码是18960538152\n联系我吧");
-            } else {
-                alert("输入错误，请重新尝试！");
-            }
-        }
-    </script>
-</body>
+        
+        dayElement.appendChild(dutyPerson);
+        calendarGrid.appendChild(dayElement);
+      }
+      
+      // 确保日历网格有42个格子（6行）
+      const totalCells = calendarGrid.children.length;
+      const remainingCells = 42 - totalCells;
+      
+      for (let i = 0; i < remainingCells; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day other-month';
+        calendarGrid.appendChild(emptyDay);
+      }
+    }
+  </script>  
+ </body>
 </html>
