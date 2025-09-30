@@ -313,6 +313,7 @@
             border-radius: 8px;
             transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
         }
 
         .contact-item:hover {
@@ -408,11 +409,174 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        
+        /* 新增的弹窗样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+            position: relative;
+            border: 1px solid rgba(74, 143, 231, 0.3);
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(74, 143, 231, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #4a8fe7;
+            margin-right: 15px;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            color: #f5f5f5;
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .modal-info {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .modal-info-label {
+            color: #8d8d8d;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .modal-info-value {
+            color: #f5f5f5;
+            font-size: 16px;
+            word-break: break-all;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-btn-primary {
+            background: #4a8fe7;
+            color: white;
+        }
+        
+        .modal-btn-primary:hover {
+            background: #3a7ed7;
+            transform: translateY(-2px);
+        }
+        
+        .modal-btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #8d8d8d;
+        }
+        
+        .modal-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .qr-code {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #2c2c2c, #3a3a3a);
+            border: 1px dashed #4a8fe7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a8fe7;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 头部信息 -->
+      <!-- 头部信息 -->
         <header>
             <div class="avatar">
                 <i class="fas fa-user-graduate"></i>
@@ -560,7 +724,7 @@
                             <span class="tech-tag">CSS</span>
                             <span class="tech-tag">JavaScript</span>
                         </div>
-                        <a href="aixin1.html" class="project-link">查看表白页面 →</a>
+                        <a href="aixin1.html" class="project-link">点击查看 →</a>
                     </div>
                 </div>
                 
@@ -594,13 +758,13 @@
                 </div>
             </div>
         </section>
-        
+
         <!-- 联系方式 -->
         <section class="section">
             <h2 class="section-title"><i class="fas fa-envelope"></i> 联系我</h2>
             <p>欢迎同学和学长学姐交流：</p>
             <div class="contact-methods">
-                <div class="contact-item">
+                <div class="contact-item" data-platform="github">
                     <div class="contact-icon">
                         <i class="fab fa-github"></i>
                     </div>
@@ -609,7 +773,7 @@
                         <div style="font-size: 12px; color: #8d8d8d;">只有几个README</div>
                     </div>
                 </div>
-                <div class="contact-item">
+                <div class="contact-item" data-platform="qq">
                     <div class="contact-icon">
                         <i class="fab fa-qq"></i>
                     </div>
@@ -618,7 +782,7 @@
                         <div style="font-size: 12px; color: #8d8d8d;">主要用来加班级群</div>
                     </div>
                 </div>
-                <div class="contact-item">
+                <div class="contact-item" data-platform="weixin">
                     <div class="contact-icon">
                         <i class="fab fa-weixin"></i>
                     </div>
@@ -627,7 +791,7 @@
                         <div style="font-size: 12px; color: #8d8d8d;">扫码加我（假装有码）</div>
                     </div>
                 </div>
-                <div class="contact-item">
+                <div class="contact-item" data-platform="email">
                     <div class="contact-icon">
                         <i class="fas fa-envelope"></i>
                     </div>
@@ -646,29 +810,163 @@
         </footer>
     </div>
 
+    <!-- 弹窗结构 -->
+    <div class="modal-overlay" id="socialModal">
+        <div class="modal-content">
+            <div class="close-btn">
+                <i class="fas fa-times"></i>
+            </div>
+            <div class="modal-header">
+                <div class="modal-icon" id="modalIcon">
+                    <i class="fab fa-github"></i>
+                </div>
+                <h2 class="modal-title" id="modalTitle">GitHub</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-info">
+                    <div class="modal-info-label">用户名</div>
+                    <div class="modal-info-value" id="username">coder_student</div>
+                </div>
+                <div class="modal-info">
+                    <div class="modal-info-label">状态</div>
+                    <div class="modal-info-value" id="status">只有几个README</div>
+                </div>
+                <div class="modal-info">
+                    <div class="modal-info-label">描述</div>
+                    <div class="modal-info-value" id="description">主要用来存放学习笔记和课程项目</div>
+                </div>
+                <div id="qrContainer" class="qr-code">
+                    <div class="qr-placeholder">二维码占位符</div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" id="closeModal">关闭</button>
+                <button class="modal-btn modal-btn-primary" id="actionBtn">访问</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 添加一些简单的交互效果
-        document.addEventListener('DOMContentLoaded', function() {
-            // 进度条动画
-            const skillLevels = document.querySelectorAll('.skill-level');
-            skillLevels.forEach(level => {
-                const width = level.style.width;
-                level.style.width = '0';
-                setTimeout(() => {
-                    level.style.width = width;
-                }, 500);
+        // 社交平台数据
+        const socialData = {
+            github: {
+                title: "GitHub",
+                icon: "fab fa-github",
+                username: "coder_student",
+                status: "只有几个README",
+                description: "主要用来存放学习笔记和课程项目",
+                actionText: "访问主页",
+                actionUrl: "https://github.com/coder_student",
+                showQR: false
+            },
+            qq: {
+                title: "QQ",
+                icon: "fab fa-qq",
+                username: "123456789",
+                status: "主要用来加班级群",
+                description: "加好友请备注姓名和来意",
+                actionText: "添加好友",
+                actionUrl: "https://im.qq.com/",
+                showQR: false
+            },
+            weixin: {
+                title: "微信",
+                icon: "fab fa-weixin",
+                username: "wechat_student",
+                status: "扫码加我（假装有码）",
+                description: "添加时请注明身份和来意",
+                actionText: "复制微信号",
+                actionUrl: "wechat_student",
+                showQR: true
+            },
+            email: {
+                title: "邮箱",
+                icon: "fas fa-envelope",
+                username: "student@example.com",
+                status: "主要收验证码",
+                description: "学习交流请优先使用其他联系方式",
+                actionText: "发送邮件",
+                actionUrl: "mailto:student@example.com",
+                showQR: false
+            }
+        };
+
+        // 获取DOM元素
+        const modalOverlay = document.getElementById('socialModal');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalTitle = document.getElementById('modalTitle');
+        const usernameEl = document.getElementById('username');
+        const statusEl = document.getElementById('status');
+        const descriptionEl = document.getElementById('description');
+        const qrContainer = document.getElementById('qrContainer');
+        const actionBtn = document.getElementById('actionBtn');
+        const closeModalBtn = document.getElementById('closeModal');
+        const closeBtn = document.querySelector('.close-btn');
+
+        // 为每个联系卡片添加点击事件
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const platform = item.getAttribute('data-platform');
+                const data = socialData[platform];
+                
+                // 更新弹窗内容
+                modalIcon.innerHTML = `<i class="${data.icon}"></i>`;
+                modalTitle.textContent = data.title;
+                usernameEl.textContent = data.username;
+                statusEl.textContent = data.status;
+                descriptionEl.textContent = data.description;
+                actionBtn.textContent = data.actionText;
+                
+                // 显示或隐藏二维码
+                if (data.showQR) {
+                    qrContainer.style.display = 'flex';
+                } else {
+                    qrContainer.style.display = 'none';
+                }
+                
+                // 设置按钮行为
+                actionBtn.onclick = function() {
+                    if (platform === 'weixin') {
+                        // 复制微信号到剪贴板
+                        navigator.clipboard.writeText(data.username)
+                            .then(() => {
+                                alert('微信号已复制到剪贴板');
+                            })
+                            .catch(err => {
+                                console.error('复制失败:', err);
+                            });
+                    } else {
+                        // 打开链接
+                        window.open(data.actionUrl, '_blank');
+                    }
+                };
+                
+                // 显示弹窗
+                modalOverlay.classList.add('active');
             });
-            
-            // 添加点击事件，让emoji有反应
-            const emojis = document.querySelectorAll('.emoji');
-            emojis.forEach(emoji => {
-                emoji.addEventListener('click', function() {
-                    this.style.transform = 'scale(1.5)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 500);
-                });
-            });
+        });
+
+        // 关闭弹窗
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        // 添加关闭事件
+        closeModalBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', closeModal);
+        
+        // 点击遮罩层关闭弹窗
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+        
+        // 按ESC键关闭弹窗
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                closeModal();
+            }
         });
     </script>
 </body>
