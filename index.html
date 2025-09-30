@@ -557,7 +557,14 @@
             justify-content: center;
             margin: 20px 0;
         }
-        
+                .qr-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid rgba(74, 143, 231, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
         .qr-placeholder {
             width: 150px;
             height: 150px;
@@ -788,7 +795,7 @@
                     </div>
                     <div>
                         <div>微信</div>
-                        <div style="font-size: 12px; color: #8d8d8d;">扫码加我（假装有码）</div>
+                        <div style="font-size: 12px; color: #8d8d8d;">用于回复“收到”</div>
                     </div>
                 </div>
                 <div class="contact-item" data-platform="email">
@@ -852,32 +859,34 @@
             github: {
                 title: "GitHub",
                 icon: "fab fa-github",
-                username: "coder_student",
+                username: "GuZhi223",
                 status: "只有几个README",
                 description: "主要用来存放学习笔记和课程项目",
                 actionText: "访问主页",
-                actionUrl: "https://github.com/coder_student",
+                actionUrl: "https://github.com/GuZhi223",
                 showQR: false
             },
             qq: {
                 title: "QQ",
                 icon: "fab fa-qq",
-                username: "123456789",
-                status: "主要用来加班级群",
+                username: "1034687640",
+                status: "主要用来加班级群和登录游戏",
                 description: "加好友请备注姓名和来意",
                 actionText: "添加好友",
-                actionUrl: "https://im.qq.com/",
+                actionUrl: "https://qm.qq.com/q/pIPK6ZC5kO",
                 showQR: false
             },
             weixin: {
                 title: "微信",
                 icon: "fab fa-weixin",
                 username: "wechat_student",
-                status: "扫码加我（假装有码）",
+                status: "扫码加我",
                 description: "添加时请注明身份和来意",
                 actionText: "复制微信号",
                 actionUrl: "wechat_student",
-                showQR: true
+                showQR: true,
+                // 使用您提供的微信二维码直链
+                qrCodeUrl: "https://img.cdn1.vip/i/68db57ce74606_1759205326.jpg"
             },
             email: {
                 title: "邮箱",
@@ -886,7 +895,7 @@
                 status: "主要收验证码",
                 description: "学习交流请优先使用其他联系方式",
                 actionText: "发送邮件",
-                actionUrl: "mailto:student@example.com",
+                actionUrl: "1034687640@qq.com",
                 showQR: false
             }
         };
@@ -919,10 +928,19 @@
                 
                 // 显示或隐藏二维码
                 if (data.showQR) {
+                    // 创建二维码图片元素
+                    qrContainer.innerHTML = '';
+                    const qrImg = document.createElement('img');
+                    qrImg.src = data.qrCodeUrl;
+                    qrImg.alt = `${data.title}二维码`;
+                    qrImg.className = 'qr-image';
+                    qrContainer.appendChild(qrImg);
                     qrContainer.style.display = 'flex';
                 } else {
+                    qrContainer.innerHTML = '<div class="qr-placeholder">无二维码</div>';
                     qrContainer.style.display = 'none';
                 }
+
                 
                 // 设置按钮行为
                 actionBtn.onclick = function() {
