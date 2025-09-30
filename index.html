@@ -879,11 +879,11 @@
             weixin: {
                 title: "微信",
                 icon: "fab fa-weixin",
-                username: "wechat_student",
+                username: "l18960538152",
                 status: "扫码加我",
                 description: "添加时请注明身份和来意",
                 actionText: "复制微信号",
-                actionUrl: "wechat_student",
+                actionUrl: "l18960538152",
                 showQR: true,
                 // 使用您提供的微信二维码直链
                 qrCodeUrl: "https://img.cdn1.vip/i/68db57ce74606_1759205326.jpg"
@@ -891,7 +891,7 @@
             email: {
                 title: "邮箱",
                 icon: "fas fa-envelope",
-                username: "student@example.com",
+                username: "1034687640@qq.com",
                 status: "主要收验证码",
                 description: "学习交流请优先使用其他联系方式",
                 actionText: "发送邮件",
@@ -944,11 +944,11 @@
                 
                 // 设置按钮行为
                 actionBtn.onclick = function() {
-                    if (platform === 'weixin') {
+                    if (platform === 'weixin'||platform === 'email') {
                         // 复制微信号到剪贴板
                         navigator.clipboard.writeText(data.username)
                             .then(() => {
-                                alert('微信号已复制到剪贴板');
+                                alert('已复制到剪贴板');
                             })
                             .catch(err => {
                                 console.error('复制失败:', err);
