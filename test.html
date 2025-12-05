@@ -131,7 +131,18 @@
         // --- 全局变量定义 ---
         let scene, camera, renderer, particles, geometry, material;
         let positionsAttribute;
-        
+                    // --- 调试版材质 (Debug Material) ---
+            // 目的：不使用纹理，不透明，尺寸巨大，确保肉眼能看见
+            material = new THREE.PointsMaterial({ 
+                color: 0xff0000,     // 纯红色，极度显眼
+                size: 2.0,           // 尺寸放大 10 倍 (原来是 0.25)
+                sizeAttenuation: true, 
+                map: null,           // ❌ 移除纹理，只显示方块
+                transparent: false,  // ❌ 关闭透明，防止看不清
+                opacity: 1.0,
+                depthWrite: true     // 开启深度写入
+            });
+
         // 粒子位置数据
         let currentPositions = []; // 当前实际位置
         let targetPositions = [];  // 目标形状位置
