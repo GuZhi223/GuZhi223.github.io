@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>沉浸式3D手势控制塔罗牌占卜</title>
+  <title>星门塔罗 | 3D 手势抽牌</title>
   <style>
     :root {
       --theme: #b78cff;
@@ -155,7 +155,14 @@
 
     textarea::placeholder { color: rgba(245,239,255,.42); }
 
-    .start-btn, .panel button {
+    .action-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .start-btn, .ghost-btn, .panel button, .restart-btn {
       border: 0;
       cursor: pointer;
       color: white;
@@ -165,18 +172,47 @@
       transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
     }
 
-    .start-btn {
+    .start-btn, .ghost-btn {
       width: 100%;
-      margin-top: 18px;
       padding: 15px 20px;
       font-size: 15px;
       background: linear-gradient(135deg, var(--theme), #ff81d8);
       box-shadow: 0 16px 42px rgba(183,140,255,.28);
     }
 
-    .start-btn:hover, .panel button:hover {
+    .ghost-btn {
+      color: rgba(245,239,255,.88);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: none;
+    }
+
+    .start-btn:hover, .ghost-btn:hover, .panel button:hover, .restart-btn:hover {
       transform: translateY(-1px);
       filter: brightness(1.08);
+    }
+
+    .seed-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 0 16px;
+    }
+
+    .seed-btn {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 7px 10px;
+      color: rgba(245,239,255,.74);
+      background: rgba(255,255,255,.07);
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .seed-btn:hover {
+      color: white;
+      border-color: rgba(255,255,255,.3);
     }
 
     .panel {
@@ -212,6 +248,33 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
+    }
+
+    .phase-track {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .phase {
+      min-height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 999px;
+      color: rgba(245,239,255,.48);
+      background: rgba(255,255,255,.05);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+    }
+
+    .phase.active {
+      color: white;
+      border-color: rgba(255,255,255,.24);
+      background: linear-gradient(135deg, rgba(183,140,255,.28), rgba(255,129,216,.16));
+      box-shadow: 0 0 18px rgba(183,140,255,.16);
     }
 
     .dot {
@@ -309,15 +372,17 @@
       z-index: 30;
       left: 50%;
       bottom: 42px;
-      width: min(720px, calc(100vw - 42px));
+      width: min(760px, calc(100vw - 42px));
       transform: translateX(-50%) translateY(28px);
       opacity: 0;
       pointer-events: none;
       transition: opacity .8s ease, transform .8s ease;
       border: 1px solid rgba(255,255,255,.16);
       border-radius: 24px;
-      padding: 18px 22px;
-      background: rgba(10, 7, 23, .68);
+      padding: 22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.04)),
+        rgba(10, 7, 23, .74);
       backdrop-filter: blur(16px);
       box-shadow: 0 20px 70px rgba(0,0,0,.42);
       text-align: center;
@@ -325,7 +390,22 @@
 
     .question-result.show {
       opacity: 1;
+      pointer-events: auto;
       transform: translateX(-50%) translateY(0);
+    }
+
+    .result-kicker {
+      margin-bottom: 6px;
+      color: rgba(245,239,255,.58);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .18em;
+    }
+
+    .question-result h2 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 5vw, 46px);
+      line-height: 1.1;
     }
 
     .question-result .q {
@@ -338,6 +418,42 @@
       color: white;
       font-size: 16px;
       line-height: 1.75;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 14px;
+      text-align: left;
+    }
+
+    .result-note {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,.055);
+    }
+
+    .result-note strong {
+      display: block;
+      margin-bottom: 4px;
+      color: rgba(255,255,255,.94);
+      font-size: 13px;
+    }
+
+    .result-note span {
+      color: rgba(245,239,255,.7);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .restart-btn {
+      margin-top: 16px;
+      padding: 11px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(183,140,255,.9), rgba(255,129,216,.86));
+      box-shadow: 0 12px 32px rgba(183,140,255,.2);
     }
 
     .video-wrap {
@@ -387,7 +503,13 @@
       .control { padding: 0; border-top: 0; }
       .hint { display: none; }
       .video-wrap { width: 132px; height: 99px; left: 12px; top: 12px; }
-      .question-result { bottom: 190px; }
+      .question-result {
+        bottom: 164px;
+        max-height: calc(100vh - 190px);
+        overflow: auto;
+      }
+      .result-grid { grid-template-columns: 1fr; }
+      .action-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -401,9 +523,17 @@
       <div class="intro-card">
         <div class="sigil"></div>
         <h1>星门塔罗</h1>
-        <p>把心中的问题写下来。摄像头启动后，移动手掌选择牌位；张开手、握拳、再张开，完成一次抽取。</p>
+        <p>把心中的问题写下来。你可以用摄像头手势抽牌，也可以直接用鼠标或触摸滑动画面，让牌阵回应你的选择。</p>
+        <div class="seed-row" aria-label="问题灵感">
+          <button class="seed-btn" data-seed="我现在最该看清什么？">看清什么</button>
+          <button class="seed-btn" data-seed="这件事下一步应该怎么推进？">下一步</button>
+          <button class="seed-btn" data-seed="我需要放下什么，保留什么？">取舍</button>
+        </div>
         <textarea id="questionInput" placeholder="例如：我现在应该如何看待这段关系 / 这件事下一步该怎么走？"></textarea>
-        <button id="startBtn" class="start-btn">开始感知</button>
+        <div class="action-row">
+          <button id="startBtn" class="start-btn">手势抽牌</button>
+          <button id="manualBtn" class="ghost-btn">直接抽牌</button>
+        </div>
       </div>
     </section>
 
@@ -412,6 +542,11 @@
       <div class="status">
         <span id="statusDot" class="dot"></span>
         <span id="statusText">等待开始感知</span>
+      </div>
+      <div class="phase-track" aria-label="抽牌阶段">
+        <span class="phase active" data-phase="waitingOpen">定问</span>
+        <span class="phase" data-phase="fistSeen">聚焦</span>
+        <span class="phase" data-phase="drawn">揭牌</span>
       </div>
 
       <div class="control">
@@ -443,12 +578,25 @@
     </div>
 
     <div class="hint">
-      手势说明：手掌左右移动会旋转牌堆；离正前方最近的牌会浮起发光。完成「张开 → 握拳 → 张开」后抽出当前高亮牌。
+      手势说明：手掌左右移动会旋转牌堆；离正前方最近的牌会浮起发光。完成「张开 → 握拳 → 张开」后抽出当前高亮牌。没有摄像头时，移动鼠标或手指选择牌位，点击画面即可抽取。
     </div>
 
     <div id="resultBox" class="question-result">
+      <div class="result-kicker">THE CARD OPENS</div>
+      <h2 id="resultTitle"></h2>
       <div id="resultQuestion" class="q"></div>
       <div id="resultAnswer" class="a"></div>
+      <div class="result-grid">
+        <div class="result-note">
+          <strong>关键词</strong>
+          <span id="resultKeyword"></span>
+        </div>
+        <div class="result-note">
+          <strong>行动建议</strong>
+          <span id="resultAction"></span>
+        </div>
+      </div>
+      <button id="restartBtn" class="restart-btn">重新开启</button>
     </div>
   </div>
 
@@ -492,10 +640,12 @@
       targetDeckRotation: 0,
       highlightedIndex: 0,
       handX: 0.5,
+      manualMode: false,
       gesture: "unknown",
       gesturePhase: "waitingOpen",
       lastGestureChange: performance.now(),
-      lastHandSeen: 0
+      lastHandSeen: 0,
+      chosenCardName: ""
     };
 
     const canvas = document.getElementById("threeCanvas");
@@ -884,10 +1034,12 @@
     function drawSelectedCard() {
       if (appState.drawn) return;
       appState.drawn = true;
+      updatePhase("drawn");
       setStatus("抽卡完成，正在翻开牌面", true);
 
       const selected = cards[appState.highlightedIndex];
-      const tarot = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
+      const tarot = pickTarot();
+      appState.chosenCardName = tarot.name;
       const frontTexture = makeRoundedCardTexture("front", tarot);
       disposeCardTextureIfNeeded(selected.userData.baseMat);
       selected.userData.baseMat.map = frontTexture;
@@ -912,11 +1064,64 @@
         .call(() => showResult(tarot));
     }
 
+    function pickTarot() {
+      const source = `${appState.userQuestion}|${appState.highlightedIndex}|${new Date().toDateString()}`;
+      let hash = 0;
+      for (let i = 0; i < source.length; i++) {
+        hash = ((hash << 5) - hash + source.charCodeAt(i)) | 0;
+      }
+      const index = Math.abs(hash) % tarotDeck.length;
+      return tarotDeck[index];
+    }
+
+    function buildReading(tarot) {
+      const keywordMap = {
+        "愚者": "开始 / 试错 / 保持轻盈",
+        "魔术师": "资源 / 执行 / 主动组合",
+        "女祭司": "直觉 / 暂停 / 隐藏信息",
+        "女皇": "滋养 / 生长 / 耐心",
+        "皇帝": "边界 / 规则 / 责任",
+        "教皇": "经验 / 指引 / 传统路径",
+        "恋人": "选择 / 价值排序 / 关系",
+        "战车": "方向 / 纪律 / 推进",
+        "力量": "温和 / 自控 / 长期主义",
+        "隐者": "独处 / 复盘 / 看清",
+        "命运之轮": "变化 / 时机 / 窗口",
+        "正义": "事实 / 后果 / 公平",
+        "倒吊人": "换角度 / 停顿 / 松手",
+        "死神": "结束 / 转场 / 新空间",
+        "节制": "调和 / 节奏 / 平衡",
+        "恶魔": "依赖 / 消耗 / 松绑",
+        "高塔": "破局 / 暴露问题 / 重建",
+        "星星": "希望 / 恢复 / 重新相信",
+        "月亮": "情绪 / 投射 / 不确定",
+        "太阳": "坦诚 / 明亮 / 简单",
+        "审判": "评估 / 唤醒 / 重新选择",
+        "世界": "完成 / 收束 / 下一阶段"
+      };
+      const actions = [
+        "把问题拆成一个今天能完成的小动作，先别追求完美答案。",
+        "给自己十分钟写下事实、猜测和情绪，把三者分开看。",
+        "找一个可信的人复述你的判断，看看哪里还站不稳。",
+        "先暂停一次冲动选择，让明天的自己再确认。",
+        "把最消耗你的环节减掉一点，把最有效的环节重复一次。"
+      ];
+      const seed = Math.abs((tarot.name.charCodeAt(0) || 0) + appState.highlightedIndex);
+      return {
+        keyword: keywordMap[tarot.name] || "观察 / 选择 / 行动",
+        action: actions[seed % actions.length]
+      };
+    }
+
     function showResult(tarot) {
+      const reading = buildReading(tarot);
+      document.getElementById("resultTitle").textContent = tarot.name;
       document.getElementById("resultQuestion").textContent = `你的问题：${appState.userQuestion || "那个还没有说出口的问题"}`;
-      document.getElementById("resultAnswer").innerHTML = `<strong>${tarot.name}</strong>：${tarot.meaning}`;
+      document.getElementById("resultAnswer").textContent = tarot.meaning;
+      document.getElementById("resultKeyword").textContent = reading.keyword;
+      document.getElementById("resultAction").textContent = reading.action;
       document.getElementById("resultBox").classList.add("show");
-      setStatus("仪式完成，可以刷新页面重新开始", true);
+      setStatus("仪式完成，可以点击结果面板重新开启", true);
     }
 
     let prevTime = performance.now();
@@ -961,12 +1166,67 @@
       else await document.exitFullscreen().catch(() => {});
     });
 
+    document.querySelectorAll(".seed-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.getElementById("questionInput").value = btn.dataset.seed;
+      });
+    });
+
     document.getElementById("startBtn").addEventListener("click", async () => {
       appState.userQuestion = document.getElementById("questionInput").value.trim();
       document.getElementById("intro").classList.add("hidden");
       appState.started = true;
+      appState.manualMode = false;
+      updatePhase("waitingOpen");
       setStatus("正在请求摄像头权限", false);
       await startHandTracking();
+    });
+
+    document.getElementById("manualBtn").addEventListener("click", () => {
+      startManualMode();
+    });
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      window.location.reload();
+    });
+
+    function startManualMode() {
+      appState.userQuestion = document.getElementById("questionInput").value.trim();
+      document.getElementById("intro").classList.add("hidden");
+      appState.started = true;
+      appState.manualMode = true;
+      updatePhase("fistSeen");
+      setStatus("移动鼠标或手指选择牌位，点击画面抽牌", true);
+    }
+
+    function updatePhase(phase) {
+      document.querySelectorAll(".phase").forEach(item => {
+        item.classList.toggle("active", item.dataset.phase === phase);
+      });
+    }
+
+    function updatePointerSelection(clientX) {
+      if (!appState.started || appState.drawn) return;
+      const x = Math.min(Math.max(clientX / window.innerWidth, 0), 1);
+      appState.handX += (x - appState.handX) * 0.5;
+      appState.targetDeckRotation = (appState.handX - 0.5) * Math.PI * 2.15;
+      if (appState.manualMode) intensifyParticles();
+    }
+
+    canvas.addEventListener("pointermove", e => updatePointerSelection(e.clientX));
+    canvas.addEventListener("pointerdown", () => {
+      if (appState.manualMode && appState.started && !appState.drawn) {
+        pulseDeck();
+        drawSelectedCard();
+      }
+    });
+
+    window.addEventListener("keydown", e => {
+      if ((e.key === "Enter" || e.key === " ") && appState.manualMode && !appState.drawn) {
+        e.preventDefault();
+        pulseDeck();
+        drawSelectedCard();
+      }
     });
 
     function setStatus(text, ok) {
@@ -1004,7 +1264,9 @@
         requestAnimationFrame(handLoop);
       } catch (err) {
         console.error(err);
-        setStatus("摄像头启动失败，请检查浏览器权限", false);
+        appState.manualMode = true;
+        updatePhase("fistSeen");
+        setStatus("摄像头启动失败，已切换为点击抽牌模式", false);
       }
     }
 
@@ -1149,6 +1411,7 @@
       if (appState.gesturePhase === "waitingOpen") {
         if (gesture === "open") {
           appState.gesturePhase = "openSeen";
+          updatePhase("waitingOpen");
           setStatus("已感知张开手掌，握拳抓取当前牌", true);
         } else {
           setStatus("请先张开手掌，让牌堆响应你的位置", true);
@@ -1159,6 +1422,7 @@
       if (appState.gesturePhase === "openSeen") {
         if (gesture === "fist") {
           appState.gesturePhase = "fistSeen";
+          updatePhase("fistSeen");
           pulseDeck();
           setStatus("已握拳，松开手掌完成抽卡", true);
         }
