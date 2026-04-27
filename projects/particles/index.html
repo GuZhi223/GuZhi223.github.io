@@ -205,7 +205,7 @@
       margin-top: 34px;
     }
 
-    .start-btn, .ghost-btn, .panel button, .restart-btn {
+    .start-btn, .ghost-btn, .restart-btn {
       border: 0;
       cursor: pointer;
       color: white;
@@ -230,7 +230,7 @@
       border-color: rgba(255,255,255,.16);
     }
 
-    .start-btn:hover, .ghost-btn:hover, .panel button:hover, .restart-btn:hover {
+    .start-btn:hover, .ghost-btn:hover, .restart-btn:hover {
       transform: translateY(-1px);
       filter: none;
       color: var(--gold);
@@ -263,37 +263,31 @@
       border-color: rgba(241,214,138,.38);
     }
 
-    .panel {
+    .hud {
       position: fixed;
       z-index: 20;
-      top: 50%;
-      right: 22px;
-      width: 280px;
-      transform: translateY(-50%);
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 26px;
-      padding: 18px;
-      background: var(--panel);
-      backdrop-filter: blur(18px) saturate(1.25);
-      box-shadow: 0 22px 66px rgba(0,0,0,.36), inset 0 0 40px rgba(255,255,255,.03);
-    }
-
-    .panel h2 {
-      margin: 2px 0 14px;
-      font-size: 16px;
-      letter-spacing: .08em;
+      left: 50%;
+      top: 18px;
+      width: min(520px, calc(100vw - 32px));
+      transform: translateX(-50%);
+      pointer-events: none;
     }
 
     .status {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       min-height: 28px;
-      padding: 8px 10px;
-      margin-bottom: 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.07);
-      color: var(--muted);
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto 10px;
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      background: rgba(6, 4, 15, .38);
+      color: rgba(245,239,255,.62);
+      backdrop-filter: blur(12px);
       font-size: 12px;
       line-height: 1.45;
     }
@@ -302,7 +296,8 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 7px;
-      margin-bottom: 14px;
+      width: min(340px, 100%);
+      margin: 0 auto;
     }
 
     .phase {
@@ -337,66 +332,6 @@
     .dot.on {
       background: #80ffcd;
       box-shadow: 0 0 16px #80ffcd;
-    }
-
-    .control {
-      padding: 12px 0;
-      border-top: 1px solid rgba(255,255,255,.1);
-    }
-
-    .control label {
-      display: block;
-      margin-bottom: 9px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .08em;
-    }
-
-    .segmented {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .mode-btn, .panel button.fullscreen {
-      width: 100%;
-      padding: 11px 12px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.11);
-      box-shadow: none;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .04em;
-      text-align: left;
-    }
-
-    .mode-btn.active {
-      background: linear-gradient(135deg, rgba(183,140,255,.34), rgba(255,129,216,.22));
-      border-color: rgba(255,255,255,.24);
-      box-shadow: 0 0 24px rgba(183,140,255,.18);
-    }
-
-    .color-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    input[type="color"] {
-      width: 54px;
-      height: 42px;
-      border: 0;
-      padding: 0;
-      border-radius: 14px;
-      overflow: hidden;
-      background: transparent;
-      cursor: pointer;
-    }
-
-    .color-value {
-      color: var(--muted);
-      font-size: 13px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
 
     .hint {
@@ -535,20 +470,9 @@
     }
 
     @media (max-width: 900px) {
-      .panel {
-        top: auto;
-        right: 12px;
-        left: 12px;
-        bottom: 12px;
-        width: auto;
-        transform: none;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px 14px;
-        padding: 14px;
-      }
-      .panel h2, .status { grid-column: 1 / -1; margin-bottom: 4px; }
-      .control { padding: 0; border-top: 0; }
+      .hud { top: 10px; }
+      .status { font-size: 11px; margin-bottom: 7px; }
+      .phase { min-height: 26px; font-size: 10px; }
       .hint { display: none; }
       .video-wrap { width: 132px; height: 99px; left: 12px; top: 12px; }
       .question-result {
@@ -585,8 +509,7 @@
       </div>
     </section>
 
-    <aside class="panel">
-      <h2>仪式控制台</h2>
+    <aside class="hud">
       <div class="status">
         <span id="statusDot" class="dot"></span>
         <span id="statusText">等待开始感知</span>
@@ -595,28 +518,6 @@
         <span class="phase active" data-phase="waitingOpen">定问</span>
         <span class="phase" data-phase="fistSeen">聚焦</span>
         <span class="phase" data-phase="drawn">揭牌</span>
-      </div>
-
-      <div class="control">
-        <label>粒子阵列</label>
-        <div class="segmented">
-          <button class="mode-btn active" data-mode="nebula">星云环绕</button>
-          <button class="mode-btn" data-mode="circle">魔法阵</button>
-          <button class="mode-btn" data-mode="vortex">能量旋涡</button>
-        </div>
-      </div>
-
-      <div class="control">
-        <label>灵光颜色</label>
-        <div class="color-row">
-          <input id="colorPicker" type="color" value="#b78cff" />
-          <span id="colorValue" class="color-value">#b78cff</span>
-        </div>
-      </div>
-
-      <div class="control">
-        <label>显示</label>
-        <button id="fullscreenBtn" class="fullscreen">切换全屏</button>
       </div>
     </aside>
 
@@ -683,7 +584,7 @@
       drawn: false,
       userQuestion: "",
       theme: new THREE.Color("#b78cff"),
-      particleMode: "nebula",
+      particleMode: "cosmos",
       deckRotation: 0,
       targetDeckRotation: 0,
       highlightedIndex: 0,
@@ -693,7 +594,8 @@
       gesturePhase: "waitingOpen",
       lastGestureChange: performance.now(),
       lastHandSeen: 0,
-      chosenCardName: ""
+      chosenCardName: "",
+      cameraReady: false
     };
 
     const canvas = document.getElementById("threeCanvas");
@@ -902,7 +804,7 @@
 
     for (let i = 0; i < CARD_COUNT; i++) createCard(i);
 
-    const particleCount = 2200;
+    const particleCount = 4600;
     const particleGeo = new THREE.BufferGeometry();
     const particlePositions = new Float32Array(particleCount * 3);
     const particleTargets = new Float32Array(particleCount * 3);
@@ -913,7 +815,7 @@
       particleSeeds[i * 4 + 1] = Math.random();
       particleSeeds[i * 4 + 2] = Math.random();
       particleSeeds[i * 4 + 3] = Math.random();
-      const p = getParticleTarget(i, "nebula", 0);
+      const p = getParticleTarget(i, "cosmos", 0);
       particlePositions[i * 3] = p.x;
       particlePositions[i * 3 + 1] = p.y;
       particlePositions[i * 3 + 2] = p.z;
@@ -925,9 +827,9 @@
     particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
     const particleMat = new THREE.PointsMaterial({
       color: appState.theme,
-      size: 0.035,
+      size: 0.052,
       transparent: true,
-      opacity: 0.78,
+      opacity: 0.9,
       depthWrite: false,
       blending: THREE.AdditiveBlending
     });
@@ -941,19 +843,19 @@
       const d = particleSeeds[i * 4 + 3];
 
       if (mode === "circle") {
-        const ring = Math.floor(b * 5);
-        const r = 1.45 + ring * 0.46 + Math.sin(a * 7 + t * 0.8) * 0.025;
+        const ring = Math.floor(b * 8);
+        const r = 1.4 + ring * 0.55 + Math.sin(a * 9 + t * 1.2) * 0.06;
         return {
           x: Math.cos(a) * r,
-          y: -0.72 + ring * 0.07 + Math.sin(a * 12 + t) * 0.035,
+          y: -0.9 + ring * 0.08 + Math.sin(a * 14 + t) * 0.07,
           z: Math.sin(a) * r
         };
       }
 
       if (mode === "vortex") {
-        const height = (b - 0.5) * 4.1;
-        const twist = a + height * 1.8 + t * 0.62;
-        const r = 0.95 + c * 2.6 + Math.sin(t + c * 12) * 0.08;
+        const height = (b - 0.5) * 6.6;
+        const twist = a + height * 2.45 + t * 0.9;
+        const r = 0.65 + c * 4.4 + Math.sin(t * 1.2 + c * 14) * 0.18;
         return {
           x: Math.cos(twist) * r,
           y: height,
@@ -961,12 +863,17 @@
         };
       }
 
-      const theta = a + t * (0.06 + d * 0.05);
+      if (mode === "cosmos") {
+        const lane = d < 0.34 ? "nebula" : d < 0.67 ? "vortex" : "circle";
+        return getParticleTarget(i, lane, t);
+      }
+
+      const theta = a + t * (0.12 + d * 0.12);
       const phi = Math.acos(2 * b - 1);
-      const r = 2.1 + c * 2.4 + Math.sin(t * 0.6 + a * 3) * 0.06;
+      const r = 3.1 + c * 4.9 + Math.sin(t * 0.9 + a * 5) * 0.16;
       return {
         x: r * Math.sin(phi) * Math.cos(theta),
-        y: r * Math.cos(phi) * 0.72,
+        y: r * Math.cos(phi) * 0.9,
         z: r * Math.sin(phi) * Math.sin(theta)
       };
     }
@@ -991,7 +898,8 @@
       sideLight.color.copy(appState.theme);
       document.documentElement.style.setProperty("--theme", hex);
       document.documentElement.style.setProperty("--theme-soft", hexToRgba(hex, .22));
-      document.getElementById("colorValue").textContent = hex.toLowerCase();
+      const colorValue = document.getElementById("colorValue");
+      if (colorValue) colorValue.textContent = hex.toLowerCase();
       for (const c of cards) c.userData.edgeMat.color.copy(appState.theme);
     }
 
@@ -1048,12 +956,15 @@
       const pos = particleGeo.attributes.position.array;
       for (let i = 0; i < particleCount; i++) {
         const idx = i * 3;
-        pos[idx] += (particleTargets[idx] - pos[idx]) * 0.045;
-        pos[idx + 1] += (particleTargets[idx + 1] - pos[idx + 1]) * 0.045;
-        pos[idx + 2] += (particleTargets[idx + 2] - pos[idx + 2]) * 0.045;
+        pos[idx] += (particleTargets[idx] - pos[idx]) * 0.058;
+        pos[idx + 1] += (particleTargets[idx + 1] - pos[idx + 1]) * 0.058;
+        pos[idx + 2] += (particleTargets[idx + 2] - pos[idx + 2]) * 0.058;
       }
       particleGeo.attributes.position.needsUpdate = true;
-      particles.rotation.y = time * 0.035;
+      particleMat.size = 0.048 + Math.sin(time * 2.3) * 0.008;
+      particleMat.opacity = 0.82 + Math.sin(time * 1.7) * 0.12;
+      particles.rotation.y = time * 0.075;
+      particles.rotation.x = Math.sin(time * 0.21) * 0.16;
     }
 
     function scatterOtherCards(selected) {
@@ -1063,15 +974,15 @@
         const world = new THREE.Vector3();
         card.getWorldPosition(world);
         const base = i * 3;
-        for (let k = 0; k < 100 && base + k < particleCount; k++) {
+        for (let k = 0; k < 170 && base + k < particleCount; k++) {
           const pIndex = base + k;
           particlePositions[pIndex * 3] = world.x + (Math.random() - .5) * .4;
           particlePositions[pIndex * 3 + 1] = world.y + (Math.random() - .5) * .4;
           particlePositions[pIndex * 3 + 2] = world.z + (Math.random() - .5) * .4;
-          const out = world.clone().normalize().multiplyScalar(4 + Math.random() * 3);
-          particleTargets[pIndex * 3] = out.x + (Math.random() - .5) * 3;
-          particleTargets[pIndex * 3 + 1] = out.y + (Math.random() - .5) * 3;
-          particleTargets[pIndex * 3 + 2] = out.z + (Math.random() - .5) * 3;
+          const out = world.clone().normalize().multiplyScalar(6 + Math.random() * 5);
+          particleTargets[pIndex * 3] = out.x + (Math.random() - .5) * 5;
+          particleTargets[pIndex * 3 + 1] = out.y + (Math.random() - .5) * 5;
+          particleTargets[pIndex * 3 + 2] = out.z + (Math.random() - .5) * 5;
         }
         gsap.to(card.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.38, ease: "power2.in" });
         gsap.to(card.rotation, { x: card.rotation.x + Math.random() * 3, y: card.rotation.y + Math.random() * 3, duration: 0.42 });
@@ -1113,13 +1024,7 @@
     }
 
     function pickTarot() {
-      const source = `${appState.userQuestion}|${appState.highlightedIndex}|${new Date().toDateString()}`;
-      let hash = 0;
-      for (let i = 0; i < source.length; i++) {
-        hash = ((hash << 5) - hash + source.charCodeAt(i)) | 0;
-      }
-      const index = Math.abs(hash) % tarotDeck.length;
-      return tarotDeck[index];
+      return tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
     }
 
     function buildReading(tarot) {
@@ -1199,21 +1104,6 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    document.querySelectorAll(".mode-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        appState.particleMode = btn.dataset.mode;
-        updateParticleTargets(appState.particleMode, performance.now() / 1000);
-      });
-    });
-
-    document.getElementById("colorPicker").addEventListener("input", e => setTheme(e.target.value));
-    document.getElementById("fullscreenBtn").addEventListener("click", async () => {
-      if (!document.fullscreenElement) await document.documentElement.requestFullscreen().catch(() => {});
-      else await document.exitFullscreen().catch(() => {});
-    });
-
     document.querySelectorAll(".seed-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         document.getElementById("questionInput").value = btn.dataset.seed;
@@ -1235,7 +1125,7 @@
     });
 
     document.getElementById("restartBtn").addEventListener("click", () => {
-      window.location.reload();
+      resetReading();
     });
 
     function startManualMode() {
@@ -1245,6 +1135,43 @@
       appState.manualMode = true;
       updatePhase("fistSeen");
       setStatus("移动鼠标或手指选择牌位，点击画面抽牌", true);
+    }
+
+    function resetReading() {
+      document.getElementById("resultBox").classList.remove("show");
+      document.getElementById("intro").classList.remove("hidden");
+      document.getElementById("questionInput").value = "";
+      appState.started = false;
+      appState.drawn = false;
+      appState.manualMode = false;
+      appState.userQuestion = "";
+      appState.chosenCardName = "";
+      appState.gesture = "unknown";
+      appState.gesturePhase = "waitingOpen";
+      appState.handX = 0.5;
+      appState.targetDeckRotation = 0;
+      appState.particleMode = "cosmos";
+      updatePhase("waitingOpen");
+      setStatus(appState.cameraReady ? "摄像头保持开启，写下新问题即可继续" : "等待开始感知", appState.cameraReady);
+
+      for (const card of cards) {
+        gsap.killTweensOf(card.position);
+        gsap.killTweensOf(card.rotation);
+        gsap.killTweensOf(card.scale);
+        if (card.parent !== deckGroup) {
+          if (card.parent) card.parent.remove(card);
+          deckGroup.add(card);
+        }
+        disposeCardTextureIfNeeded(card.userData.baseMat);
+        card.userData.baseMat.map = backTexture;
+        card.userData.baseMat.emissive.set(0x21114d);
+        card.userData.baseMat.emissiveIntensity = 0.18;
+        card.userData.baseMat.needsUpdate = true;
+        card.userData.edgeMat.opacity = 0.28;
+        card.scale.set(1, 1, 1);
+      }
+      deckGroup.scale.set(1, 1, 1);
+      updateParticleTargets(appState.particleMode, performance.now() / 1000);
     }
 
     function updatePhase(phase) {
@@ -1288,9 +1215,15 @@
     let hands = null;
     let processingHands = false;
     let lastHandsSent = 0;
+    let handLoopRunning = false;
 
     async function startHandTracking() {
       try {
+        if (appState.cameraReady && video.srcObject) {
+          appState.gesturePhase = "waitingOpen";
+          setStatus("摄像头已就绪，张开手掌开始选牌", true);
+          return;
+        }
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30, max: 60 } },
           audio: false
@@ -1308,8 +1241,12 @@
           minTrackingConfidence: 0.62
         });
         hands.onResults(onHandResults);
+        appState.cameraReady = true;
         setStatus("摄像头已启动，张开手掌开始选牌", true);
-        requestAnimationFrame(handLoop);
+        if (!handLoopRunning) {
+          handLoopRunning = true;
+          requestAnimationFrame(handLoop);
+        }
       } catch (err) {
         console.error(err);
         appState.manualMode = true;
@@ -1446,7 +1383,7 @@
     }
 
     function updateGestureState(gesture) {
-      if (appState.drawn) return;
+      if (!appState.started || appState.drawn) return;
       const now = performance.now();
       const stableEnough = now - appState.lastGestureChange > 120;
       if (gesture !== appState.gesture) {
@@ -1494,12 +1431,12 @@
     }
 
     function intensifyParticles() {
-      particleMat.size += (0.06 - particleMat.size) * 0.05;
-      particleMat.opacity += (0.95 - particleMat.opacity) * 0.05;
-      for (let i = 0; i < particleCount; i += 6) {
-        particleTargets[i * 3] *= 0.985;
-        particleTargets[i * 3 + 1] *= 0.985;
-        particleTargets[i * 3 + 2] *= 0.985;
+      particleMat.size += (0.082 - particleMat.size) * 0.08;
+      particleMat.opacity += (0.98 - particleMat.opacity) * 0.08;
+      for (let i = 0; i < particleCount; i += 4) {
+        particleTargets[i * 3] *= 0.965;
+        particleTargets[i * 3 + 1] *= 0.965;
+        particleTargets[i * 3 + 2] *= 0.965;
       }
     }
 
