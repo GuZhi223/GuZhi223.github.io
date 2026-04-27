@@ -1,158 +1,1224 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D 手势交互粒子系统 - 修复版</title>
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #050505; font-family: sans-serif; user-select: none; }
-        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
-        #video-container { position: absolute; bottom: 20px; left: 20px; width: 200px; height: 150px; z-index: 10; border-radius: 12px; overflow: hidden; border: 2px solid rgba(255,255,255,0.3); background: #000; }
-        #video-feed { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); opacity: 0.8; }
-        #loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; z-index: 20; pointer-events: none; }
-        .fullscreen-btn { position: absolute; bottom: 20px; right: 20px; z-index: 10; padding: 10px 24px; background: rgba(255,255,255,0.2); border: 1px solid white; color: white; cursor: pointer; border-radius: 30px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>沉浸式3D手势控制塔罗牌占卜</title>
+  <style>
+    :root {
+      --theme: #b78cff;
+      --theme-soft: rgba(183, 140, 255, 0.22);
+      --panel: rgba(18, 14, 35, 0.58);
+      --line: rgba(255,255,255,0.16);
+      --text: #f5efff;
+      --muted: rgba(245,239,255,0.68);
+      --danger: #ff6bba;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 15%, rgba(135, 68, 255, 0.28), transparent 32%),
+        radial-gradient(circle at 78% 70%, rgba(255, 84, 190, 0.16), transparent 30%),
+        linear-gradient(135deg, #03020a 0%, #0a0718 52%, #110820 100%);
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    #threeCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      opacity: 0.2;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(255,255,255,0.28) 1px, transparent 0);
+      background-size: 34px 34px;
+      mix-blend-mode: screen;
+    }
+
+    .vignette {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 48%, rgba(0,0,0,0.52) 100%);
+    }
+
+    .intro-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(167, 109, 255, 0.22), transparent 26%),
+        rgba(3, 2, 10, 0.76);
+      backdrop-filter: blur(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+
+    .intro-modal.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.03);
+    }
+
+    .intro-card {
+      width: min(560px, 92vw);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 28px;
+      padding: 32px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.045)),
+        rgba(12, 7, 25, .78);
+      box-shadow: 0 28px 90px rgba(0,0,0,.48), inset 0 0 70px rgba(183,140,255,.08);
+      text-align: center;
+    }
+
+    .sigil {
+      width: 86px;
+      height: 86px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.24);
+      background:
+        radial-gradient(circle, rgba(255,255,255,.95) 0 3px, transparent 4px),
+        conic-gradient(from 0deg, transparent, var(--theme), transparent, #ff8bd8, transparent);
+      box-shadow: 0 0 38px var(--theme-soft);
+      position: relative;
+      animation: spin 12s linear infinite;
+    }
+
+    .sigil::before, .sigil::after {
+      content: "";
+      position: absolute;
+      inset: 13px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.32);
+    }
+    .sigil::after {
+      inset: 28px;
+      border-style: dashed;
+      opacity: .8;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .intro-card h1 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 4vw, 42px);
+      letter-spacing: .08em;
+      font-weight: 800;
+    }
+
+    .intro-card p {
+      margin: 0 auto 24px;
+      max-width: 420px;
+      line-height: 1.8;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 118px;
+      resize: none;
+      outline: none;
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.7;
+      padding: 16px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.07);
+      box-shadow: inset 0 0 28px rgba(0,0,0,.22);
+    }
+
+    textarea::placeholder { color: rgba(245,239,255,.42); }
+
+    .start-btn, .panel button {
+      border: 0;
+      cursor: pointer;
+      color: white;
+      font-weight: 800;
+      letter-spacing: .08em;
+      border-radius: 999px;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    .start-btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 15px 20px;
+      font-size: 15px;
+      background: linear-gradient(135deg, var(--theme), #ff81d8);
+      box-shadow: 0 16px 42px rgba(183,140,255,.28);
+    }
+
+    .start-btn:hover, .panel button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .panel {
+      position: fixed;
+      z-index: 20;
+      top: 50%;
+      right: 22px;
+      width: 280px;
+      transform: translateY(-50%);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 26px;
+      padding: 18px;
+      background: var(--panel);
+      backdrop-filter: blur(18px) saturate(1.25);
+      box-shadow: 0 22px 66px rgba(0,0,0,.36), inset 0 0 40px rgba(255,255,255,.03);
+    }
+
+    .panel h2 {
+      margin: 2px 0 14px;
+      font-size: 16px;
+      letter-spacing: .08em;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      padding: 8px 10px;
+      margin-bottom: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .dot {
+      flex: 0 0 auto;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--danger);
+      box-shadow: 0 0 16px var(--danger);
+    }
+
+    .dot.on {
+      background: #80ffcd;
+      box-shadow: 0 0 16px #80ffcd;
+    }
+
+    .control {
+      padding: 12px 0;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+
+    .control label {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .08em;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .mode-btn, .panel button.fullscreen {
+      width: 100%;
+      padding: 11px 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.11);
+      box-shadow: none;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-align: left;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, rgba(183,140,255,.34), rgba(255,129,216,.22));
+      border-color: rgba(255,255,255,.24);
+      box-shadow: 0 0 24px rgba(183,140,255,.18);
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="color"] {
+      width: 54px;
+      height: 42px;
+      border: 0;
+      padding: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .color-value {
+      color: var(--muted);
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .hint {
+      position: fixed;
+      left: 22px;
+      bottom: 20px;
+      z-index: 15;
+      max-width: min(520px, calc(100vw - 44px));
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      background: rgba(9, 6, 20, .52);
+      backdrop-filter: blur(14px);
+      color: rgba(245,239,255,.74);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .question-result {
+      position: fixed;
+      z-index: 30;
+      left: 50%;
+      bottom: 42px;
+      width: min(720px, calc(100vw - 42px));
+      transform: translateX(-50%) translateY(28px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .8s ease, transform .8s ease;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 24px;
+      padding: 18px 22px;
+      background: rgba(10, 7, 23, .68);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 70px rgba(0,0,0,.42);
+      text-align: center;
+    }
+
+    .question-result.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .question-result .q {
+      margin-bottom: 10px;
+      color: rgba(245,239,255,.66);
+      font-size: 13px;
+    }
+
+    .question-result .a {
+      color: white;
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .video-wrap {
+      position: fixed;
+      z-index: 18;
+      left: 22px;
+      top: 22px;
+      width: 180px;
+      height: 135px;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.28);
+      box-shadow: 0 15px 50px rgba(0,0,0,.28);
+      opacity: .68;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .hand-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: scaleX(-1);
+    }
+
+    @media (max-width: 900px) {
+      .panel {
+        top: auto;
+        right: 12px;
+        left: 12px;
+        bottom: 12px;
+        width: auto;
+        transform: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 14px;
+        padding: 14px;
+      }
+      .panel h2, .status { grid-column: 1 / -1; margin-bottom: 4px; }
+      .control { padding: 0; border-top: 0; }
+      .hint { display: none; }
+      .video-wrap { width: 132px; height: 99px; left: 12px; top: 12px; }
+      .question-result { bottom: 190px; }
+    }
+  </style>
 </head>
 <body>
-    <div id="loading">正在初始化...</div>
-    <div id="canvas-container"></div>
-    <div id="video-container"><video id="video-feed" playsinline></video></div>
-    <button class="fullscreen-btn" onclick="document.documentElement.requestFullscreen()">全屏体验</button>
+  <div id="app">
+    <canvas id="threeCanvas"></canvas>
+    <div class="grain"></div>
+    <div class="vignette"></div>
 
-    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-    <script type="importmap">
-        { "imports": { "three": "https://unpkg.com/three@0.154.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.154.0/examples/jsm/" } }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <section id="intro" class="intro-modal">
+      <div class="intro-card">
+        <div class="sigil"></div>
+        <h1>星门塔罗</h1>
+        <p>把心中的问题写下来。摄像头启动后，移动手掌选择牌位；张开手、握拳、再张开，完成一次抽取。</p>
+        <textarea id="questionInput" placeholder="例如：我现在应该如何看待这段关系 / 这件事下一步该怎么走？"></textarea>
+        <button id="startBtn" class="start-btn">开始感知</button>
+      </div>
+    </section>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+    <aside class="panel">
+      <h2>仪式控制台</h2>
+      <div class="status">
+        <span id="statusDot" class="dot"></span>
+        <span id="statusText">等待开始感知</span>
+      </div>
 
-        // --- 全局变量 ---
-        let scene, camera, renderer, particles, geometry, material, positionsAttribute;
-        let currentPositions = [], targetPositions = [];
-        
-        // ✅ 关键修复：把变量声明移到了最前面
-        let handScaleTarget = 1.0; 
-        let currentScale = 1.0; 
+      <div class="control">
+        <label>粒子阵列</label>
+        <div class="segmented">
+          <button class="mode-btn active" data-mode="nebula">星云环绕</button>
+          <button class="mode-btn" data-mode="circle">魔法阵</button>
+          <button class="mode-btn" data-mode="vortex">能量旋涡</button>
+        </div>
+      </div>
 
-        const PARTICLE_COUNT = 15000;
-        
-        const params = { model: '爱心 (Heart)', color: '#ff0055', particleSize: 0.25, handControl: true, debugCamera: true };
-        const models = { '爱心 (Heart)': getHeartPoints, '花朵 (Flower)': getFlowerPoints, '土星 (Saturn)': getSaturnPoints, '佛像 (Abstract)': getBuddhaPoints, '烟花 (Fireworks)': getFireworkPoints };
+      <div class="control">
+        <label>灵光颜色</label>
+        <div class="color-row">
+          <input id="colorPicker" type="color" value="#b78cff" />
+          <span id="colorValue" class="color-value">#b78cff</span>
+        </div>
+      </div>
 
-        init();
-        initMediaPipe();
-        animate();
+      <div class="control">
+        <label>显示</label>
+        <button id="fullscreenBtn" class="fullscreen">切换全屏</button>
+      </div>
+    </aside>
 
-        function init() {
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050505, 0.02);
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 30;
+    <div class="video-wrap">
+      <video id="video" playsinline muted></video>
+      <canvas id="handCanvas" class="hand-canvas"></canvas>
+    </div>
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
+    <div class="hint">
+      手势说明：手掌左右移动会旋转牌堆；离正前方最近的牌会浮起发光。完成「张开 → 握拳 → 张开」后抽出当前高亮牌。
+    </div>
 
-            geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(PARTICLE_COUNT * 3);
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                const x = (Math.random() - 0.5) * 100, y = (Math.random() - 0.5) * 100, z = (Math.random() - 0.5) * 100;
-                positions[i * 3] = x; positions[i * 3 + 1] = y; positions[i * 3 + 2] = z;
-                currentPositions.push({x, y, z});
-            }
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            positionsAttribute = geometry.attributes.position;
+    <div id="resultBox" class="question-result">
+      <div id="resultQuestion" class="q"></div>
+      <div id="resultAnswer" class="a"></div>
+    </div>
+  </div>
 
-            material = new THREE.PointsMaterial({ 
-                color: params.color, size: params.particleSize, map: createGlowTexture(), 
-                transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true 
-            });
-            particles = new THREE.Points(geometry, material);
-            scene.add(particles);
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
 
-            new OrbitControls(camera, renderer.domElement).enableDamping = true;
+  <script>
+    const tarotDeck = [
+      { name: "愚者", meaning: "新的旅程正在打开。它提醒你允许自己尝试，但不要把冲动误认为勇气。" },
+      { name: "魔术师", meaning: "你手里已经有足够的工具。关键不是再等条件成熟，而是开始组合已有资源。" },
+      { name: "女祭司", meaning: "答案不急着说出口。多观察隐藏的信息，直觉会比表面逻辑更早抵达。" },
+      { name: "女皇", meaning: "事情需要被温柔地培育。给它时间，也给自己一点稳定的滋养。" },
+      { name: "皇帝", meaning: "边界、秩序和责任变得重要。你需要把松散的想法落到清晰规则里。" },
+      { name: "教皇", meaning: "传统经验或可靠的前辈能给你支点。别急着孤军奋战。" },
+      { name: "恋人", meaning: "选择背后是价值排序。真正的问题不是选谁，而是你想成为什么样的人。" },
+      { name: "战车", meaning: "方向已经出现，但需要纪律感。把分散的力气收回来，稳稳推进。" },
+      { name: "力量", meaning: "这不是硬碰硬的局面。温和、耐心、自控，反而是更强的力量。" },
+      { name: "隐者", meaning: "暂时后退不是逃避，而是为了看清。安静下来，答案会变得更具体。" },
+      { name: "命运之轮", meaning: "局势正在转动。你无法控制全部变化，但可以抓住变化中的窗口。" },
+      { name: "正义", meaning: "请回到事实与后果。公平不只对别人，也包括对自己诚实。" },
+      { name: "倒吊人", meaning: "停顿本身就是信息。换一个角度看，你会发现真正被卡住的地方。" },
+      { name: "死神", meaning: "某个阶段正在结束。它未必是坏事，旧结构退场后，新空间才会出现。" },
+      { name: "节制", meaning: "答案在调和之中。不要走极端，把节奏放慢一点会更稳。" },
+      { name: "恶魔", meaning: "有些东西看似吸引，其实在消耗你。看清依赖，才有松绑的可能。" },
+      { name: "高塔", meaning: "不稳定的结构可能被打破。震动虽然难受，却能暴露真正的问题。" },
+      { name: "星星", meaning: "希望不是空话，而是恢复感正在发生。请给自己一点重新相信的空间。" },
+      { name: "月亮", meaning: "情绪和想象会放大不确定。别急着下结论，先分清事实与投射。" },
+      { name: "太阳", meaning: "事情会变得更明亮。坦诚、直接、简单，可能是最有效的方式。" },
+      { name: "审判", meaning: "你正在面对一次重新评估。过去的经验不是包袱，而是提醒。" },
+      { name: "世界", meaning: "一个循环接近完成。你可以收束、确认成果，然后进入新的阶段。" }
+    ];
 
-            const gui = new GUI({ title: '控制台' });
-            gui.add(params, 'model', Object.keys(models)).onChange(changeModel);
-            gui.addColor(params, 'color').onChange(v => material.color.set(v));
-            gui.add(params, 'particleSize', 0.05, 1.0).onChange(v => material.size = v);
-            gui.add(params, 'debugCamera').onChange(v => document.getElementById('video-container').style.display = v ? 'block' : 'none');
-            
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-            changeModel('爱心 (Heart)');
+    const appState = {
+      started: false,
+      drawn: false,
+      userQuestion: "",
+      theme: new THREE.Color("#b78cff"),
+      particleMode: "nebula",
+      deckRotation: 0,
+      targetDeckRotation: 0,
+      highlightedIndex: 0,
+      handX: 0.5,
+      gesture: "unknown",
+      gesturePhase: "waitingOpen",
+      lastGestureChange: performance.now(),
+      lastHandSeen: 0
+    };
+
+    const canvas = document.getElementById("threeCanvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x070512, 0.045);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.7, 10.8);
+    camera.lookAt(0, 0.3, 0);
+
+    const ambientLight = new THREE.AmbientLight(0xb78cff, 0.8);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.PointLight(0xffffff, 1.8, 18);
+    keyLight.position.set(0, 4, 5);
+    scene.add(keyLight);
+
+    const sideLight = new THREE.PointLight(0xb78cff, 1.3, 20);
+    sideLight.position.set(-4, 2, 2);
+    scene.add(sideLight);
+
+    const deckGroup = new THREE.Group();
+    scene.add(deckGroup);
+
+    const CARD_COUNT = 22;
+    const CARD_W = 1.05;
+    const CARD_H = 1.62;
+    const RADIUS = 4.35;
+    const cards = [];
+
+    function makeRoundedCardTexture(type, tarot) {
+      const c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 768;
+      const ctx = c.getContext("2d");
+      const grd = ctx.createLinearGradient(0, 0, 512, 768);
+      if (type === "back") {
+        grd.addColorStop(0, "#211342");
+        grd.addColorStop(.5, "#090717");
+        grd.addColorStop(1, "#3c1d58");
+      } else {
+        grd.addColorStop(0, "#f8ecce");
+        grd.addColorStop(.56, "#fffaf0");
+        grd.addColorStop(1, "#d8b66b");
+      }
+      ctx.fillStyle = grd;
+      roundRect(ctx, 26, 26, 460, 716, 34);
+      ctx.fill();
+
+      ctx.strokeStyle = type === "back" ? "rgba(255,255,255,.56)" : "rgba(72,41,12,.76)";
+      ctx.lineWidth = 8;
+      roundRect(ctx, 42, 42, 428, 684, 28);
+      ctx.stroke();
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = type === "back" ? "rgba(183,140,255,.72)" : "rgba(132,82,22,.72)";
+      roundRect(ctx, 68, 72, 376, 624, 22);
+      ctx.stroke();
+
+      if (type === "back") {
+        ctx.save();
+        ctx.translate(256, 384);
+        for (let i = 0; i < 16; i++) {
+          ctx.rotate(Math.PI / 8);
+          ctx.beginPath();
+          ctx.moveTo(0, -178);
+          ctx.quadraticCurveTo(38, -70, 0, 0);
+          ctx.quadraticCurveTo(-38, -70, 0, -178);
+          ctx.strokeStyle = `rgba(255,255,255,${0.18 + (i % 2) * 0.12})`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
         }
+        ctx.beginPath();
+        ctx.arc(0, 0, 132, 0, Math.PI * 2);
+        ctx.arc(0, 0, 72, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,255,255,.42)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255,255,255,.92)";
+        star(ctx, 0, 0, 5, 34, 13);
+        ctx.fill();
+        ctx.restore();
 
-        function createGlowTexture() {
-            const c = document.createElement('canvas'), ctx = c.getContext('2d');
-            c.width = c.height = 32;
-            const g = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
-            g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = g; ctx.fillRect(0, 0, 32, 32);
-            return new THREE.CanvasTexture(c);
-        }
+        ctx.font = "700 34px Georgia, serif";
+        ctx.fillStyle = "rgba(255,255,255,.78)";
+        ctx.textAlign = "center";
+        ctx.fillText("ARCANA", 256, 662);
+      } else {
+        drawTarotFace(ctx, tarot);
+      }
 
-        function changeModel(name) {
-            targetPositions = models[name](PARTICLE_COUNT);
-            material.size = name.includes('Fireworks') ? params.particleSize * 1.5 : params.particleSize;
-        }
-        
-        // 简单的模型算法
-        function getHeartPoints(c) { 
-            const p=[]; for(let i=0;i<c;i++){ let t=Math.random()*Math.PI*2, x=16*Math.pow(Math.sin(t),3), y=13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t), z=(Math.random()-0.5)*6; p.push({x:x*0.5, y:y*0.5, z:z}); } return p; 
-        }
-        function getFlowerPoints(c) { 
-            const p=[]; for(let i=0;i<c;i++){ let t=Math.random()*Math.PI*2, phi=Math.random()*Math.PI, r=10*Math.cos(3*t); p.push({x:r*Math.sin(phi)*Math.cos(t), y:r*Math.sin(phi)*Math.sin(t), z:r*Math.cos(phi)*0.5}); } return p; 
-        }
-        function getSaturnPoints(c) { 
-            const p=[]; let rc=c*0.4; for(let i=0;i<c-rc;i++){ let t=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1), r=6; p.push({x:r*Math.sin(ph)*Math.cos(t), y:r*Math.sin(ph)*Math.sin(t), z:r*Math.cos(ph)}); } for(let i=0;i<rc;i++){ let t=Math.random()*Math.PI*2, r=8+Math.random()*6; p.push({x:r*Math.cos(t), y:(Math.random()-0.5)*0.4, z:r*Math.sin(t)}); } return p; 
-        }
-        function getBuddhaPoints(c) {
-             const p=[]; for(let i=0;i<c;i++){ let t=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1), r=(i<c*0.2?2.5:(i<c*0.7?4.5:6)); let yOffset=(i<c*0.2?6:(i<c*0.7?0:-4)); p.push({x:r*Math.sin(ph)*Math.cos(t), y:r*Math.sin(ph)*Math.sin(t)+yOffset, z:r*Math.cos(ph)}); } return p; 
-        }
-        function getFireworkPoints(c) { 
-            const p=[]; for(let i=0;i<c;i++){ let r=15*Math.pow(Math.random(),0.5), t=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1); p.push({x:r*Math.sin(ph)*Math.cos(t), y:r*Math.sin(ph)*Math.sin(t), z:r*Math.cos(ph)}); } return p; 
-        }
+      const texture = new THREE.CanvasTexture(c);
+      texture.encoding = THREE.sRGBEncoding;
+      texture.anisotropy = 8;
+      return texture;
+    }
 
-        function animate() {
-            requestAnimationFrame(animate);
-            currentScale += (handScaleTarget - currentScale) * 0.1;
-            const pos = positionsAttribute.array;
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                const cur = currentPositions[i], tgt = targetPositions[i] || {x:0,y:0,z:0};
-                cur.x += (tgt.x * currentScale - cur.x) * 0.08;
-                cur.y += (tgt.y * currentScale - cur.y) * 0.08;
-                cur.z += (tgt.z * currentScale - cur.z) * 0.08;
-                pos[i*3] = cur.x; pos[i*3+1] = cur.y; pos[i*3+2] = cur.z;
-            }
-            positionsAttribute.needsUpdate = true;
-            particles.rotation.y += 0.002;
-            renderer.render(scene, camera);
-        }
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
 
-        function initMediaPipe() {
-            const v = document.getElementById('video-feed');
-            const hands = new Hands({locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
-            hands.setOptions({maxNumHands: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5});
-            hands.onResults(res => {
-                if (params.handControl && res.multiHandLandmarks?.length) {
-                    const lm = res.multiHandLandmarks[0];
-                    const d = Math.sqrt(Math.pow(lm[4].x - lm[8].x, 2) + Math.pow(lm[4].y - lm[8].y, 2));
-                    handScaleTarget = Math.max(0.2, Math.min(3.0, (d - 0.02) * 15));
-                } else { handScaleTarget = 1.0; }
-            });
-            new Camera(v, {onFrame: async () => await hands.send({image: v}), width: 640, height: 480}).start().then(()=>document.getElementById('loading').style.display='none');
+    function star(ctx, x, y, points, outer, inner) {
+      ctx.beginPath();
+      for (let i = 0; i < points * 2; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / points;
+        const r = i % 2 === 0 ? outer : inner;
+        ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r);
+      }
+      ctx.closePath();
+    }
+
+    function drawTarotFace(ctx, tarot) {
+      ctx.fillStyle = "rgba(69,41,14,.88)";
+      ctx.textAlign = "center";
+      ctx.font = "700 52px 'Microsoft YaHei', serif";
+      wrapText(ctx, tarot.name, 256, 128, 360, 62);
+
+      ctx.save();
+      ctx.translate(256, 350);
+      ctx.strokeStyle = "rgba(100,58,19,.86)";
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.arc(0, 0, 124, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, 82, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < 12; i++) {
+        const a = i / 12 * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 54, Math.sin(a) * 54);
+        ctx.lineTo(Math.cos(a) * 148, Math.sin(a) * 148);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "rgba(100,58,19,.9)";
+      star(ctx, 0, 0, 6, 58, 22);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.font = "400 28px 'Microsoft YaHei', sans-serif";
+      ctx.fillStyle = "rgba(69,41,14,.82)";
+      wrapText(ctx, tarot.meaning, 256, 570, 360, 42);
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      let line = "";
+      const chars = [...text];
+      for (let i = 0; i < chars.length; i++) {
+        const test = line + chars[i];
+        if (ctx.measureText(test).width > maxWidth && line) {
+          ctx.fillText(line, x, y);
+          line = chars[i];
+          y += lineHeight;
+        } else {
+          line = test;
         }
-    </script>
+      }
+      ctx.fillText(line, x, y);
+    }
+
+    const cardGeo = new THREE.BoxGeometry(CARD_W, CARD_H, 0.055, 2, 2, 1);
+    const edgeGeo = new THREE.EdgesGeometry(cardGeo);
+    const backTexture = makeRoundedCardTexture("back");
+
+    function createCard(index) {
+      const group = new THREE.Group();
+      group.userData.index = index;
+
+      const baseMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        map: backTexture,
+        roughness: 0.35,
+        metalness: 0.16,
+        emissive: 0x21114d,
+        emissiveIntensity: 0.18
+      });
+      const mesh = new THREE.Mesh(cardGeo, baseMat);
+      group.add(mesh);
+
+      const edgeMat = new THREE.LineBasicMaterial({ color: 0xb78cff, transparent: true, opacity: 0.28 });
+      const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+      group.add(edges);
+
+      const angle = index / CARD_COUNT * Math.PI * 2;
+      group.userData.baseAngle = angle;
+      group.userData.mesh = mesh;
+      group.userData.edges = edges;
+      group.userData.edgeMat = edgeMat;
+      group.userData.baseMat = baseMat;
+      deckGroup.add(group);
+      cards.push(group);
+    }
+
+    for (let i = 0; i < CARD_COUNT; i++) createCard(i);
+
+    const particleCount = 2200;
+    const particleGeo = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+    const particleTargets = new Float32Array(particleCount * 3);
+    const particleSeeds = new Float32Array(particleCount * 4);
+
+    for (let i = 0; i < particleCount; i++) {
+      particleSeeds[i * 4] = Math.random();
+      particleSeeds[i * 4 + 1] = Math.random();
+      particleSeeds[i * 4 + 2] = Math.random();
+      particleSeeds[i * 4 + 3] = Math.random();
+      const p = getParticleTarget(i, "nebula", 0);
+      particlePositions[i * 3] = p.x;
+      particlePositions[i * 3 + 1] = p.y;
+      particlePositions[i * 3 + 2] = p.z;
+      particleTargets[i * 3] = p.x;
+      particleTargets[i * 3 + 1] = p.y;
+      particleTargets[i * 3 + 2] = p.z;
+    }
+
+    particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+    const particleMat = new THREE.PointsMaterial({
+      color: appState.theme,
+      size: 0.035,
+      transparent: true,
+      opacity: 0.78,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    function getParticleTarget(i, mode, t) {
+      const a = particleSeeds[i * 4] * Math.PI * 2;
+      const b = particleSeeds[i * 4 + 1];
+      const c = particleSeeds[i * 4 + 2];
+      const d = particleSeeds[i * 4 + 3];
+
+      if (mode === "circle") {
+        const ring = Math.floor(b * 5);
+        const r = 1.45 + ring * 0.46 + Math.sin(a * 7 + t * 0.8) * 0.025;
+        return {
+          x: Math.cos(a) * r,
+          y: -0.72 + ring * 0.07 + Math.sin(a * 12 + t) * 0.035,
+          z: Math.sin(a) * r
+        };
+      }
+
+      if (mode === "vortex") {
+        const height = (b - 0.5) * 4.1;
+        const twist = a + height * 1.8 + t * 0.62;
+        const r = 0.95 + c * 2.6 + Math.sin(t + c * 12) * 0.08;
+        return {
+          x: Math.cos(twist) * r,
+          y: height,
+          z: Math.sin(twist) * r
+        };
+      }
+
+      const theta = a + t * (0.06 + d * 0.05);
+      const phi = Math.acos(2 * b - 1);
+      const r = 2.1 + c * 2.4 + Math.sin(t * 0.6 + a * 3) * 0.06;
+      return {
+        x: r * Math.sin(phi) * Math.cos(theta),
+        y: r * Math.cos(phi) * 0.72,
+        z: r * Math.sin(phi) * Math.sin(theta)
+      };
+    }
+
+    function updateParticleTargets(mode, time) {
+      for (let i = 0; i < particleCount; i++) {
+        const p = getParticleTarget(i, mode, time);
+        particleTargets[i * 3] = p.x;
+        particleTargets[i * 3 + 1] = p.y;
+        particleTargets[i * 3 + 2] = p.z;
+      }
+    }
+
+    function disposeCardTextureIfNeeded(mat) {
+      if (mat && mat.map && mat.map !== backTexture) mat.map.dispose();
+    }
+
+    function setTheme(hex) {
+      appState.theme.set(hex);
+      particleMat.color.copy(appState.theme);
+      ambientLight.color.copy(appState.theme);
+      sideLight.color.copy(appState.theme);
+      document.documentElement.style.setProperty("--theme", hex);
+      document.documentElement.style.setProperty("--theme-soft", hexToRgba(hex, .22));
+      document.getElementById("colorValue").textContent = hex.toLowerCase();
+      for (const c of cards) c.userData.edgeMat.color.copy(appState.theme);
+    }
+
+    function hexToRgba(hex, alpha) {
+      const h = hex.replace("#", "");
+      const r = parseInt(h.slice(0,2), 16);
+      const g = parseInt(h.slice(2,4), 16);
+      const b = parseInt(h.slice(4,6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function layoutCards(dt) {
+      const lerp = 1 - Math.pow(0.0001, dt);
+      appState.deckRotation += (appState.targetDeckRotation - appState.deckRotation) * lerp;
+
+      if (!appState.drawn) {
+        let bestIndex = 0;
+        let bestZ = -Infinity;
+        for (let i = 0; i < cards.length; i++) {
+          const group = cards[i];
+          const a = group.userData.baseAngle + appState.deckRotation;
+          const spiral = (i - CARD_COUNT / 2) * 0.025;
+          const x = Math.sin(a) * RADIUS;
+          const z = Math.cos(a) * RADIUS;
+          const y = Math.sin(a * 2.0) * 0.12 + spiral;
+
+          group.position.set(x, y, z);
+          group.rotation.set(0, a + Math.PI, Math.sin(a) * 0.06);
+
+          const isFrontCandidate = z > bestZ;
+          if (isFrontCandidate) {
+            bestZ = z;
+            bestIndex = i;
+          }
+        }
+        appState.highlightedIndex = bestIndex;
+      }
+
+      for (let i = 0; i < cards.length; i++) {
+        const group = cards[i];
+        const hot = i === appState.highlightedIndex && !appState.drawn;
+        const targetScale = hot ? 1.14 : 1.0;
+        group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.13);
+        group.userData.baseMat.emissiveIntensity += ((hot ? 0.78 : 0.16) - group.userData.baseMat.emissiveIntensity) * 0.12;
+        group.userData.edgeMat.opacity += ((hot ? 0.9 : 0.24) - group.userData.edgeMat.opacity) * 0.12;
+        if (hot) {
+          group.position.y += 0.26;
+        }
+      }
+    }
+
+    function animateParticles(time) {
+      if (!appState.drawn) updateParticleTargets(appState.particleMode, time);
+      const pos = particleGeo.attributes.position.array;
+      for (let i = 0; i < particleCount; i++) {
+        const idx = i * 3;
+        pos[idx] += (particleTargets[idx] - pos[idx]) * 0.045;
+        pos[idx + 1] += (particleTargets[idx + 1] - pos[idx + 1]) * 0.045;
+        pos[idx + 2] += (particleTargets[idx + 2] - pos[idx + 2]) * 0.045;
+      }
+      particleGeo.attributes.position.needsUpdate = true;
+      particles.rotation.y = time * 0.035;
+    }
+
+    function scatterOtherCards(selected) {
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        if (card === selected) continue;
+        const world = new THREE.Vector3();
+        card.getWorldPosition(world);
+        const base = i * 3;
+        for (let k = 0; k < 100 && base + k < particleCount; k++) {
+          const pIndex = base + k;
+          particlePositions[pIndex * 3] = world.x + (Math.random() - .5) * .4;
+          particlePositions[pIndex * 3 + 1] = world.y + (Math.random() - .5) * .4;
+          particlePositions[pIndex * 3 + 2] = world.z + (Math.random() - .5) * .4;
+          const out = world.clone().normalize().multiplyScalar(4 + Math.random() * 3);
+          particleTargets[pIndex * 3] = out.x + (Math.random() - .5) * 3;
+          particleTargets[pIndex * 3 + 1] = out.y + (Math.random() - .5) * 3;
+          particleTargets[pIndex * 3 + 2] = out.z + (Math.random() - .5) * 3;
+        }
+        gsap.to(card.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.38, ease: "power2.in" });
+        gsap.to(card.rotation, { x: card.rotation.x + Math.random() * 3, y: card.rotation.y + Math.random() * 3, duration: 0.42 });
+      }
+      particleGeo.attributes.position.needsUpdate = true;
+    }
+
+    function drawSelectedCard() {
+      if (appState.drawn) return;
+      appState.drawn = true;
+      setStatus("抽卡完成，正在翻开牌面", true);
+
+      const selected = cards[appState.highlightedIndex];
+      const tarot = tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
+      const frontTexture = makeRoundedCardTexture("front", tarot);
+      disposeCardTextureIfNeeded(selected.userData.baseMat);
+      selected.userData.baseMat.map = frontTexture;
+      selected.userData.baseMat.emissive.set(0x000000);
+      selected.userData.baseMat.emissiveIntensity = 0.04;
+      selected.userData.baseMat.needsUpdate = true;
+
+      scatterOtherCards(selected);
+      deckGroup.remove(selected);
+      scene.add(selected);
+
+      const startWorld = new THREE.Vector3();
+      selected.getWorldPosition(startWorld);
+      selected.position.copy(startWorld);
+      selected.rotation.set(0, 0, 0);
+      selected.scale.set(1.18, 1.18, 1.18);
+
+      gsap.timeline()
+        .to(selected.position, { x: 0, y: 0.45, z: 2.9, duration: 0.95, ease: "power3.inOut" }, 0)
+        .to(selected.scale, { x: 1.72, y: 1.72, z: 1.72, duration: 0.95, ease: "power3.inOut" }, 0)
+        .to(selected.rotation, { y: Math.PI * 2, z: 0, duration: 1.25, ease: "power2.inOut" }, 0.35)
+        .call(() => showResult(tarot));
+    }
+
+    function showResult(tarot) {
+      document.getElementById("resultQuestion").textContent = `你的问题：${appState.userQuestion || "那个还没有说出口的问题"}`;
+      document.getElementById("resultAnswer").innerHTML = `<strong>${tarot.name}</strong>：${tarot.meaning}`;
+      document.getElementById("resultBox").classList.add("show");
+      setStatus("仪式完成，可以刷新页面重新开始", true);
+    }
+
+    let prevTime = performance.now();
+    function renderLoop(now) {
+      const dt = Math.min((now - prevTime) / 1000, 0.05);
+      prevTime = now;
+      const t = now / 1000;
+
+      if (!appState.started && !appState.drawn) {
+        appState.targetDeckRotation += dt * 0.22;
+      }
+
+      deckGroup.rotation.y = 0;
+      deckGroup.rotation.x = Math.sin(t * 0.4) * 0.035;
+      layoutCards(dt);
+      animateParticles(t);
+      camera.position.x += ((appState.handX - 0.5) * 0.55 - camera.position.x) * 0.035;
+      camera.lookAt(0, 0.35, 0);
+      renderer.render(scene, camera);
+      requestAnimationFrame(renderLoop);
+    }
+    requestAnimationFrame(renderLoop);
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    document.querySelectorAll(".mode-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".mode-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        appState.particleMode = btn.dataset.mode;
+        updateParticleTargets(appState.particleMode, performance.now() / 1000);
+      });
+    });
+
+    document.getElementById("colorPicker").addEventListener("input", e => setTheme(e.target.value));
+    document.getElementById("fullscreenBtn").addEventListener("click", async () => {
+      if (!document.fullscreenElement) await document.documentElement.requestFullscreen().catch(() => {});
+      else await document.exitFullscreen().catch(() => {});
+    });
+
+    document.getElementById("startBtn").addEventListener("click", async () => {
+      appState.userQuestion = document.getElementById("questionInput").value.trim();
+      document.getElementById("intro").classList.add("hidden");
+      appState.started = true;
+      setStatus("正在请求摄像头权限", false);
+      await startHandTracking();
+    });
+
+    function setStatus(text, ok) {
+      document.getElementById("statusText").textContent = text;
+      document.getElementById("statusDot").classList.toggle("on", !!ok);
+    }
+
+    const video = document.getElementById("video");
+    const handCanvas = document.getElementById("handCanvas");
+    const handCtx = handCanvas.getContext("2d");
+    let hands = null;
+    let processingHands = false;
+    let lastHandsSent = 0;
+
+    async function startHandTracking() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30, max: 60 } },
+          audio: false
+        });
+        video.srcObject = stream;
+        await video.play();
+        handCanvas.width = video.videoWidth || 640;
+        handCanvas.height = video.videoHeight || 480;
+
+        hands = new Hands({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+        hands.setOptions({
+          maxNumHands: 1,
+          modelComplexity: 0,
+          minDetectionConfidence: 0.68,
+          minTrackingConfidence: 0.62
+        });
+        hands.onResults(onHandResults);
+        setStatus("摄像头已启动，张开手掌开始选牌", true);
+        requestAnimationFrame(handLoop);
+      } catch (err) {
+        console.error(err);
+        setStatus("摄像头启动失败，请检查浏览器权限", false);
+      }
+    }
+
+    async function handLoop(now) {
+      if (!hands || video.readyState < 2) {
+        requestAnimationFrame(handLoop);
+        return;
+      }
+      // 控制识别频率，避免和 Three.js 渲染互相抢资源。30FPS 下通常能保持 100ms 内响应。
+      if (!processingHands && now - lastHandsSent > 30) {
+        processingHands = true;
+        lastHandsSent = now;
+        try {
+          await hands.send({ image: video });
+        } catch (e) {
+          console.warn(e);
+        } finally {
+          processingHands = false;
+        }
+      }
+      requestAnimationFrame(handLoop);
+    }
+
+    function onHandResults(results) {
+      handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
+      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+        if (performance.now() - appState.lastHandSeen > 800 && appState.started && !appState.drawn) {
+          setStatus("未检测到手，请把单手放入画面", false);
+        }
+        return;
+      }
+
+      const lm = results.multiHandLandmarks[0];
+      appState.lastHandSeen = performance.now();
+      drawHandOverlay(lm);
+
+      const palm = getPalmCenter(lm);
+      // 视频预览被镜像，MediaPipe 坐标未镜像。这里使用 1 - x，使手往屏幕左移动时视觉更符合直觉。
+      const mirroredX = 1 - palm.x;
+      appState.handX += (mirroredX - appState.handX) * 0.38;
+      appState.targetDeckRotation = (appState.handX - 0.5) * Math.PI * 2.15;
+
+      const gesture = classifyGesture(lm);
+      updateGestureState(gesture);
+    }
+
+    function getPalmCenter(lm) {
+      const ids = [0, 5, 9, 13, 17];
+      const p = { x: 0, y: 0, z: 0 };
+      for (const id of ids) {
+        p.x += lm[id].x;
+        p.y += lm[id].y;
+        p.z += lm[id].z;
+      }
+      p.x /= ids.length;
+      p.y /= ids.length;
+      p.z /= ids.length;
+      return p;
+    }
+
+    function dist(a, b) {
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      const dz = (a.z || 0) - (b.z || 0);
+      return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
+    function classifyGesture(lm) {
+      const palm = getPalmCenter(lm);
+      const wrist = lm[0];
+      const indexMcp = lm[5];
+      const middleMcp = lm[9];
+      const ringMcp = lm[13];
+      const pinkyMcp = lm[17];
+
+      // 用掌宽 + 掌长做归一化，避免不同人手大小、离摄像头远近导致阈值漂移。
+      const palmWidth = Math.max(dist(indexMcp, pinkyMcp), 0.001);
+      const palmLength = Math.max(dist(wrist, middleMcp), 0.001);
+      const handScale = (palmWidth + palmLength) * 0.5;
+
+      // 四根长手指：如果指尖比 PIP 关节更靠近手腕，通常就是弯曲/握拳。
+      const fingers = [
+        { tip: 8, pip: 6, mcp: 5 },
+        { tip: 12, pip: 10, mcp: 9 },
+        { tip: 16, pip: 14, mcp: 13 },
+        { tip: 20, pip: 18, mcp: 17 }
+      ];
+
+      let bent = 0;
+      let open = 0;
+      let avgTipPalm = 0;
+
+      for (const f of fingers) {
+        const tip = lm[f.tip];
+        const pip = lm[f.pip];
+        const mcp = lm[f.mcp];
+
+        const tipToWrist = dist(tip, wrist);
+        const pipToWrist = dist(pip, wrist);
+        const tipToPalm = dist(tip, palm) / handScale;
+        avgTipPalm += tipToPalm;
+
+        // bent 条件写得宽一些：普通摄像头里手指略斜、手掌倾斜也能识别。
+        const isBentByWrist = tipToWrist < pipToWrist + palmLength * 0.10;
+        const isBentByPalm = tipToPalm < 1.18;
+        const isOpenByPalm = tipToPalm > 1.34 && dist(tip, mcp) > dist(pip, mcp) * 1.08;
+
+        if (isBentByWrist || isBentByPalm) bent++;
+        if (isOpenByPalm) open++;
+      }
+
+      avgTipPalm /= fingers.length;
+
+      // 拇指单独处理：握拳时拇指经常横在掌心，不一定满足和四指相同的规则。
+      const thumbTipPalm = dist(lm[4], palm) / handScale;
+      const thumbTipIndex = dist(lm[4], lm[5]) / handScale;
+      const thumbLooksClosed = thumbTipPalm < 1.25 || thumbTipIndex < 0.92;
+      const thumbLooksOpen = thumbTipPalm > 1.30 && thumbTipIndex > 0.82;
+
+      if (thumbLooksClosed) bent += 0.6;
+      if (thumbLooksOpen) open += 0.5;
+
+      const isFist = bent >= 3.4 && avgTipPalm < 1.32;
+      const isOpen = open >= 3.4 && avgTipPalm > 1.28;
+
+      if (isFist) return "fist";
+      if (isOpen) return "open";
+      return "neutral";
+    }
+
+    function updateGestureState(gesture) {
+      if (appState.drawn) return;
+      const now = performance.now();
+      const stableEnough = now - appState.lastGestureChange > 120;
+      if (gesture !== appState.gesture) {
+        appState.gesture = gesture;
+        appState.lastGestureChange = now;
+      }
+
+      if (!stableEnough) return;
+
+      if (appState.gesturePhase === "waitingOpen") {
+        if (gesture === "open") {
+          appState.gesturePhase = "openSeen";
+          setStatus("已感知张开手掌，握拳抓取当前牌", true);
+        } else {
+          setStatus("请先张开手掌，让牌堆响应你的位置", true);
+        }
+        return;
+      }
+
+      if (appState.gesturePhase === "openSeen") {
+        if (gesture === "fist") {
+          appState.gesturePhase = "fistSeen";
+          pulseDeck();
+          setStatus("已握拳，松开手掌完成抽卡", true);
+        }
+        return;
+      }
+
+      if (appState.gesturePhase === "fistSeen") {
+        if (gesture === "open") {
+          drawSelectedCard();
+        } else if (gesture === "fist") {
+          appState.targetDeckRotation += 0.012;
+          intensifyParticles();
+        }
+      }
+    }
+
+    function pulseDeck() {
+      gsap.fromTo(deckGroup.scale, { x: 1, y: 1, z: 1 }, { x: .86, y: .86, z: .86, duration: .18, yoyo: true, repeat: 1, ease: "power2.inOut" });
+      keyLight.intensity = 3.8;
+      gsap.to(keyLight, { intensity: 1.8, duration: .6, ease: "power2.out" });
+    }
+
+    function intensifyParticles() {
+      particleMat.size += (0.06 - particleMat.size) * 0.05;
+      particleMat.opacity += (0.95 - particleMat.opacity) * 0.05;
+      for (let i = 0; i < particleCount; i += 6) {
+        particleTargets[i * 3] *= 0.985;
+        particleTargets[i * 3 + 1] *= 0.985;
+        particleTargets[i * 3 + 2] *= 0.985;
+      }
+    }
+
+    function drawHandOverlay(lm) {
+      const w = handCanvas.width;
+      const h = handCanvas.height;
+      handCtx.save();
+      handCtx.lineWidth = 3;
+      handCtx.strokeStyle = "rgba(183,140,255,.82)";
+      handCtx.fillStyle = "rgba(255,255,255,.9)";
+      const chains = [
+        [0,1,2,3,4], [0,5,6,7,8], [5,9,10,11,12], [9,13,14,15,16], [13,17,18,19,20], [0,17]
+      ];
+      for (const chain of chains) {
+        handCtx.beginPath();
+        for (let i = 0; i < chain.length; i++) {
+          const p = lm[chain[i]];
+          const x = p.x * w;
+          const y = p.y * h;
+          if (i === 0) handCtx.moveTo(x, y);
+          else handCtx.lineTo(x, y);
+        }
+        handCtx.stroke();
+      }
+      for (const p of lm) {
+        handCtx.beginPath();
+        handCtx.arc(p.x * w, p.y * h, 3.2, 0, Math.PI * 2);
+        handCtx.fill();
+      }
+      handCtx.restore();
+    }
+  </script>
 </body>
 </html>
