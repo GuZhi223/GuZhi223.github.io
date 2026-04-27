@@ -2,54 +2,67 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神秘万圣节礼物</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>&#31070;&#31192;&#19975;&#22307;&#33410;&#31036;&#29289;</title>
     <style>
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
-            min-height: 100vh;
+            width: 100%;
+            min-height: 100%;
             margin: 0;
+        }
+
+        body {
             overflow: hidden;
             font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
             color: #f8fafc;
             background:
-                radial-gradient(circle at 25% 20%, rgba(255, 138, 76, 0.35), transparent 28%),
-                radial-gradient(circle at 75% 25%, rgba(124, 58, 237, 0.28), transparent 30%),
+                radial-gradient(circle at 22% 18%, rgba(255, 138, 76, 0.34), transparent 27%),
+                radial-gradient(circle at 78% 24%, rgba(124, 58, 237, 0.28), transparent 31%),
                 linear-gradient(135deg, #130f24 0%, #1f1638 48%, #2b160f 100%);
         }
 
         .stage {
             min-height: 100vh;
+            min-height: 100dvh;
             display: grid;
             place-items: center;
-            padding: 24px;
+            padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+                max(20px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
             position: relative;
         }
 
         .gift-card {
             width: min(92vw, 460px);
-            padding: 30px;
+            padding: clamp(22px, 5vw, 32px);
             border: 1px solid rgba(255, 255, 255, 0.16);
             border-radius: 16px;
-            background: rgba(18, 14, 32, 0.82);
+            background: rgba(18, 14, 32, 0.84);
             box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
             text-align: center;
             backdrop-filter: blur(14px);
             z-index: 2;
+            transition: transform 0.45s ease, opacity 0.45s ease;
+        }
+
+        .stage.opened .gift-card {
+            opacity: 0.34;
+            transform: translateY(-18vh) scale(0.86);
         }
 
         .pumpkin {
-            font-size: 64px;
+            font-size: clamp(52px, 14vw, 70px);
             margin-bottom: 14px;
             animation: float 2.4s ease-in-out infinite;
         }
 
         h1 {
             margin: 0 0 12px;
-            font-size: 30px;
+            font-size: clamp(26px, 6vw, 34px);
             letter-spacing: 0;
         }
 
@@ -57,6 +70,7 @@
             margin: 0 0 22px;
             color: #d7d1e8;
             line-height: 1.7;
+            font-size: clamp(15px, 3.6vw, 17px);
         }
 
         button {
@@ -78,6 +92,17 @@
             box-shadow: 0 14px 28px rgba(255, 122, 24, 0.35);
         }
 
+        button:disabled {
+            cursor: default;
+            opacity: 0.85;
+        }
+
+        .note {
+            margin-top: 14px;
+            color: #9f94ba;
+            font-size: 13px;
+        }
+
         .popup-layer {
             position: fixed;
             inset: 0;
@@ -87,30 +112,34 @@
 
         .message {
             position: absolute;
-            width: 210px;
-            padding: 12px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            border-radius: 12px;
+            width: var(--bubble-width);
+            min-height: var(--bubble-height);
+            display: grid;
+            place-items: center;
+            padding: 7px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 999px;
             background: rgba(255, 255, 255, 0.95);
-            color: #2f2144;
+            color: #37214a;
             text-align: center;
-            font-size: 17px;
-            font-weight: 700;
-            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
-            animation: pop 0.35s ease-out both;
+            font-size: var(--bubble-font);
+            font-weight: 800;
+            line-height: 1.24;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.25);
+            transform: translate(-50%, -50%) scale(0.58) rotate(-5deg);
+            animation: pop 0.34s ease-out forwards, glow 2.2s ease-in-out infinite;
         }
 
-        .message small {
-            display: block;
-            margin-bottom: 4px;
-            color: #ff7a18;
-            font-size: 12px;
+        .message:nth-child(3n) {
+            background: rgba(255, 241, 214, 0.96);
         }
 
-        .note {
-            margin-top: 14px;
-            color: #9f94ba;
-            font-size: 13px;
+        .message:nth-child(3n + 1) {
+            background: rgba(255, 232, 242, 0.96);
+        }
+
+        .message:nth-child(3n + 2) {
+            background: rgba(237, 232, 255, 0.96);
         }
 
         @keyframes float {
@@ -119,40 +148,37 @@
         }
 
         @keyframes pop {
-            from {
-                opacity: 0;
-                transform: scale(0.6) rotate(-4deg);
-            }
             to {
                 opacity: 1;
-                transform: scale(1) rotate(var(--rotate));
+                transform: translate(-50%, -50%) scale(1) rotate(var(--rotate));
             }
         }
 
-        @media (max-width: 520px) {
-            .gift-card {
-                padding: 24px 18px;
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 14px 34px rgba(0, 0, 0, 0.25); }
+            50% { box-shadow: 0 18px 42px rgba(255, 122, 24, 0.28); }
+        }
+
+        @media (max-width: 640px) {
+            .stage.opened .gift-card {
+                opacity: 0.26;
+                transform: translateY(-25vh) scale(0.72);
             }
 
-            h1 {
-                font-size: 25px;
-            }
-
-            .message {
-                width: min(190px, 78vw);
-                font-size: 15px;
+            .note {
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <main class="stage">
+    <main class="stage" id="stage">
         <section class="gift-card">
-            <div class="pumpkin">🎃</div>
-            <h1>神秘万圣节礼物</h1>
-            <p>你有一份来自钢的万圣节礼物。点开以后，会收到一点点快乐提示。</p>
-            <button id="openGift">打开礼物</button>
-            <div class="note">如果浏览器拦截音乐，页面也会正常显示。</div>
+            <div class="pumpkin">&#127875;</div>
+            <h1>&#31070;&#31192;&#19975;&#22307;&#33410;&#31036;&#29289;</h1>
+            <p>&#20320;&#26377;&#19968;&#20221;&#26469;&#33258;&#38050;&#30340;&#19975;&#22307;&#33410;&#31036;&#29289;&#12290;&#28857;&#24320;&#21518;&#65292;&#25552;&#31034;&#20250;&#25490;&#25104;&#19968;&#39063;&#29233;&#24515;&#12290;</p>
+            <button id="openGift">&#25171;&#24320;&#31036;&#29289;</button>
+            <div class="note">&#25163;&#26426;&#21644;&#30005;&#33041;&#37117;&#20250;&#33258;&#21160;&#36866;&#37197;&#29233;&#24515;&#22823;&#23567;</div>
         </section>
     </main>
 
@@ -163,55 +189,106 @@
 
     <script>
         const messages = [
-            "万圣节快乐",
-            "今天也要开心",
-            "记得早点休息",
-            "保持微笑呀",
-            "你已经很棒啦",
-            "好运正在赶来",
-            "别被作业吓到",
-            "代码会慢慢变听话",
-            "愿你每天都有糖",
-            "期待下一次见面"
+            "\u4e07\u5723\u8282\u5feb\u4e50",
+            "\u4eca\u5929\u4e5f\u8981\u5f00\u5fc3",
+            "\u8bb0\u5f97\u65e9\u70b9\u4f11\u606f",
+            "\u4fdd\u6301\u5fae\u7b11\u5440",
+            "\u4f60\u5df2\u7ecf\u5f88\u68d2\u5566",
+            "\u597d\u8fd0\u6b63\u5728\u8d76\u6765",
+            "\u522b\u88ab\u4f5c\u4e1a\u5413\u5230",
+            "\u4ee3\u7801\u4f1a\u53d8\u542c\u8bdd",
+            "\u613f\u4f60\u6bcf\u5929\u6709\u7cd6",
+            "\u671f\u5f85\u4e0b\u6b21\u89c1\u9762"
         ];
 
+        const stage = document.getElementById("stage");
         const layer = document.getElementById("popupLayer");
         const button = document.getElementById("openGift");
         const music = document.getElementById("bgMusic");
+        let opened = false;
+        let timers = [];
 
-        function randomBetween(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
+        function getLayout() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const mobile = width < 640;
+            const bubbleWidth = mobile ? Math.max(54, Math.min(72, width / 6.4)) : Math.max(72, Math.min(104, width / 11));
+            const bubbleHeight = mobile ? 36 : 42;
+            const centerX = width / 2;
+            const centerY = mobile ? height * 0.56 : height * 0.53;
+            const scale = Math.min(
+                (width - bubbleWidth * 1.8) / 34,
+                (height - bubbleHeight * 3.2) / 30,
+                mobile ? 13 : 20
+            );
+
+            return {
+                count: mobile ? 38 : 52,
+                bubbleWidth,
+                bubbleHeight,
+                fontSize: mobile ? 11 : 13,
+                centerX,
+                centerY,
+                scale: Math.max(7, scale)
+            };
         }
 
-        function createMessage(index) {
-            const message = document.createElement("div");
-            message.className = "message";
-            message.style.left = `${randomBetween(8, Math.max(8, window.innerWidth - 230))}px`;
-            message.style.top = `${randomBetween(8, Math.max(8, window.innerHeight - 110))}px`;
-            message.style.setProperty("--rotate", `${randomBetween(-6, 6)}deg`);
-            message.innerHTML = `<small>提示 ${index + 1}</small>${messages[index % messages.length]}`;
-            layer.appendChild(message);
+        function heartPoint(index, count, layout) {
+            const t = Math.PI - (index / count) * Math.PI * 2;
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+            return {
+                x: layout.centerX + x * layout.scale,
+                y: layout.centerY - y * layout.scale
+            };
+        }
+
+        function clearTimers() {
+            timers.forEach((timer) => clearTimeout(timer));
+            timers = [];
+        }
+
+        function renderHeart() {
+            clearTimers();
+            layer.innerHTML = "";
+
+            const layout = getLayout();
+            layer.style.setProperty("--bubble-width", `${layout.bubbleWidth}px`);
+            layer.style.setProperty("--bubble-height", `${layout.bubbleHeight}px`);
+            layer.style.setProperty("--bubble-font", `${layout.fontSize}px`);
+
+            for (let i = 0; i < layout.count; i += 1) {
+                const timer = setTimeout(() => {
+                    const point = heartPoint(i, layout.count, layout);
+                    const message = document.createElement("div");
+                    message.className = "message";
+                    message.style.left = `${point.x}px`;
+                    message.style.top = `${point.y}px`;
+                    message.style.setProperty("--rotate", `${(i % 7) - 3}deg`);
+                    message.textContent = messages[i % messages.length];
+                    layer.appendChild(message);
+                }, i * 58);
+                timers.push(timer);
+            }
         }
 
         function openGift() {
+            opened = true;
+            stage.classList.add("opened");
             button.disabled = true;
-            button.textContent = "礼物已打开";
+            button.textContent = "\u7231\u5fc3\u5df2\u7ed8\u5236";
 
-            music.volume = 0.45;
+            music.volume = 0.42;
             music.play().catch(() => {});
-
-            layer.innerHTML = "";
-            let count = 0;
-            const timer = setInterval(() => {
-                createMessage(count);
-                count += 1;
-                if (count >= 36) {
-                    clearInterval(timer);
-                }
-            }, 110);
+            renderHeart();
         }
 
         button.addEventListener("click", openGift);
+        window.addEventListener("resize", () => {
+            if (opened) {
+                renderHeart();
+            }
+        });
     </script>
 </body>
 </html>
