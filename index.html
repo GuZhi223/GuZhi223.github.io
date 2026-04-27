@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style><script src="chrome-extension://memhacajcfhmibggbgilihlmiiddeggo/assets/main-world.ts-4ed993c7.js" type="module"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>钢的学习页</title>
@@ -428,7 +428,7 @@
             </div>
             <nav class="nav" aria-label="页面导航">
                 <a href="#about">关于我</a>
-                <a href="#shares">实验室</a>
+                <a href="#shares">一些分享</a>
                 <a href="#opensource">开源库</a>
                 <a href="#contact">传送门</a>
             </nav>
@@ -437,10 +437,10 @@
         <main>
             <section class="hero" id="about">
                 <div class="intro">
-                    <p class="eyebrow">大一计科在读 / 实用主义折腾者 / 慢慢把代码写优雅</p>
+                    <p class="eyebrow">大一计科在读 / 喜欢折腾 / 慢慢成为嘿壳</p>
                     <h1>你好，我是钢。</h1>
                     <p class="lead">
-                        欢迎来到我的数字试验田。这里记录着我正在啃的基础、正在造的轮子，以及顺手写的一些实用小工具。不强行包装大项目，只展示真实的成长轨迹。能跑通、能解决实际问题、能留下来复盘的代码，我都会收拾好放在这里。
+                        欢迎来到我的数字试验田。这里记录着我的成长历程，以及用AI实现的一些idea。我付出过一定努力和对感觉他人有用的代码，我会收拾好放在这里。
                     </p>
                     <div class="actions">
                         <a class="button primary" href="#opensource"><i class="fab fa-github"></i>浏览开源仓库</a>
@@ -461,14 +461,14 @@
                             <i class="fas fa-mug-hot"></i>
                             <div>
                                 <strong>页面说明</strong>
-                                <span>个人介绍、实验室入口与 GitHub 仓库索引。比起花哨的 UI，现在更看重内容和实用性。</span>
+                                <span>个人介绍、小工具入口与 GitHub 仓库索引。</span>
                             </div>
                         </div>
                         <div class="status-item">
                             <i class="fas fa-location-dot"></i>
                             <div>
                                 <strong>关于 AI</strong>
-                                <span>拥抱 AI 辅助，但拒绝做无脑调包侠。AI 可以提高效率，代码逻辑还是要自己消化。</span>
+                                <span>求求你再给我一点Token吧 .TvT.</span>
                             </div>
                         </div>
                     </div>
@@ -477,32 +477,32 @@
 
             <section>
                 <div class="section-head">
-                    <h2>这个站点放什么</h2>
+                    <h2>关于站点</h2>
                     <p>这里是个人主页，也是一个公开实验台：放网页练习、实用工具、开源仓库和阶段性学习记录。</p>
                 </div>
                 <div class="grid">
                     <article class="card">
                         <div class="card-icon"><i class="fas fa-share-nodes"></i></div>
-                        <h3>实验室</h3>
-                        <p>轻量级静态网页、前端小工具和课程拓展，适合直接点开看效果。</p>
+                        <h3>一些分享</h3>
+                        <p>一些“网红”网页、前端小工具和课程拓展，适合直接点开看效果。</p>
                     </article>
                     <article class="card">
                         <div class="card-icon"><i class="fab fa-github"></i></div>
                         <h3>开源库</h3>
-                        <p>放到 GitHub 上的完整仓库，记录需求整理、功能实现和 debug 过程。</p>
+                        <p>分享介绍我放到 GitHub 上的代码仓库</p>
                     </article>
                     <article class="card">
                         <div class="card-icon"><i class="fas fa-wrench"></i></div>
                         <h3>持续迭代</h3>
-                        <p>目录、命名、页面风格都会继续调整。先让内容跑起来，再慢慢把体验打磨好。</p>
+                        <p>不断学习的的过程</p>
                     </article>
                 </div>
             </section>
 
             <section id="shares">
                 <div class="section-head">
-                    <h2>实验室</h2>
-                    <p>一些轻量级静态网页、前端小工具和课程相关拓展。不算大工程，但都是为了解决具体问题，或者单纯觉得好玩而折腾出来的。</p>
+                    <h2>一些分享</h2>
+                    <p>几个轻量级静态网页、大多收集于互联网</p>
                 </div>
                 <div class="works">
                     <article class="work">
@@ -524,7 +524,7 @@
                         <div class="work-top">
                             <div>
                                 <h3>爱心展示合集</h3>
-                                <p>从网上收集的“低脂”爱心 HTML 源码，整理成干净的导航页，并彻底清理了原版的外部推广入口。</p>
+                                <p>从网上收集的“低脂”爱心 HTML 源码，整理成干净的导航页，并彻底清理了外部推广入口。</p>
                             </div>
                             <div class="work-icon"><i class="fas fa-heart"></i></div>
                         </div>
@@ -540,7 +540,7 @@
                         <div class="work-top">
                             <div>
                                 <h3>营养素计算器</h3>
-                                <p>结合日常减脂和长跑训练的需求写的小工具。输入性别、体重和运动量，估算每日碳水、蛋白质和脂肪目标。</p>
+                                <p>根据谭成义老师的生活化减脂理论小工具。输入性别、体重和运动量，估算每日碳水、蛋白质和脂肪目标。</p>
                             </div>
                             <div class="work-icon"><i class="fas fa-calculator"></i></div>
                         </div>
@@ -548,14 +548,14 @@
                             <span class="tag">表单交互</span>
                             <span class="tag">实用工具</span>
                             <span class="tag">JavaScript</span>
-                        </div>
+                        <span class="tag">Vibe Coding</span></div>
                         <a class="work-link" href="projects/nutrition/index.html">打开页面 <i class="fas fa-arrow-right"></i></a>
                     </article>
 
                     <article class="work">
                         <div class="work-top">
                             <div>
-                                <h3>3D 手势塔罗牌</h3>
+                                <h3>3D 手势塔罗牌抽取</h3>
                                 <p>基于 Three.js 和 MediaPipe Hands 的全屏交互实验。输入问题后，用「张开手 → 握拳 → 张开手」的手势在 3D 牌阵中抽取塔罗牌。</p>
                             </div>
                             <div class="work-icon"><i class="fas fa-hand-paper"></i></div>
@@ -564,7 +564,7 @@
                             <span class="tag">Three.js</span>
                             <span class="tag">MediaPipe Hands</span>
                             <span class="tag">手势交互</span>
-                        </div>
+                        <span class="tag">Vibe Coding</span></div>
                         <a class="work-link" href="projects/particles/index.html">打开页面 <i class="fas fa-arrow-right"></i></a>
                     </article>
                 </div>
@@ -573,14 +573,14 @@
             <section id="opensource">
                 <div class="section-head">
                     <h2>开源库</h2>
-                    <p>这里不全是从零原创的大项目，也有 GUI 封装、油猴脚本和 fork 学习仓库。说白了，很多东西还带着很重的折腾痕迹，但它们确实记录了我怎么把一个想法慢慢跑起来。</p>
+                    <p>这里其实都是一些vibe coding不过大多都是我自己从idea开始到落地的</p>
                 </div>
                 <div class="works">
                     <article class="work">
                         <div class="work-top">
                             <div>
                                 <h3>hnjingsai_help</h3>
-                                <p>说得直白点，这是一个应付形式主义答题的油猴脚本。针对 henanjingsai.cn 写了自动匹配逻辑，顺手整理了约 244 道题的题库。</p>
+                                <p>这是一个应付形式主义答题的油猴脚本。针对 henanjingsai.cn 写了自动匹配逻辑，顺手整理了约 244 道题的题库。</p>
                             </div>
                             <div class="work-icon"><i class="fas fa-trophy"></i></div>
                         </div>
@@ -588,7 +588,7 @@
                             <span class="tag">油猴脚本</span>
                             <span class="tag">题库整理</span>
                             <span class="tag">JavaScript</span>
-                        </div>
+                        <span class="tag">Vibe Coding</span></div>
                         <a class="work-link" href="https://github.com/GuZhi223/hnjingsai_help" target="_blank" rel="noopener">打开仓库 <i class="fas fa-arrow-right"></i></a>
                     </article>
 
@@ -604,7 +604,7 @@
                             <span class="tag">Flet GUI</span>
                             <span class="tag">Python</span>
                             <span class="tag">MVVM</span>
-                        </div>
+                        <span class="tag">Vibe Coding</span></div>
                         <a class="work-link" href="https://github.com/GuZhi223/chaoxing-GUI-Helper" target="_blank" rel="noopener">打开仓库 <i class="fas fa-arrow-right"></i></a>
                     </article>
 
@@ -629,7 +629,7 @@
             <section id="contact">
                 <div class="section-head">
                     <h2>传送门</h2>
-                    <p>公开页面仅保留必要的信息接口，有事可以通过邮件或 Issue 找我。</p>
+                    <p>有事可以通过邮件或 Issue 找我。</p>
                 </div>
                 <div class="contact">
                     <div class="contact-box">
@@ -642,15 +642,15 @@
                             </div>
                             <div class="contact-row">
                                 <span>邮箱</span>
-                                <button class="copy-btn" data-copy="1034687640@qq.com">复制邮箱</button>
+                                <button class="copy-btn" data-copy="lbwwdg@vip.qq.com">复制邮箱</button>
                             </div>
                         </div>
                     </div>
                     <div class="contact-box">
                         <h3>留白说明</h3>
                         <p>
-                            这个主页会和我的 GitHub 仓库一起野蛮生长。现在粗糙的地方就先大大方方晾着，等技术栈深了，再回头重构。
-                        </p>
+GO WORK
+</p>
                     </div>
                 </div>
             </section>
@@ -676,5 +676,6 @@
             });
         });
     </script>
-</body>
-</html>
+
+
+<yd-mg-icon style="position: fixed; z-index: 2147483647;"></yd-mg-icon><yd-mg-block-icon></yd-mg-block-icon><yd-image-ocr style="z-index: 2147483647;"></yd-image-ocr></body></html>
