@@ -1287,6 +1287,35 @@
     let lastHandsSent = 0;
     let handLoopRunning = false;
 
+    function waitForVideoReady(videoEl, timeout = 3500) {
+      return new Promise((resolve, reject) => {
+        const started = performance.now();
+        const check = () => {
+          if (videoEl.readyState >= 2 && videoEl.videoWidth > 0 && videoEl.videoHeight > 0) {
+            resolve();
+            return;
+          }
+          if (performance.now() - started > timeout) {
+            reject(new Error("video metadata timeout"));
+            return;
+          }
+          requestAnimationFrame(check);
+        };
+        if (videoEl.readyState >= 1) check();
+        else videoEl.addEventListener("loadedmetadata", check, { once: true });
+      });
+    }
+
+    async function ensureVideoPlaying(videoEl) {
+      await waitForVideoReady(videoEl);
+      const playPromise = videoEl.play();
+      if (playPromise) await playPromise;
+      await waitForVideoReady(videoEl);
+      if (videoEl.paused || videoEl.readyState < 2) {
+        throw new Error("video did not start playing");
+      }
+    }
+
     async function startHandTracking() {
       try {
         if (appState.cameraReady && video.srcObject) {
@@ -1305,9 +1334,15 @@
           audio: false
         });
         video.srcObject = stream;
-        await video.play();
+        video.muted = true;
+        video.playsInline = true;
+        await ensureVideoPlaying(video);
         handCanvas.width = video.videoWidth || 640;
         handCanvas.height = video.videoHeight || 480;
+
+        if (typeof Hands === "undefined") {
+          throw new Error("MediaPipe Hands failed to load");
+        }
 
         hands = new Hands({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
         hands.setOptions({
@@ -1328,12 +1363,21 @@
         console.error(err);
         appState.manualMode = true;
         updatePhase("fistSeen");
-        setStatus("摄像头启动失败，已切换为点击抽牌模式", false);
+        const message = err && err.message ? err.message : "";
+        if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+          setStatus("手机浏览器需要 HTTPS 才能开摄像头，已切换为点击抽牌", false);
+        } else if (/MediaPipe|Hands/i.test(message)) {
+          setStatus("手势识别资源加载失败，已切换为点击抽牌", false);
+        } else if (/metadata|playing/i.test(message)) {
+          setStatus("视频流没有正常启动，已切换为点击抽牌", false);
+        } else {
+          setStatus("摄像头启动失败，已切换为点击抽牌模式", false);
+        }
       }
     }
 
     async function handLoop(now) {
-      if (!hands || video.readyState < 2) {
+      if (!hands || video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
         requestAnimationFrame(handLoop);
         return;
       }
