@@ -1,1055 +1,660 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的学习空间 | 大一计科学生</title>
+    <title>钢的学习页</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --bg: #f7f8fb;
+            --paper: #ffffff;
+            --ink: #20242c;
+            --muted: #626b7a;
+            --line: #dfe4ec;
+            --blue: #2f6fed;
+            --green: #138a63;
+            --orange: #c56a21;
+            --shadow: 0 12px 34px rgba(34, 43, 58, 0.08);
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            background: linear-gradient(135deg, #121212, #2a2a2a);
-            color: #e0e0e0;
-            min-height: 100vh;
-            overflow-x: hidden;
-            line-height: 1.6;
+            margin: 0;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, #eef4ff 0, rgba(238, 244, 255, 0) 320px),
+                var(--bg);
+            font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+            line-height: 1.7;
         }
 
-        .container {
-            max-width: 1000px;
+        a {
+            color: inherit;
+        }
+
+        .page {
+            width: min(1100px, calc(100% - 32px));
             margin: 0 auto;
-            padding: 20px;
         }
 
-        header {
-            text-align: center;
-            padding: 40px 0 30px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto 20px;
-            border: 3px solid #4a8fe7;
-            background: #2c2c2c;
+        .topbar {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #4a8fe7;
-            font-size: 50px;
-            position: relative;
-            box-shadow: 0 0 20px rgba(74, 143, 231, 0.4);
+            justify-content: space-between;
+            gap: 18px;
+            padding: 22px 0;
         }
 
-        h1 {
-            font-size: 32px;
-            margin-bottom: 10px;
-            color: #f5f5f5;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-
-        .subtitle {
-            color: #8d8d8d;
-            font-size: 18px;
-            margin-bottom: 20px;
-            font-weight: 300;
-        }
-
-        .tagline {
-            font-style: italic;
-            color: #4a8fe7;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 10px 20px;
-            background: rgba(74, 143, 231, 0.1);
-            border-radius: 30px;
-        }
-
-        .section {
-            background: rgba(30, 30, 30, 0.8);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .section-title {
-            font-size: 22px;
-            margin-bottom: 20px;
-            color: #4a8fe7;
+        .brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 800;
+            letter-spacing: 0;
         }
 
-        .section-title i {
-            font-size: 24px;
-        }
-
-        .about-content {
+        .brand-mark {
+            width: 34px;
+            height: 34px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            place-items: center;
+            border-radius: 10px;
+            color: #fff;
+            background: var(--blue);
         }
 
-        @media (max-width: 768px) {
-            .about-content {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .about-text p {
-            margin-bottom: 15px;
-            line-height: 1.8;
-        }
-
-        .info-item {
+        .nav {
             display: flex;
-            margin-bottom: 12px;
-            padding: 8px;
-            border-radius: 6px;
-            background: rgba(255, 255, 255, 0.05);
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
-        .info-label {
-            width: 100px;
-            color: #8d8d8d;
-            font-weight: 500;
-        }
-
-        .info-value {
-            flex: 1;
-        }
-
-        .skills {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 15px;
-        }
-
-        .skill-item {
-            background: #2c2c2c;
-            padding: 15px;
+        .nav a {
+            padding: 8px 12px;
+            color: var(--muted);
+            text-decoration: none;
             border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
         }
 
-        .skill-name {
+        .nav a:hover {
+            color: var(--blue);
+            background: rgba(47, 111, 237, 0.08);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+            gap: 28px;
+            align-items: stretch;
+            padding: 34px 0 22px;
+        }
+
+        .intro {
+            padding: clamp(26px, 5vw, 46px);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.82);
+            box-shadow: var(--shadow);
+        }
+
+        .eyebrow {
+            margin: 0 0 12px;
+            color: var(--green);
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(36px, 7vw, 64px);
+            line-height: 1.05;
+            letter-spacing: 0;
+        }
+
+        .lead {
+            max-width: 680px;
+            margin: 22px 0 0;
+            color: var(--muted);
+            font-size: clamp(16px, 2vw, 19px);
+        }
+
+        .actions {
             display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 9px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .button.primary {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: #fff;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        .side-note {
+            display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            margin-bottom: 8px;
-            font-weight: 500;
+            gap: 18px;
+            padding: 26px;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: var(--shadow);
         }
 
-        .skill-bar {
-            height: 8px;
-            background: #333;
-            border-radius: 4px;
-            overflow: hidden;
+        .status-list {
+            display: grid;
+            gap: 14px;
+            margin: 0;
         }
 
-        .skill-level {
-            height: 100%;
-            background: linear-gradient(90deg, #4a8fe7, #6ba2eb);
-            border-radius: 4px;
-            transition: width 1s ease-in-out;
+        .status-item {
+            display: grid;
+            grid-template-columns: 32px 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .status-item i {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border-radius: 9px;
+            color: var(--blue);
+            background: rgba(47, 111, 237, 0.1);
+        }
+
+        .status-item strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .status-item span {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        section {
+            padding: 34px 0;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: clamp(24px, 4vw, 34px);
+            letter-spacing: 0;
+        }
+
+        .section-head p {
+            max-width: 520px;
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            min-height: 100%;
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: var(--paper);
+            box-shadow: 0 8px 24px rgba(34, 43, 58, 0.05);
+        }
+
+        .card-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 16px;
+            border-radius: 12px;
+            color: var(--blue);
+            background: rgba(47, 111, 237, 0.1);
+            font-size: 18px;
+        }
+
+        .card h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 15px;
         }
 
         .projects {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 15px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
         }
 
-        .project-card {
-            background: #2c2c2c;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: relative;
+        .project {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 230px;
+            padding: 20px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(34, 43, 58, 0.05);
         }
 
-        .project-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .project-img {
-            height: 160px;
-            background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+        .project-top {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: #4a8fe7;
-            font-size: 50px;
-            position: relative;
-            overflow: hidden;
+            justify-content: space-between;
+            gap: 12px;
         }
 
-        .project-img::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, rgba(74, 143, 231, 0.2), transparent);
+        .project-icon {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            color: #fff;
+            background: var(--blue);
         }
 
-        .project-content {
-            padding: 20px;
+        .project:nth-child(2n) .project-icon {
+            background: var(--green);
         }
 
-        .project-title {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #f5f5f5;
-            font-weight: 600;
+        .project:nth-child(3n) .project-icon {
+            background: var(--orange);
         }
 
-        .project-desc {
-            color: #8d8d8d;
-            font-size: 14px;
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-
-        .project-tech {
+        .tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            margin-top: auto;
         }
 
-        .tech-tag {
-            background: rgba(74, 143, 231, 0.2);
-            color: #4a8fe7;
-            padding: 4px 12px;
-            border-radius: 20px;
+        .tag {
+            padding: 4px 9px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--muted);
+            background: #f8fafc;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 700;
         }
 
         .project-link {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 8px 16px;
-            background: rgba(74, 143, 231, 0.2);
-            color: #4a8fe7;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            color: var(--blue);
+            font-weight: 800;
             text-decoration: none;
-            border-radius: 20px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(74, 143, 231, 0.3);
         }
 
         .project-link:hover {
-            background: rgba(74, 143, 231, 0.3);
-            transform: translateY(-2px);
+            text-decoration: underline;
         }
 
-        .learning-list {
+        .contact {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 0.75fr);
+            gap: 16px;
+            align-items: stretch;
         }
 
-        .learning-item {
-            background: #2c2c2c;
-            padding: 15px;
-            border-radius: 8px;
+        .contact-box {
+            padding: 22px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: #fff;
+        }
+
+        .contact-box p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .contact-links {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .contact-row {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 12px;
-            transition: transform 0.3s ease;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
         }
 
-        .learning-item:hover {
-            transform: translateX(5px);
+        .contact-row:last-child {
+            border-bottom: 0;
         }
 
-        .learning-icon {
-            color: #4a8fe7;
-            font-size: 24px;
-        }
-
-        .contact-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: #2c2c2c;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        .contact-row a,
+        .copy-btn {
+            color: var(--blue);
+            border: 0;
+            background: transparent;
+            font: inherit;
+            font-weight: 800;
+            text-decoration: none;
             cursor: pointer;
-        }
-
-        .contact-item:hover {
-            background: #333;
-            transform: translateY(-5px);
-        }
-
-        .contact-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: rgba(74, 143, 231, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: #4a8fe7;
         }
 
         footer {
-            text-align: center;
-            padding: 30px 0;
-            margin-top: 40px;
-            color: #8d8d8d;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .motivation {
-            font-style: italic;
-            margin-top: 15px;
-            color: #4a8fe7;
-            font-size: 16px;
-        }
-
-        .progress-0 { width: 0%; }
-        .progress-1 { width: 1%; }
-        .progress-2 { width: 2%; }
-        .progress-5 { width: 5%; }
-        .progress-50 { width: 50%; }
-        .progress-60 { width: 60%; }
-        .progress-40 { width: 40%; }
-        .progress-30 { width: 30%; }
-        .progress-70 { width: 70%; }
-
-        .fun-fact {
-            background: rgba(74, 143, 231, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border-left: 4px solid #4a8fe7;
-        }
-
-        .fun-fact p {
-            margin: 0;
-            font-style: italic;
-            color: #8d8d8d;
-        }
-
-        .emoji {
-            display: inline-block;
-            animation: bounce 2s infinite;
-            margin: 0 5px;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .highlight {
-            color: #4a8fe7;
-            font-weight: 600;
-        }
-
-        .pulse {
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .heart-icon {
-            color: #ff6b6b;
-            animation: heartbeat 1.5s infinite;
-        }
-
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        /* 新增的弹窗样式 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-content {
-            background: rgba(30, 30, 30, 0.95);
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transform: translateY(20px);
-            transition: transform 0.4s ease;
-            position: relative;
-            border: 1px solid rgba(74, 143, 231, 0.3);
-        }
-        
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-        }
-        
-        .modal-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .modal-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(74, 143, 231, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: #4a8fe7;
-            margin-right: 15px;
-        }
-        
-        .modal-title {
-            font-size: 24px;
-            color: #f5f5f5;
-        }
-        
-        .modal-body {
-            margin-bottom: 25px;
-        }
-        
-        .modal-info {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-        }
-        
-        .modal-info-label {
-            color: #8d8d8d;
-            margin-bottom: 5px;
+            padding: 26px 0 40px;
+            color: var(--muted);
             font-size: 14px;
+            border-top: 1px solid var(--line);
         }
-        
-        .modal-info-value {
-            color: #f5f5f5;
-            font-size: 16px;
-            word-break: break-all;
+
+        @media (max-width: 860px) {
+            .hero,
+            .contact {
+                grid-template-columns: 1fr;
+            }
+
+            .grid,
+            .projects {
+                grid-template-columns: 1fr;
+            }
         }
-        
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
-        .modal-btn {
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .modal-btn-primary {
-            background: #4a8fe7;
-            color: white;
-        }
-        
-        .modal-btn-primary:hover {
-            background: #3a7ed7;
-            transform: translateY(-2px);
-        }
-        
-        .modal-btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #8d8d8d;
-        }
-        
-        .modal-btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: rotate(90deg);
-        }
-        
-        .qr-code {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
-                .qr-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid rgba(74, 143, 231, 0.3);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-        .qr-placeholder {
-            width: 150px;
-            height: 150px;
-            background: linear-gradient(45deg, #2c2c2c, #3a3a3a);
-            border: 1px dashed #4a8fe7;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #4a8fe7;
-            font-size: 14px;
-            text-align: center;
-            padding: 10px;
+
+        @media (max-width: 560px) {
+            .page {
+                width: min(100% - 24px, 1100px);
+            }
+
+            .topbar,
+            .section-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .nav {
+                justify-content: flex-start;
+            }
+
+            .intro,
+            .side-note,
+            .card,
+            .project,
+            .contact-box {
+                border-radius: 12px;
+            }
+
+            .contact-row {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 4px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-      <!-- 头部信息 -->
-        <header>
-            <div class="avatar">
-                <i class="fas fa-user-graduate"></i>
+    <div class="page">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark"><i class="fas fa-code"></i></span>
+                <span>钢的学习页</span>
             </div>
-            <h1>钢 <span class="emoji">👨‍💻</span></h1>
-            <div class="subtitle">计科专业大一学生 · 编程萌新</div>
-            <div class="tagline">"大可不必了解我，看我笑话就好"</div>
+            <nav class="nav" aria-label="页面导航">
+                <a href="#about">关于</a>
+                <a href="#projects">作品</a>
+                <a href="#contact">联系</a>
+            </nav>
         </header>
-        
-        <!-- 关于我 -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-user"></i> 关于我</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <p>嗨！我是钢，一个普通的<span class="highlight">计科专业大一学生</span>，正在探索编程的奇妙世界。</p>
-                    <p><span class="pulse">会背九九乘法表</span>，下雨知道往家跑，<span class="highlight">从小独立呼吸</span>，长大会玩手机</p>
-                    
-                </div>
-                <div class="about-info">
-                    <div class="info-item">
-                        <div class="info-label">状态：</div>
-                        <div class="info-value">学习中 <span class="emoji">📚</span></div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">心情：</div>
-                        <div class="info-value">乐观且困惑 <span class="emoji">😅</span></div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">目标：</div>
-                        <div class="info-value">学会写"Hello World"以外的程序</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="fun-fact">
-                <p><i class="fas fa-lightbulb"></i> 有趣的事实：我曾经花了3小时找到一个缺失的分号</p>
-            </div>
-        </section>
-        <!-- 作业分享 -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-graduation-cap"></i> 作业分享</h2>
-            <p></p>
-            <div class="projects"> <!-- 作业 -->
-                <div class="project-card">
-                    <div class="project-img"> <i class="fas fa-pencil-alt"></i> </div>
-                    <div class="project-content">
-                        <div class="project-title">电子作业思路分享 <span class="emoji">📄</span></div>
-                        <div class="project-desc">说谢谢了吗（提醒我及时更新）</div>
-                        <div class="project-tech"> <span class="tech-tag">计算机导论</span>  <span class="tech-tag">程序设计基础</span>  </div>
-                        <a href="assignments/index.html" class="project-link" target="_self">点击查看 →</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- 技能 -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-code"></i> 我的技能</h2>
-            <p>正在学习中的技能（诚实评估）：</p>
-            <div class="skills">
-                <div class="skill-item">
-                    <div class="skill-name">
-                        <span>Java <span class="emoji">☕</span></span>
-                        <span>5%</span>
-                    </div>
-                    <div class="skill-bar">
-                        <div class="skill-level progress-5"></div>
-                    </div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name">
-                        <span>C <span class="emoji">🔍</span></span>
-                        <span>0.5%</span>
-                    </div>
-                    <div class="skill-bar">
-                        <div class="skill-level progress-1"></div>
-                    </div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name">
-                        <span>数据结构 <span class="emoji">🧩</span></span>
-                        <span>0%</span>
-                    </div>
-                    <div class="skill-bar">
-                        <div class="skill-level progress-0"></div>
-                    </div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name">
-                        <span>Git <span class="emoji">📦</span></span>
-                        <span>1%</span>
-                    </div>
-                    <div class="skill-bar">
-                        <div class="skill-level progress-2"></div>
-                    </div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name">
-                        <span>HTML/CSS <span class="emoji">🎨</span></span>
-                        <span>30%</span>
-                    </div>
-                    <div class="skill-bar">
-                        <div class="skill-level progress-30"></div>
-                    </div>
-                </div>
-                <div class="skill-item">
-                    <div class="skill-name">
-                        <span>Debug <span class="emoji">🐛</span></span>
-                        <span>80%</span>
-                    </div>
-                    <div class="skill-bar">
-                        <div class="skill-level progress-70"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="fun-fact">
-                <p><i class="fas fa-lightbulb"></i> 注：Debug技能指的是"找出为什么代码不工作"的能力，而非"写出不需要Debug的代码"的能力</p>
-            </div>
-        </section>
-        
-        <!-- 学习计划 -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-book"></i> 学习计划</h2>
-            <p>正在学习的内容：</p>
-            <div class="learning-list">
-                <div class="learning-item">
-                    <div class="learning-icon"><i class="fas fa-laptop-code"></i></div>
-                    <div>C语言程序设计基础</div>
-                </div>
-                <div class="learning-item">
-                    <div class="learning-icon"><i class="fas fa-calculator"></i></div>
-                    <div>高等数学</div>
-                </div>
-                <div class="learning-item">
-                    <div class="learning-icon"><i class="fas fa-chart-bar"></i></div>
-                    <div>数据结构</div>
-                </div>
-                <div class="learning-item">
-                    <div class="learning-icon"><i class="fas fa-brain"></i></div>
-                    <div>如何保持清醒不睡着</div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 项目展示 -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-project-diagram"></i> 我的项目</h2>
-            <p>课程作业和自学练习项目：</p>
-            <div class="projects">
-                <!-- 爱心表白网页项目 -->
-                <div class="project-card">
-                    <div class="project-img">
-                        <i class="fas fa-heart heart-icon"></i>
-                    </div>
-                    <div class="project-content">
-                        <div class="project-title">爱心表白网页（抄的） <span class="emoji">💖</span></div>
-                        <div class="project-desc">一个动态爱心</div>
-                        <div class="project-tech">
-                            <span class="tech-tag">HTML</span>
-                            <span class="tech-tag">CSS</span>
-                            <span class="tech-tag">JavaScript</span>
-                        </div>
-                        <a href="projects/love/index.html" class="project-link" target="_self">点击查看 →</a>
-                    </div>
-                </div>
-                
-                <div class="project-card">
-                    <div class="project-img">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="project-content">
-                        <div class="project-title">个人简历网页 <span class="emoji">📄</span></div>
-                        <div class="project-desc">你正在看的这个网页，写了3天调试了5天</div>
-                        <div class="project-tech">
-                            <span class="tech-tag">HTML</span>
-                            <span class="tech-tag">CSS</span>
-                            <span class="tech-tag">头发</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="project-card">
-                    <div class="project-img">
-                        <i class="fas fa-question-circle"></i>
-                    </div>
-                    <div class="project-content">
-                        <div class="project-title">未来神秘项目 <span class="emoji">❓</span></div>
-                        <div class="project-desc">暂时只有一个文件夹名称，但未来会很厉害</div>
-                        <div class="project-tech">
-                            <span class="tech-tag">梦想</span>
-                            <span class="tech-tag">期待</span>
-                        </div>
+
+        <main>
+            <section class="hero" id="about">
+                <div class="intro">
+                    <p class="eyebrow">计科学生 / 正在补基础 / 偶尔做点小页面</p>
+                    <h1>你好，我是钢。</h1>
+                    <p class="lead">
+                        这里放一些我正在学、正在做、或者临时写出来的小东西。水平还在路上，但会慢慢把能跑的、能看的、能复用的内容整理起来。
+                    </p>
+                    <div class="actions">
+                        <a class="button primary" href="#projects"><i class="fas fa-folder-open"></i>看作品</a>
+                        <a class="button" href="assignments/index.html"><i class="fas fa-pen"></i>作业思路</a>
                     </div>
                 </div>
 
-                <div class="project-card">
-                    <div class="project-img">
-                        <i class="fas fa-calculator"></i>
-                    </div>
-                    <div class="project-content">
-                        <div class="project-title">营养素计算器 <span class="emoji">🥗</span></div>
-                        <div class="project-desc">根据性别、体重和运动时长，计算减脂期每日碳水、蛋白质和脂肪目标。</div>
-                        <div class="project-tech">
-                            <span class="tech-tag">HTML</span>
-                            <span class="tech-tag">CSS</span>
-                            <span class="tech-tag">JavaScript</span>
+                <aside class="side-note">
+                    <div class="status-list">
+                        <div class="status-item">
+                            <i class="fas fa-book"></i>
+                            <div>
+                                <strong>最近在学</strong>
+                                <span>C 语言、数据结构、Git，还有怎么少写一点出错的代码。</span>
+                            </div>
                         </div>
-                        <a href="projects/nutrition/index.html" class="project-link" target="_self">点击查看 →</a>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-img">
-                        <i class="fas fa-hand-paper"></i>
-                    </div>
-                    <div class="project-content">
-                        <div class="project-title">3D手势粒子系统 <span class="emoji">✨</span></div>
-                        <div class="project-desc">用 Three.js 和 MediaPipe 做的粒子互动页面，可以通过摄像头手势控制形态缩放。</div>
-                        <div class="project-tech">
-                            <span class="tech-tag">Three.js</span>
-                            <span class="tech-tag">MediaPipe</span>
-                            <span class="tech-tag">Canvas</span>
+                        <div class="status-item">
+                            <i class="fas fa-mug-hot"></i>
+                            <div>
+                                <strong>页面用途</strong>
+                                <span>个人介绍、作业入口、小作品展示。先实用，后面再慢慢变好看。</span>
+                            </div>
                         </div>
-                        <a href="projects/particles/index.html" class="project-link" target="_self">点击查看 →</a>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-img">
-                        <i class="fas fa-gift"></i>
-                    </div>
-                    <div class="project-content">
-                        <div class="project-title">万圣节礼物页面 <span class="emoji">🎃</span></div>
-                        <div class="project-desc">一个点击后弹出很多提示窗口并播放音乐的小互动页面。</div>
-                        <div class="project-tech">
-                            <span class="tech-tag">HTML</span>
-                            <span class="tech-tag">CSS动画</span>
-                            <span class="tech-tag">JavaScript</span>
+                        <div class="status-item">
+                            <i class="fas fa-location-dot"></i>
+                            <div>
+                                <strong>当前状态</strong>
+                                <span>还在学习。能跑就先记录，写烂了再重构。</span>
+                            </div>
                         </div>
-                        <a href="projects/halloween/index.html" class="project-link" target="_self">点击查看 →</a>
                     </div>
-                </div>
-            </div>
-        </section>
+                </aside>
+            </section>
 
-        <!-- 联系方式 -->
-        <section class="section">
-            <h2 class="section-title"><i class="fas fa-envelope"></i> 联系我</h2>
-            <p>欢迎同学和学长学姐交流：</p>
-            <div class="contact-methods">
-                <div class="contact-item" data-platform="github">
-                    <div class="contact-icon">
-                        <i class="fab fa-github"></i>
+            <section>
+                <div class="section-head">
+                    <h2>这个站点放什么</h2>
+                    <p>不装成熟，也不把练习包装成大项目。这里更像一个公开的学习抽屉。</p>
+                </div>
+                <div class="grid">
+                    <article class="card">
+                        <div class="card-icon"><i class="fas fa-pencil-alt"></i></div>
+                        <h3>作业整理</h3>
+                        <p>把课程作业的思路、链接和更新入口放在一起，方便自己和同学查。</p>
+                    </article>
+                    <article class="card">
+                        <div class="card-icon"><i class="fas fa-flask"></i></div>
+                        <h3>网页练习</h3>
+                        <p>一些 HTML、CSS、JavaScript 小实验，重点是动手，不追求一开始就完美。</p>
+                    </article>
+                    <article class="card">
+                        <div class="card-icon"><i class="fas fa-wrench"></i></div>
+                        <h3>持续整理</h3>
+                        <p>目录、命名、页面风格都会继续调整，尽量让以后回来看的时候不头疼。</p>
+                    </article>
+                </div>
+            </section>
+
+            <section id="projects">
+                <div class="section-head">
+                    <h2>作品和入口</h2>
+                    <p>目前都是静态页面。能打开、能说明用途，比堆很多华丽描述更重要。</p>
+                </div>
+                <div class="projects">
+                    <article class="project">
+                        <div class="project-top">
+                            <div>
+                                <h3>作业思路分享</h3>
+                                <p>课程作业入口和外部文档链接，后续更新也会放这里。</p>
+                            </div>
+                            <div class="project-icon"><i class="fas fa-graduation-cap"></i></div>
+                        </div>
+                        <div class="tags">
+                            <span class="tag">课程</span>
+                            <span class="tag">整理</span>
+                            <span class="tag">链接入口</span>
+                        </div>
+                        <a class="project-link" href="assignments/index.html">打开页面 <i class="fas fa-arrow-right"></i></a>
+                    </article>
+
+                    <article class="project">
+                        <div class="project-top">
+                            <div>
+                                <h3>万圣节礼物页面</h3>
+                                <p>点击后弹窗按爱心形状出现，做了手机和电脑端适配。</p>
+                            </div>
+                            <div class="project-icon"><i class="fas fa-gift"></i></div>
+                        </div>
+                        <div class="tags">
+                            <span class="tag">互动</span>
+                            <span class="tag">动画</span>
+                            <span class="tag">自适应</span>
+                        </div>
+                        <a class="project-link" href="projects/halloween/index.html">打开页面 <i class="fas fa-arrow-right"></i></a>
+                    </article>
+
+                    <article class="project">
+                        <div class="project-top">
+                            <div>
+                                <h3>营养素计算器</h3>
+                                <p>输入性别、体重和运动量，估算每日碳水、蛋白质和脂肪目标。</p>
+                            </div>
+                            <div class="project-icon"><i class="fas fa-calculator"></i></div>
+                        </div>
+                        <div class="tags">
+                            <span class="tag">表单</span>
+                            <span class="tag">计算</span>
+                            <span class="tag">JavaScript</span>
+                        </div>
+                        <a class="project-link" href="projects/nutrition/index.html">打开页面 <i class="fas fa-arrow-right"></i></a>
+                    </article>
+
+                    <article class="project">
+                        <div class="project-top">
+                            <div>
+                                <h3>3D 手势粒子系统</h3>
+                                <p>用 Three.js 和 MediaPipe 做的粒子页面，会请求摄像头权限。</p>
+                            </div>
+                            <div class="project-icon"><i class="fas fa-hand-paper"></i></div>
+                        </div>
+                        <div class="tags">
+                            <span class="tag">Three.js</span>
+                            <span class="tag">MediaPipe</span>
+                            <span class="tag">实验</span>
+                        </div>
+                        <a class="project-link" href="projects/particles/index.html">打开页面 <i class="fas fa-arrow-right"></i></a>
+                    </article>
+
+                    <article class="project">
+                        <div class="project-top">
+                            <div>
+                                <h3>爱心页面</h3>
+                                <p>早期收集/练习页面。内容还需要再整理，先保留入口。</p>
+                            </div>
+                            <div class="project-icon"><i class="fas fa-heart"></i></div>
+                        </div>
+                        <div class="tags">
+                            <span class="tag">旧页面</span>
+                            <span class="tag">练习</span>
+                        </div>
+                        <a class="project-link" href="projects/love/index.html">打开页面 <i class="fas fa-arrow-right"></i></a>
+                    </article>
+                </div>
+            </section>
+
+            <section id="contact">
+                <div class="section-head">
+                    <h2>联系</h2>
+                    <p>公开页面上我先只放必要入口，隐私信息以后再决定要不要展示。</p>
+                </div>
+                <div class="contact">
+                    <div class="contact-box">
+                        <h3>GitHub</h3>
+                        <p>主要用来放练习、页面和一些课程相关的东西。</p>
+                        <div class="contact-links">
+                            <div class="contact-row">
+                                <span>主页</span>
+                                <a href="https://github.com/GuZhi223" target="_blank" rel="noopener">GuZhi223</a>
+                            </div>
+                            <div class="contact-row">
+                                <span>邮箱</span>
+                                <button class="copy-btn" data-copy="1034687640@qq.com">复制邮箱</button>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <div>GitHub</div>
-                        <div style="font-size: 12px; color: #8d8d8d;">只有几个README</div>
+                    <div class="contact-box">
+                        <h3>一点说明</h3>
+                        <p>
+                            之前页面里放了比较多联系方式和二维码，公开站点里有点冒险。现在先收起来，只保留 GitHub 和邮箱按钮。
+                        </p>
                     </div>
                 </div>
-                <div class="contact-item" data-platform="qq">
-                    <div class="contact-icon">
-                        <i class="fab fa-qq"></i>
-                    </div>
-                    <div>
-                        <div>QQ</div>
-                        <div style="font-size: 12px; color: #8d8d8d;">主要用来加班级群</div>
-                    </div>
-                </div>
-                <div class="contact-item" data-platform="weixin">
-                    <div class="contact-icon">
-                        <i class="fab fa-weixin"></i>
-                    </div>
-                    <div>
-                        <div>微信</div>
-                        <div style="font-size: 12px; color: #8d8d8d;">用于回复“收到”</div>
-                    </div>
-                </div>
-                <div class="contact-item" data-platform="email">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <div>
-                        <div>邮箱</div>
-                        <div style="font-size: 12px; color: #8d8d8d;">主要收验证码</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- 页脚 -->
+            </section>
+        </main>
+
         <footer>
-            <p>© 2025 我的学习空间 | 大一计科学生</p>
-            <div class="motivation">"代码虐我千百遍，我待代码如初恋"</div>
+            © 2026 钢的学习页。页面还会继续改，能变清楚一点就算进步。
         </footer>
     </div>
 
-    <!-- 弹窗结构 -->
-    <div class="modal-overlay" id="socialModal">
-        <div class="modal-content">
-            <div class="close-btn">
-                <i class="fas fa-times"></i>
-            </div>
-            <div class="modal-header">
-                <div class="modal-icon" id="modalIcon">
-                    <i class="fab fa-github"></i>
-                </div>
-                <h2 class="modal-title" id="modalTitle">GitHub</h2>
-            </div>
-            <div class="modal-body">
-                <div class="modal-info">
-                    <div class="modal-info-label">用户名</div>
-                    <div class="modal-info-value" id="username">coder_student</div>
-                </div>
-                <div class="modal-info">
-                    <div class="modal-info-label">状态</div>
-                    <div class="modal-info-value" id="status">只有几个README</div>
-                </div>
-                <div class="modal-info">
-                    <div class="modal-info-label">描述</div>
-                    <div class="modal-info-value" id="description">主要用来存放学习笔记和课程项目</div>
-                </div>
-                <div id="qrContainer" class="qr-code">
-                    <div class="qr-placeholder">二维码占位符</div>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button class="modal-btn modal-btn-secondary" id="closeModal">关闭</button>
-                <button class="modal-btn modal-btn-primary" id="actionBtn">访问</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // 社交平台数据
-        const socialData = {
-            github: {
-                title: "GitHub",
-                icon: "fab fa-github",
-                username: "GuZhi223",
-                status: "只有几个README",
-                description: "主要用来存放学习笔记和课程项目",
-                actionText: "访问主页",
-                actionUrl: "https://github.com/GuZhi223",
-                showQR: false
-            },
-            qq: {
-                title: "QQ",
-                icon: "fab fa-qq",
-                username: "1034687640",
-                status: "主要用来加班级群和登录游戏",
-                description: "加好友请备注姓名和来意",
-                actionText: "添加好友",
-                actionUrl: "https://qm.qq.com/q/pIPK6ZC5kO",
-                showQR: false
-            },
-            weixin: {
-                title: "微信",
-                icon: "fab fa-weixin",
-                username: "l18960538152",
-                status: "扫码加我",
-                description: "添加时请注明身份和来意",
-                actionText: "复制微信号",
-                actionUrl: "l18960538152",
-                showQR: true,
-                // 使用您提供的微信二维码直链
-                qrCodeUrl: "https://img.cdn1.vip/i/68db57ce74606_1759205326.jpg"
-            },
-            email: {
-                title: "邮箱",
-                icon: "fas fa-envelope",
-                username: "1034687640@qq.com",
-                status: "主要收验证码",
-                description: "学习交流请优先使用其他联系方式",
-                actionText: "发送邮件",
-                actionUrl: "1034687640@qq.com",
-                showQR: false
-            }
-        };
-
-        // 获取DOM元素
-        const modalOverlay = document.getElementById('socialModal');
-        const modalIcon = document.getElementById('modalIcon');
-        const modalTitle = document.getElementById('modalTitle');
-        const usernameEl = document.getElementById('username');
-        const statusEl = document.getElementById('status');
-        const descriptionEl = document.getElementById('description');
-        const qrContainer = document.getElementById('qrContainer');
-        const actionBtn = document.getElementById('actionBtn');
-        const closeModalBtn = document.getElementById('closeModal');
-        const closeBtn = document.querySelector('.close-btn');
-
-        // 为每个联系卡片添加点击事件
-        document.querySelectorAll('.contact-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const platform = item.getAttribute('data-platform');
-                const data = socialData[platform];
-                
-                // 更新弹窗内容
-                modalIcon.innerHTML = `<i class="${data.icon}"></i>`;
-                modalTitle.textContent = data.title;
-                usernameEl.textContent = data.username;
-                statusEl.textContent = data.status;
-                descriptionEl.textContent = data.description;
-                actionBtn.textContent = data.actionText;
-                
-                // 显示或隐藏二维码
-                if (data.showQR) {
-                    // 创建二维码图片元素
-                    qrContainer.innerHTML = '';
-                    const qrImg = document.createElement('img');
-                    qrImg.src = data.qrCodeUrl;
-                    qrImg.alt = `${data.title}二维码`;
-                    qrImg.className = 'qr-image';
-                    qrContainer.appendChild(qrImg);
-                    qrContainer.style.display = 'flex';
-                } else {
-                    qrContainer.innerHTML = '<div class="qr-placeholder">无二维码</div>';
-                    qrContainer.style.display = 'none';
+        document.querySelectorAll("[data-copy]").forEach((button) => {
+            button.addEventListener("click", async () => {
+                try {
+                    await navigator.clipboard.writeText(button.dataset.copy);
+                    button.textContent = "已复制";
+                    setTimeout(() => {
+                        button.textContent = "复制邮箱";
+                    }, 1400);
+                } catch (error) {
+                    button.textContent = button.dataset.copy;
                 }
-
-                
-                // 设置按钮行为
-                actionBtn.onclick = function() {
-                    if (platform === 'weixin'||platform === 'email') {
-                        // 复制微信号到剪贴板
-                        navigator.clipboard.writeText(data.username)
-                            .then(() => {
-                                alert('已复制到剪贴板');
-                            })
-                            .catch(err => {
-                                console.error('复制失败:', err);
-                            });
-                    } else {
-                        // 打开链接
-                        window.open(data.actionUrl, '_blank');
-                    }
-                };
-                
-                // 显示弹窗
-                modalOverlay.classList.add('active');
             });
-        });
-
-        // 关闭弹窗
-        function closeModal() {
-            modalOverlay.classList.remove('active');
-        }
-
-        // 添加关闭事件
-        closeModalBtn.addEventListener('click', closeModal);
-        closeBtn.addEventListener('click', closeModal);
-        
-        // 点击遮罩层关闭弹窗
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) {
-                closeModal();
-            }
-        });
-        
-        // 按ESC键关闭弹窗
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
-                closeModal();
-            }
         });
     </script>
 </body>
 </html>
-
