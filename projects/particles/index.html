@@ -230,6 +230,21 @@
       border-color: rgba(255,255,255,.16);
     }
 
+    .ghost-btn.recommended {
+      color: #160f24;
+      border-color: rgba(241,214,138,.86);
+      background: linear-gradient(135deg, rgba(241,214,138,.96), rgba(255,235,176,.82));
+      box-shadow: 0 0 30px rgba(241,214,138,.24);
+    }
+
+    .ghost-btn.recommended::after {
+      content: "推荐";
+      margin-left: 8px;
+      font-size: 10px;
+      letter-spacing: .12em;
+      opacity: .72;
+    }
+
     .start-btn:hover, .ghost-btn:hover, .restart-btn:hover {
       transform: translateY(-1px);
       filter: none;
@@ -1153,6 +1168,12 @@
         document.getElementById("questionInput").value = btn.dataset.seed;
       });
     });
+
+    if (isMobileUA) {
+      document.getElementById("manualBtn").classList.add("recommended");
+      document.getElementById("startBtn").textContent = "手势抽牌";
+      setStatus("手机端推荐直接抽牌，体验更稳定", true);
+    }
 
     document.getElementById("startBtn").addEventListener("click", async () => {
       appState.userQuestion = document.getElementById("questionInput").value.trim();
