@@ -579,12 +579,36 @@
       { name: "世界", meaning: "一个循环接近完成。你可以收束、确认成果，然后进入新的阶段。" }
     ];
 
+    const isMobileUA = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MiuiBrowser|HuaweiBrowser/i.test(navigator.userAgent);
+    const profiles = {
+      visual: {
+        pixelRatio: Math.min(window.devicePixelRatio, 1.8),
+        activeParticles: 4600,
+        particleLerp: 0.058,
+        pointSize: 0.048,
+        pointPulse: 0.008,
+        opacityBase: 0.82,
+        opacityPulse: 0.12
+      },
+      gestureLite: {
+        pixelRatio: Math.min(window.devicePixelRatio, 1),
+        activeParticles: 1200,
+        particleLerp: 0.035,
+        pointSize: 0.036,
+        pointPulse: 0.003,
+        opacityBase: 0.62,
+        opacityPulse: 0.04
+      }
+    };
+
     const appState = {
       started: false,
       drawn: false,
       userQuestion: "",
       theme: new THREE.Color("#b78cff"),
       particleMode: "cosmos",
+      renderProfile: "visual",
+      activeParticles: profiles.visual.activeParticles,
       deckRotation: 0,
       targetDeckRotation: 0,
       highlightedIndex: 0,
@@ -601,7 +625,7 @@
 
     const canvas = document.getElementById("threeCanvas");
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+    renderer.setPixelRatio(profiles.visual.pixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -826,6 +850,7 @@
     }
 
     particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+    particleGeo.setDrawRange(0, appState.activeParticles);
     const particleMat = new THREE.PointsMaterial({
       color: appState.theme,
       size: 0.052,
@@ -836,6 +861,17 @@
     });
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
+
+    function applyRenderProfile(name) {
+      const next = profiles[name] || profiles.visual;
+      appState.renderProfile = name;
+      appState.activeParticles = next.activeParticles;
+      renderer.setPixelRatio(next.pixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      particleGeo.setDrawRange(0, appState.activeParticles);
+      particleMat.size = next.pointSize;
+      particleMat.opacity = next.opacityBase;
+    }
 
     function getParticleTarget(i, mode, t) {
       const a = particleSeeds[i * 4] * Math.PI * 2;
@@ -880,7 +916,7 @@
     }
 
     function updateParticleTargets(mode, time) {
-      for (let i = 0; i < particleCount; i++) {
+      for (let i = 0; i < appState.activeParticles; i++) {
         const p = getParticleTarget(i, mode, time);
         particleTargets[i * 3] = p.x;
         particleTargets[i * 3 + 1] = p.y;
@@ -956,18 +992,19 @@
 
     function animateParticles(time) {
       if (!appState.drawn) updateParticleTargets(appState.particleMode, time);
+      const profile = profiles[appState.renderProfile] || profiles.visual;
       const pos = particleGeo.attributes.position.array;
-      for (let i = 0; i < particleCount; i++) {
+      for (let i = 0; i < appState.activeParticles; i++) {
         const idx = i * 3;
-        pos[idx] += (particleTargets[idx] - pos[idx]) * 0.058;
-        pos[idx + 1] += (particleTargets[idx + 1] - pos[idx + 1]) * 0.058;
-        pos[idx + 2] += (particleTargets[idx + 2] - pos[idx + 2]) * 0.058;
+        pos[idx] += (particleTargets[idx] - pos[idx]) * profile.particleLerp;
+        pos[idx + 1] += (particleTargets[idx + 1] - pos[idx + 1]) * profile.particleLerp;
+        pos[idx + 2] += (particleTargets[idx + 2] - pos[idx + 2]) * profile.particleLerp;
       }
       particleGeo.attributes.position.needsUpdate = true;
-      particleMat.size = 0.048 + Math.sin(time * 2.3) * 0.008;
-      particleMat.opacity = 0.82 + Math.sin(time * 1.7) * 0.12;
-      particles.rotation.y = time * 0.075;
-      particles.rotation.x = Math.sin(time * 0.21) * 0.16;
+      particleMat.size = profile.pointSize + Math.sin(time * 2.3) * profile.pointPulse;
+      particleMat.opacity = profile.opacityBase + Math.sin(time * 1.7) * profile.opacityPulse;
+      particles.rotation.y = time * (appState.renderProfile === "gestureLite" ? 0.035 : 0.075);
+      particles.rotation.x = Math.sin(time * 0.21) * (appState.renderProfile === "gestureLite" ? 0.06 : 0.16);
     }
 
     function scatterOtherCards(selected) {
@@ -977,7 +1014,7 @@
         const world = new THREE.Vector3();
         card.getWorldPosition(world);
         const base = i * 3;
-        for (let k = 0; k < 170 && base + k < particleCount; k++) {
+        for (let k = 0; k < 170 && base + k < appState.activeParticles; k++) {
           const pIndex = base + k;
           particlePositions[pIndex * 3] = world.x + (Math.random() - .5) * .4;
           particlePositions[pIndex * 3 + 1] = world.y + (Math.random() - .5) * .4;
@@ -1107,6 +1144,7 @@
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
+      renderer.setPixelRatio((profiles[appState.renderProfile] || profiles.visual).pixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
@@ -1121,8 +1159,9 @@
       document.getElementById("intro").classList.add("hidden");
       appState.started = true;
       appState.manualMode = false;
+      applyRenderProfile(isMobileUA ? "gestureLite" : "visual");
       updatePhase("waitingOpen");
-      setStatus("正在请求摄像头权限", false);
+      setStatus(isMobileUA ? "手机手势模式已降档，优先保证识别" : "正在请求摄像头权限", false);
       await startHandTracking();
     });
 
@@ -1139,6 +1178,7 @@
       document.getElementById("intro").classList.add("hidden");
       appState.started = true;
       appState.manualMode = true;
+      applyRenderProfile("visual");
       updatePhase("fistSeen");
       setStatus("移动鼠标或手指选择牌位，点击画面抽牌", true);
     }
@@ -1159,6 +1199,7 @@
       appState.handX = 0.5;
       appState.targetDeckRotation = 0;
       appState.particleMode = "cosmos";
+      applyRenderProfile("visual");
       updatePhase("waitingOpen");
       setStatus(appState.cameraReady ? "摄像头保持开启，写下新问题即可继续" : "等待开始感知", appState.cameraReady);
 
@@ -1235,13 +1276,11 @@
           setStatus("摄像头已就绪，张开手掌开始选牌", true);
           return;
         }
+        const videoProfile = isMobileUA
+          ? { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30, max: 30 } }
+          : { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, max: 60 } };
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "user",
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            frameRate: { ideal: 30, max: 60 }
-          },
+          video: videoProfile,
           audio: false
         });
         video.srcObject = stream;
@@ -1259,7 +1298,7 @@
         });
         hands.onResults(onHandResults);
         appState.cameraReady = true;
-        setStatus("摄像头已启动，张开手掌开始选牌", true);
+        setStatus(isMobileUA ? "轻量手势模式已启动，张开手掌开始选牌" : "摄像头已启动，张开手掌开始选牌", true);
         if (!handLoopRunning) {
           handLoopRunning = true;
           requestAnimationFrame(handLoop);
@@ -1455,7 +1494,7 @@
     function intensifyParticles() {
       particleMat.size += (0.082 - particleMat.size) * 0.08;
       particleMat.opacity += (0.98 - particleMat.opacity) * 0.08;
-      for (let i = 0; i < particleCount; i += 4) {
+      for (let i = 0; i < appState.activeParticles; i += 4) {
         particleTargets[i * 3] *= 0.965;
         particleTargets[i * 3 + 1] *= 0.965;
         particleTargets[i * 3 + 2] *= 0.965;
