@@ -12,6 +12,7 @@
       --line: rgba(255,255,255,0.16);
       --text: #f5efff;
       --muted: rgba(245,239,255,0.68);
+      --gold: #f1d68a;
       --danger: #ff6bba;
     }
 
@@ -70,96 +71,138 @@
       place-items: center;
       padding: 24px;
       background:
-        radial-gradient(circle at 50% 42%, rgba(167, 109, 255, 0.22), transparent 26%),
-        rgba(3, 2, 10, 0.76);
-      backdrop-filter: blur(18px);
-      transition: opacity .55s ease, transform .55s ease;
+        radial-gradient(circle at center, rgba(48, 35, 94, 0.72), rgba(7, 8, 22, 0.88) 72%),
+        linear-gradient(135deg, rgba(241,214,138,0.08), rgba(169,139,255,0.10));
+      backdrop-filter: blur(10px);
+      transition: opacity 1.2s ease, transform 1s ease;
     }
 
     .intro-modal.hidden {
       opacity: 0;
       pointer-events: none;
-      transform: scale(1.03);
+      transform: scale(1.05);
     }
 
     .intro-card {
-      width: min(560px, 92vw);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 28px;
-      padding: 32px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.045)),
-        rgba(12, 7, 25, .78);
-      box-shadow: 0 28px 90px rgba(0,0,0,.48), inset 0 0 70px rgba(183,140,255,.08);
+      width: min(520px, 90vw);
+      border: 1px solid rgba(241, 214, 138, 0.16);
+      border-radius: 0;
+      padding: 40px;
+      background: rgba(18, 13, 36, 0.34);
+      box-shadow: 0 24px 90px rgba(0,0,0,0.28), inset 0 0 40px rgba(169,139,255,0.05);
+      backdrop-filter: blur(12px);
       text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro-card::before, .intro-card::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .intro-card::before {
+      inset: 16px;
+      border: 1px solid rgba(241,214,138,0.08);
+    }
+
+    .intro-card::after {
+      left: 24px;
+      right: 24px;
+      bottom: 18px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(241,214,138,0.35), transparent);
     }
 
     .sigil {
-      width: 86px;
-      height: 86px;
-      margin: 0 auto 18px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.24);
-      background:
-        radial-gradient(circle, rgba(255,255,255,.95) 0 3px, transparent 4px),
-        conic-gradient(from 0deg, transparent, var(--theme), transparent, #ff8bd8, transparent);
-      box-shadow: 0 0 38px var(--theme-soft);
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 30px;
+      border-radius: 0;
+      border: 1px solid rgba(241, 214, 138, 0.42);
+      background: transparent;
+      box-shadow: 0 0 16px rgba(142,110,227,0.12);
       position: relative;
-      animation: spin 12s linear infinite;
+      transform: rotate(45deg);
+      animation: breathe 4s ease-in-out infinite alternate;
     }
 
     .sigil::before, .sigil::after {
       content: "";
       position: absolute;
-      inset: 13px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,.32);
-    }
-    .sigil::after {
-      inset: 28px;
-      border-style: dashed;
-      opacity: .8;
+      border-radius: 0;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .sigil::before {
+      inset: 9px;
+      border: 1px solid rgba(142, 110, 227, 0.62);
+      transform: rotate(45deg);
+    }
+
+    .sigil::after {
+      inset: 22px;
+      border: 1px solid rgba(241, 214, 138, 0.34);
+      background: rgba(241,214,138,0.5);
+    }
+
+    @keyframes breathe {
+      0% { box-shadow: 0 0 10px rgba(142,110,227,0.12); }
+      100% { box-shadow: 0 0 30px rgba(142,110,227,0.42); }
+    }
 
     .intro-card h1 {
-      margin: 0 0 10px;
-      font-size: clamp(26px, 4vw, 42px);
-      letter-spacing: .08em;
-      font-weight: 800;
+      margin: 0 0 20px;
+      font-size: clamp(26px, 5vw, 34px);
+      letter-spacing: .36em;
+      font-weight: 300;
+      color: var(--gold);
+      text-shadow: 0 0 24px rgba(241, 214, 138, 0.35);
     }
 
     .intro-card p {
-      margin: 0 auto 24px;
-      max-width: 420px;
-      line-height: 1.8;
+      margin: 0 auto 30px;
+      max-width: 430px;
+      line-height: 2;
       color: var(--muted);
-      font-size: 15px;
+      font-size: 14px;
+      letter-spacing: .08em;
     }
 
     textarea {
       width: 100%;
-      min-height: 118px;
+      min-height: 104px;
       resize: none;
       outline: none;
-      color: var(--text);
-      font-size: 16px;
-      line-height: 1.7;
-      padding: 16px 18px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.07);
-      box-shadow: inset 0 0 28px rgba(0,0,0,.22);
+      color: var(--gold);
+      font-size: 15px;
+      line-height: 1.8;
+      padding: 15px 0;
+      border: 0;
+      border-bottom: 1px solid rgba(255,255,255,.22);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      text-align: center;
+      font-family: inherit;
+      transition: border-color .3s ease, box-shadow .3s ease;
     }
 
-    textarea::placeholder { color: rgba(245,239,255,.42); }
+    textarea:focus {
+      border-bottom-color: var(--gold);
+      box-shadow: 0 18px 26px -28px rgba(241,214,138,.7);
+    }
+
+    textarea::placeholder {
+      color: rgba(243,236,255,0.38);
+      text-align: center;
+    }
 
     .action-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 18px;
+      margin-top: 34px;
     }
 
     .start-btn, .ghost-btn, .panel button, .restart-btn {
@@ -167,29 +210,33 @@
       cursor: pointer;
       color: white;
       font-weight: 800;
-      letter-spacing: .08em;
-      border-radius: 999px;
-      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      letter-spacing: .18em;
+      border-radius: 2px;
+      transition: transform .28s ease, box-shadow .28s ease, color .28s ease, border-color .28s ease, background .28s ease;
     }
 
     .start-btn, .ghost-btn {
       width: 100%;
-      padding: 15px 20px;
-      font-size: 15px;
-      background: linear-gradient(135deg, var(--theme), #ff81d8);
-      box-shadow: 0 16px 42px rgba(183,140,255,.28);
+      padding: 12px 18px;
+      font-size: 13px;
+      color: rgba(255,255,255,.9);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.28);
+      box-shadow: none;
     }
 
     .ghost-btn {
-      color: rgba(245,239,255,.88);
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: none;
+      color: rgba(245,239,255,.64);
+      border-color: rgba(255,255,255,.16);
     }
 
     .start-btn:hover, .ghost-btn:hover, .panel button:hover, .restart-btn:hover {
       transform: translateY(-1px);
-      filter: brightness(1.08);
+      filter: none;
+      color: var(--gold);
+      border-color: rgba(241,214,138,.72);
+      background: rgba(241,214,138,0.08);
+      box-shadow: 0 0 26px rgba(241, 214, 138, 0.18);
     }
 
     .seed-row {
@@ -197,22 +244,23 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
-      margin: 0 0 16px;
+      margin: 0 0 18px;
     }
 
     .seed-btn {
       border: 1px solid rgba(255,255,255,.14);
       border-radius: 999px;
       padding: 7px 10px;
-      color: rgba(245,239,255,.74);
-      background: rgba(255,255,255,.07);
+      color: rgba(245,239,255,.56);
+      background: transparent;
       cursor: pointer;
       font-size: 12px;
+      letter-spacing: .08em;
     }
 
     .seed-btn:hover {
-      color: white;
-      border-color: rgba(255,255,255,.3);
+      color: var(--gold);
+      border-color: rgba(241,214,138,.38);
     }
 
     .panel {
@@ -522,14 +570,14 @@
     <section id="intro" class="intro-modal">
       <div class="intro-card">
         <div class="sigil"></div>
-        <h1>星门塔罗</h1>
-        <p>把心中的问题写下来。你可以用摄像头手势抽牌，也可以直接用鼠标或触摸滑动画面，让牌阵回应你的选择。</p>
+        <h1>星夜秘仪</h1>
+        <p>让喧嚣慢慢沉下去。<br>在下方写下此刻最想询问的事。<br>用手势或指尖拨动星轨，让一张牌替你照见答案。</p>
         <div class="seed-row" aria-label="问题灵感">
-          <button class="seed-btn" data-seed="我现在最该看清什么？">看清什么</button>
-          <button class="seed-btn" data-seed="这件事下一步应该怎么推进？">下一步</button>
-          <button class="seed-btn" data-seed="我需要放下什么，保留什么？">取舍</button>
+          <button class="seed-btn" data-seed="我现在最该看清什么？">✦ 看清什么</button>
+          <button class="seed-btn" data-seed="这件事下一步应该怎么推进？">✦ 下一步</button>
+          <button class="seed-btn" data-seed="我需要放下什么，保留什么？">✦ 取舍</button>
         </div>
-        <textarea id="questionInput" placeholder="例如：我现在应该如何看待这段关系 / 这件事下一步该怎么走？"></textarea>
+        <textarea id="questionInput" placeholder="写下你想询问的事..."></textarea>
         <div class="action-row">
           <button id="startBtn" class="start-btn">手势抽牌</button>
           <button id="manualBtn" class="ghost-btn">直接抽牌</button>
