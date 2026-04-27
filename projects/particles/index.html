@@ -628,8 +628,10 @@
       targetDeckRotation: 0,
       highlightedIndex: 0,
       handX: 0.5,
+      handTargetX: 0.5,
       manualMode: false,
       gesture: "unknown",
+      gestureSamples: [],
       gesturePhase: "waitingOpen",
       lastGestureChange: performance.now(),
       lastPhaseChange: performance.now(),
@@ -1149,6 +1151,9 @@
       deckGroup.rotation.x = Math.sin(t * 0.4) * 0.035;
       layoutCards(dt);
       animateParticles(t);
+      const handEase = appState.renderProfile === "gestureLite" ? 0.1 : 0.14;
+      appState.handX += (appState.handTargetX - appState.handX) * handEase;
+      appState.targetDeckRotation = (appState.handX - 0.5) * Math.PI * 2.15;
       camera.position.x += ((appState.handX - 0.5) * 0.55 - camera.position.x) * 0.035;
       camera.lookAt(0, 0.35, 0);
       renderer.render(scene, camera);
@@ -1214,10 +1219,12 @@
       appState.userQuestion = "";
       appState.chosenCardName = "";
       appState.gesture = "unknown";
+      appState.gestureSamples = [];
       appState.gesturePhase = "waitingOpen";
       appState.lastGestureChange = performance.now();
       appState.lastPhaseChange = performance.now();
       appState.handX = 0.5;
+      appState.handTargetX = 0.5;
       appState.targetDeckRotation = 0;
       appState.particleMode = "cosmos";
       applyRenderProfile("visual");
@@ -1253,8 +1260,7 @@
     function updatePointerSelection(clientX) {
       if (!appState.started || appState.drawn) return;
       const x = Math.min(Math.max(clientX / window.innerWidth, 0), 1);
-      appState.handX += (x - appState.handX) * 0.5;
-      appState.targetDeckRotation = (appState.handX - 0.5) * Math.PI * 2.15;
+      appState.handTargetX += (x - appState.handTargetX) * 0.55;
       if (appState.manualMode) intensifyParticles();
     }
 
@@ -1320,6 +1326,7 @@
       try {
         if (appState.cameraReady && video.srcObject) {
           appState.gesture = "unknown";
+          appState.gestureSamples = [];
           appState.gesturePhase = "waitingOpen";
           appState.lastGestureChange = performance.now();
           appState.lastPhaseChange = performance.now();
@@ -1412,10 +1419,15 @@
       const palm = getPalmCenter(lm);
       // 视频预览被镜像，MediaPipe 坐标未镜像。这里使用 1 - x，使手往屏幕左移动时视觉更符合直觉。
       const mirroredX = 1 - palm.x;
-      appState.handX += (mirroredX - appState.handX) * 0.38;
-      appState.targetDeckRotation = (appState.handX - 0.5) * Math.PI * 2.15;
+      const moveDelta = mirroredX - appState.handTargetX;
+      const deadZone = appState.renderProfile === "gestureLite" ? 0.024 : 0.014;
+      if (Math.abs(moveDelta) > deadZone) {
+        appState.handTargetX += moveDelta * 0.32;
+      } else {
+        appState.handTargetX += moveDelta * 0.08;
+      }
 
-      const gesture = classifyGesture(lm);
+      const gesture = smoothGesture(classifyGesture(lm));
       updateGestureState(gesture);
     }
 
@@ -1503,6 +1515,22 @@
       return "neutral";
     }
 
+    function smoothGesture(rawGesture) {
+      const maxSamples = appState.renderProfile === "gestureLite" ? 7 : 5;
+      appState.gestureSamples.push(rawGesture);
+      if (appState.gestureSamples.length > maxSamples) appState.gestureSamples.shift();
+
+      const counts = appState.gestureSamples.reduce((acc, item) => {
+        acc[item] = (acc[item] || 0) + 1;
+        return acc;
+      }, {});
+      const need = appState.renderProfile === "gestureLite" ? 4 : 3;
+      if ((counts.open || 0) >= need) return "open";
+      if ((counts.fist || 0) >= need) return "fist";
+      if ((counts.neutral || 0) >= need) return "neutral";
+      return appState.gesture;
+    }
+
     function updateGestureState(gesture) {
       if (!appState.started || appState.drawn) return;
       const now = performance.now();
@@ -1520,6 +1548,7 @@
         if (gesture === "open") {
           appState.gesturePhase = "openSeen";
           appState.lastPhaseChange = now;
+          appState.gestureSamples = [];
           updatePhase("waitingOpen");
           setStatus("已感知张开手掌，握拳抓取当前牌", true);
         } else {
@@ -1532,6 +1561,7 @@
         if (gesture === "fist") {
           appState.gesturePhase = "fistSeen";
           appState.lastPhaseChange = now;
+          appState.gestureSamples = [];
           updatePhase("fistSeen");
           pulseDeck();
           setStatus("已握拳，松开手掌完成抽卡", true);
