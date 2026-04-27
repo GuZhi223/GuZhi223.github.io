@@ -939,9 +939,11 @@
         appState.highlightedIndex = bestIndex;
       }
 
+      if (appState.drawn) return;
+
       for (let i = 0; i < cards.length; i++) {
         const group = cards[i];
-        const hot = i === appState.highlightedIndex && !appState.drawn;
+        const hot = i === appState.highlightedIndex;
         const targetScale = hot ? 1.14 : 1.0;
         group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.13);
         group.userData.baseMat.emissiveIntensity += ((hot ? 0.78 : 0.16) - group.userData.baseMat.emissiveIntensity) * 0.12;
