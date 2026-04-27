@@ -593,6 +593,7 @@
       gesture: "unknown",
       gesturePhase: "waitingOpen",
       lastGestureChange: performance.now(),
+      lastPhaseChange: performance.now(),
       lastHandSeen: 0,
       chosenCardName: "",
       cameraReady: false
@@ -1151,6 +1152,8 @@
       appState.chosenCardName = "";
       appState.gesture = "unknown";
       appState.gesturePhase = "waitingOpen";
+      appState.lastGestureChange = performance.now();
+      appState.lastPhaseChange = performance.now();
       appState.handX = 0.5;
       appState.targetDeckRotation = 0;
       appState.particleMode = "cosmos";
@@ -1223,12 +1226,20 @@
     async function startHandTracking() {
       try {
         if (appState.cameraReady && video.srcObject) {
+          appState.gesture = "unknown";
           appState.gesturePhase = "waitingOpen";
+          appState.lastGestureChange = performance.now();
+          appState.lastPhaseChange = performance.now();
           setStatus("摄像头已就绪，张开手掌开始选牌", true);
           return;
         }
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30, max: 60 } },
+          video: {
+            facingMode: "user",
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            frameRate: { ideal: 30, max: 60 }
+          },
           audio: false
         });
         video.srcObject = stream;
@@ -1238,10 +1249,11 @@
 
         hands = new Hands({ locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
         hands.setOptions({
+          selfieMode: true,
           maxNumHands: 1,
-          modelComplexity: 0,
-          minDetectionConfidence: 0.68,
-          minTrackingConfidence: 0.62
+          modelComplexity: 1,
+          minDetectionConfidence: 0.78,
+          minTrackingConfidence: 0.72
         });
         hands.onResults(onHandResults);
         appState.cameraReady = true;
@@ -1388,17 +1400,20 @@
     function updateGestureState(gesture) {
       if (!appState.started || appState.drawn) return;
       const now = performance.now();
-      const stableEnough = now - appState.lastGestureChange > 120;
       if (gesture !== appState.gesture) {
         appState.gesture = gesture;
         appState.lastGestureChange = now;
+        return;
       }
 
-      if (!stableEnough) return;
+      const stableEnough = now - appState.lastGestureChange > 260;
+      const phaseReady = now - appState.lastPhaseChange > 420;
+      if (!stableEnough || !phaseReady || gesture === "neutral") return;
 
       if (appState.gesturePhase === "waitingOpen") {
         if (gesture === "open") {
           appState.gesturePhase = "openSeen";
+          appState.lastPhaseChange = now;
           updatePhase("waitingOpen");
           setStatus("已感知张开手掌，握拳抓取当前牌", true);
         } else {
@@ -1410,6 +1425,7 @@
       if (appState.gesturePhase === "openSeen") {
         if (gesture === "fist") {
           appState.gesturePhase = "fistSeen";
+          appState.lastPhaseChange = now;
           updatePhase("fistSeen");
           pulseDeck();
           setStatus("已握拳，松开手掌完成抽卡", true);
@@ -1419,6 +1435,7 @@
 
       if (appState.gesturePhase === "fistSeen") {
         if (gesture === "open") {
+          appState.lastPhaseChange = now;
           drawSelectedCard();
         } else if (gesture === "fist") {
           appState.targetDeckRotation += 0.012;
