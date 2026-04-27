@@ -1020,10 +1020,10 @@
         .to(selected.position, { x: 0, y: 0.42, z: 2.9, duration: 0.9, ease: "power3.inOut" }, 0)
         .to(selected.scale, { x: 1.72, y: 1.72, z: 1.72, duration: 0.9, ease: "power3.inOut" }, 0)
         .to(selected.rotation, { y: Math.PI * 2, z: 0, duration: 1.18, ease: "power2.inOut" }, 0.32)
-        .to(selected.position, { x: 0, y: 0.28, z: 4.9, duration: 0.82, ease: "power3.out" }, 1.18)
-        .to(selected.scale, { x: 2.75, y: 2.75, z: 2.75, duration: 0.82, ease: "power3.out" }, 1.18)
-        .to(selected.rotation, { z: 0.015, duration: 0.36, yoyo: true, repeat: 1, ease: "sine.inOut" }, 1.72)
-        .call(() => showResult(tarot), null, 2.18);
+        .to(selected.position, { x: 0, y: 0.12, z: 6.85, duration: 0.92, ease: "expo.out" }, 1.18)
+        .to(selected.scale, { x: 4.15, y: 4.15, z: 4.15, duration: 0.92, ease: "expo.out" }, 1.18)
+        .to(selected.rotation, { z: 0.022, duration: 0.4, yoyo: true, repeat: 1, ease: "sine.inOut" }, 1.8)
+        .call(() => showResult(tarot), null, 2.38);
     }
 
     function pickTarot() {
