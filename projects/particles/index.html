@@ -632,6 +632,7 @@
       manualMode: false,
       gesture: "unknown",
       gestureSamples: [],
+      releaseFrames: 0,
       gesturePhase: "waitingOpen",
       lastGestureChange: performance.now(),
       lastPhaseChange: performance.now(),
@@ -1220,6 +1221,7 @@
       appState.chosenCardName = "";
       appState.gesture = "unknown";
       appState.gestureSamples = [];
+      appState.releaseFrames = 0;
       appState.gesturePhase = "waitingOpen";
       appState.lastGestureChange = performance.now();
       appState.lastPhaseChange = performance.now();
@@ -1327,6 +1329,7 @@
         if (appState.cameraReady && video.srcObject) {
           appState.gesture = "unknown";
           appState.gestureSamples = [];
+          appState.releaseFrames = 0;
           appState.gesturePhase = "waitingOpen";
           appState.lastGestureChange = performance.now();
           appState.lastPhaseChange = performance.now();
@@ -1427,8 +1430,9 @@
         appState.handTargetX += moveDelta * 0.08;
       }
 
-      const gesture = smoothGesture(classifyGesture(lm));
-      updateGestureState(gesture);
+      const rawGesture = classifyGesture(lm);
+      const gesture = smoothGesture(rawGesture);
+      updateGestureState(gesture, rawGesture);
     }
 
     function getPalmCenter(lm) {
@@ -1508,10 +1512,12 @@
       if (thumbLooksOpen) open += 0.5;
 
       const isFist = bent >= 3.4 && avgTipPalm < 1.32;
-      const isOpen = open >= 3.4 && avgTipPalm > 1.28;
+      const isOpen = open >= 3.1 && avgTipPalm > 1.24;
+      const isOpening = open >= 2.2 && avgTipPalm > 1.14 && bent < 3.1;
 
       if (isFist) return "fist";
       if (isOpen) return "open";
+      if (isOpening) return "opening";
       return "neutral";
     }
 
@@ -1525,15 +1531,29 @@
         return acc;
       }, {});
       const need = appState.renderProfile === "gestureLite" ? 4 : 3;
-      if ((counts.open || 0) >= need) return "open";
+      const openVotes = (counts.open || 0) + (counts.opening || 0) * 0.7;
+      const openNeed = appState.gesturePhase === "fistSeen" ? 1.4 : need;
+      if (openVotes >= openNeed) return "open";
       if ((counts.fist || 0) >= need) return "fist";
       if ((counts.neutral || 0) >= need) return "neutral";
       return appState.gesture;
     }
 
-    function updateGestureState(gesture) {
+    function updateGestureState(gesture, rawGesture) {
       if (!appState.started || appState.drawn) return;
       const now = performance.now();
+      if (appState.gesturePhase === "fistSeen") {
+        const releaseSignal = rawGesture === "open" ? 2 : (rawGesture === "opening" || gesture === "open" ? 1 : 0);
+        appState.releaseFrames = releaseSignal ? Math.min(appState.releaseFrames + releaseSignal, 3) : 0;
+        if (appState.releaseFrames >= 2 && now - appState.lastPhaseChange > 150) {
+          appState.gesture = "open";
+          appState.lastGestureChange = now;
+          appState.lastPhaseChange = now;
+          drawSelectedCard();
+          return;
+        }
+      }
+
       if (gesture !== appState.gesture) {
         appState.gesture = gesture;
         appState.lastGestureChange = now;
@@ -1549,6 +1569,7 @@
           appState.gesturePhase = "openSeen";
           appState.lastPhaseChange = now;
           appState.gestureSamples = [];
+          appState.releaseFrames = 0;
           updatePhase("waitingOpen");
           setStatus("已感知张开手掌，握拳抓取当前牌", true);
         } else {
@@ -1562,6 +1583,7 @@
           appState.gesturePhase = "fistSeen";
           appState.lastPhaseChange = now;
           appState.gestureSamples = [];
+          appState.releaseFrames = 0;
           updatePhase("fistSeen");
           pulseDeck();
           setStatus("已握拳，松开手掌完成抽卡", true);
