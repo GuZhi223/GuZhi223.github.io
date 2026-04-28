@@ -1,6 +1,7 @@
 @font-face{
 	font-family: 'FuturaHandwritten';
 	font-style: normal;
+	font-display: swap;
 	src: url('FuturaHandwritten.ttf') format('truetype');
 }
 

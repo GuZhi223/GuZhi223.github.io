@@ -1,3 +1,6 @@
+var c_ = {};
+var createjs = window;
+
 /**********************************
 
 RANDOM CRAP TO MAKE MY LIFE EASIER
