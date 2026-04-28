@@ -116,8 +116,8 @@
     }
 
     .sigil {
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
       margin: 0 auto 30px;
       border-radius: 0;
       border: 1px solid rgba(241, 214, 138, 0.42);
@@ -125,7 +125,7 @@
       box-shadow: 0 0 16px rgba(142,110,227,0.12);
       position: relative;
       transform: rotate(45deg);
-      animation: breathe 4s ease-in-out infinite alternate;
+      animation: breathe 4s ease-in-out infinite alternate, sigilSpin 20s linear infinite;
     }
 
     .sigil::before, .sigil::after {
@@ -138,17 +138,24 @@
       inset: 9px;
       border: 1px solid rgba(142, 110, 227, 0.62);
       transform: rotate(45deg);
+      animation: sigilSpin 12s linear infinite reverse;
     }
 
     .sigil::after {
       inset: 22px;
       border: 1px solid rgba(241, 214, 138, 0.34);
       background: rgba(241,214,138,0.5);
+      animation: breathe 3s ease-in-out infinite alternate-reverse;
     }
 
     @keyframes breathe {
-      0% { box-shadow: 0 0 10px rgba(142,110,227,0.12); }
-      100% { box-shadow: 0 0 30px rgba(142,110,227,0.42); }
+      0% { box-shadow: 0 0 10px rgba(142,110,227,0.12), 0 0 20px rgba(241,214,138,0.05); }
+      100% { box-shadow: 0 0 30px rgba(142,110,227,0.42), 0 0 50px rgba(241,214,138,0.15); }
+    }
+
+    @keyframes sigilSpin {
+      from { transform: rotate(45deg); }
+      to { transform: rotate(405deg); }
     }
 
     .intro-card h1 {
@@ -335,6 +342,34 @@
       box-shadow: 0 0 18px rgba(183,140,255,.16);
     }
 
+    .fist-focus-ring {
+      position: fixed;
+      left: 50%;
+      top: 45%;
+      width: 200px;
+      height: 200px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 1.5px solid rgba(241,214,138,0.3);
+      box-shadow: 0 0 30px rgba(241,214,138,0.15), inset 0 0 30px rgba(241,214,138,0.08);
+      pointer-events: none;
+      z-index: 150;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .fist-focus-ring.visible {
+      opacity: 1;
+      animation: focusRingSpin 4s linear infinite, focusRingPulse 2s ease-in-out infinite;
+    }
+    @keyframes focusRingSpin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    @keyframes focusRingPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(241,214,138,0.15), inset 0 0 30px rgba(241,214,138,0.08); }
+      50% { box-shadow: 0 0 50px rgba(241,214,138,0.25), inset 0 0 50px rgba(241,214,138,0.14); }
+    }
+
     .dot {
       flex: 0 0 auto;
       width: 8px;
@@ -400,6 +435,98 @@
       letter-spacing: .18em;
     }
 
+    .result-card-icon {
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 8px;
+      border-radius: 16px;
+      border: 1px solid rgba(241,214,138,.32);
+      background: rgba(241,214,138,.06);
+      display: grid;
+      place-items: center;
+      line-height: 1;
+      box-shadow: 0 0 24px rgba(241,214,138,.12);
+      position: relative;
+      overflow: hidden;
+      animation: cardIconPulse 3s ease-in-out infinite alternate;
+    }
+
+    .result-card-icon::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(241,214,138,.18);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .result-card-icon::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        linear-gradient(to right, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) top left,
+        linear-gradient(to bottom, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) top left,
+        linear-gradient(to left, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) top right,
+        linear-gradient(to bottom, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) top right,
+        linear-gradient(to right, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) bottom left,
+        linear-gradient(to top, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) bottom left,
+        linear-gradient(to left, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) bottom right,
+        linear-gradient(to top, rgba(241,214,138,.4) 0px, rgba(241,214,138,.4) 12px, transparent 12px) bottom right;
+      background-size: 50% 50%;
+      background-repeat: no-repeat;
+    }
+
+    @keyframes cardIconPulse {
+      0% { box-shadow: 0 0 20px rgba(241,214,138,.08), inset 0 0 12px rgba(241,214,138,.04); border-color: rgba(241,214,138,.22); }
+      100% { box-shadow: 0 0 40px rgba(241,214,138,.25), inset 0 0 20px rgba(241,214,138,.08); border-color: rgba(241,214,138,.5); }
+    }
+
+    .result-card-numeral {
+      display: block;
+      position: relative;
+      z-index: 2;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      color: var(--gold);
+      line-height: 1;
+      text-shadow: 0 0 12px rgba(241,214,138,.3);
+    }
+
+    .result-card-symbol {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 44px;
+      line-height: 1;
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .result-card-subtitle {
+      margin: 0 auto 8px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      color: rgba(245,239,255,.55);
+    }
+
+    .result-card-brief {
+      margin: 0 auto 12px;
+      max-width: 360px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: rgba(245,239,255,.5);
+      text-align: center;
+    }
+
     .question-result h2 {
       margin: 0 0 8px;
       font-size: clamp(28px, 5vw, 46px);
@@ -447,11 +574,88 @@
     }
 
     .restart-btn {
-      margin-top: 16px;
+      margin-top: 0;
       padding: 11px 18px;
       border-radius: 999px;
       background: linear-gradient(135deg, rgba(183,140,255,.9), rgba(255,129,216,.86));
       box-shadow: 0 12px 32px rgba(183,140,255,.2);
+    }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      font-weight: 800;
+      letter-spacing: .18em;
+      font-size: 13px;
+      padding: 11px 24px;
+      border-radius: 999px;
+      transition: all .28s ease;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .btn:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    .btn:disabled {
+      opacity: .38;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    .btn-accent {
+      color: #160f24;
+      background: linear-gradient(135deg, rgba(241,214,138,.92), rgba(255,235,176,.84));
+      border: 1px solid rgba(241,214,138,.6);
+      box-shadow: 0 0 24px rgba(241,214,138,.2), 0 4px 16px rgba(241,214,138,.12);
+    }
+
+    .btn-accent:hover {
+      background: linear-gradient(135deg, rgba(241,214,138,1), rgba(255,235,176,.94));
+      border-color: rgba(241,214,138,.86);
+      box-shadow: 0 0 36px rgba(241,214,138,.32), 0 6px 24px rgba(241,214,138,.18);
+      transform: translateY(-1px);
+    }
+
+    .btn-accent:active {
+      transform: translateY(0);
+      box-shadow: 0 0 14px rgba(241,214,138,.16);
+    }
+
+    .btn-ghost {
+      color: rgba(245,239,255,.64);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: none;
+    }
+
+    .btn-ghost:hover {
+      color: rgba(245,239,255,.92);
+      border-color: rgba(255,255,255,.36);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 0 20px rgba(183,140,255,.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost:active {
+      transform: translateY(0);
+    }
+
+    .spread-actions {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .spread-actions .btn,
+    .spread-actions .restart-btn {
+      width: 100%;
+      max-width: 260px;
     }
 
     .video-wrap {
@@ -484,33 +688,521 @@
       transform: scaleX(-1);
     }
 
+    .mystic-frame {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    .mystic-frame.visible {
+      opacity: 1;
+    }
+
+    .mystic-frame .corner {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-color: rgba(241,214,138,.22);
+      border-style: solid;
+      border-width: 0;
+    }
+
+    .mystic-frame .corner.tl { top: 16px; left: 16px; border-top-width: 1px; border-left-width: 1px; }
+    .mystic-frame .corner.tr { top: 16px; right: 16px; border-top-width: 1px; border-right-width: 1px; }
+    .mystic-frame .corner.bl { bottom: 16px; left: 16px; border-bottom-width: 1px; border-left-width: 1px; }
+    .mystic-frame .corner.br { bottom: 16px; right: 16px; border-bottom-width: 1px; border-right-width: 1px; }
+
+    .mystic-frame .line-h {
+      position: absolute;
+      height: 1px;
+      left: 110px;
+      right: 110px;
+      background: linear-gradient(90deg, transparent, rgba(241,214,138,.18), transparent);
+    }
+
+    .mystic-frame .line-h.top { top: 16px; }
+    .mystic-frame .line-h.bottom { bottom: 16px; }
+
+    .mystic-frame .line-v {
+      position: absolute;
+      width: 1px;
+      top: 110px;
+      bottom: 110px;
+      background: linear-gradient(180deg, transparent, rgba(241,214,138,.18), transparent);
+    }
+
+    .mystic-frame .line-v.left { left: 16px; }
+    .mystic-frame .line-v.right { right: 16px; }
+
+    .mystic-frame .diamond {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1px solid rgba(241,214,138,.35);
+      transform: rotate(45deg);
+      top: 11px;
+      left: 50%;
+      margin-left: -5px;
+    }
+
+    .screen-flash {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 25;
+      background: radial-gradient(circle at center, rgba(241,214,138,.42), transparent 70%);
+      opacity: 0;
+      animation: none;
+    }
+
+    .screen-flash.active {
+      animation: flashBurst .8s ease-out forwards;
+    }
+
+    @keyframes flashBurst {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
     @media (max-width: 900px) {
       .hud { top: 10px; }
       .status { font-size: 11px; margin-bottom: 7px; }
       .phase { min-height: 26px; font-size: 10px; }
       .hint { display: none; }
       .video-wrap { width: 132px; height: 99px; left: 12px; top: 12px; }
-      .question-result {
-        bottom: 164px;
-        max-height: calc(100vh - 190px);
-        overflow: auto;
+
+      .intro-modal {
+        padding: 16px;
+        overflow-y: auto;
+        align-content: center;
+        -webkit-overflow-scrolling: touch;
       }
-      .result-grid { grid-template-columns: 1fr; }
-      .action-row { grid-template-columns: 1fr; }
+
+      .intro-card {
+        padding: 22px 18px;
+      }
+
+      .intro-card::before {
+        inset: 8px;
+      }
+
+      .intro-card::after {
+        left: 14px;
+        right: 14px;
+        bottom: 10px;
+      }
+
+      .sigil {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 14px;
+      }
+
+      .sigil::before {
+        inset: 6px;
+      }
+
+      .sigil::after {
+        inset: 14px;
+      }
+
+      .intro-card h1 {
+        margin-bottom: 10px;
+        font-size: clamp(22px, 6vw, 28px);
+      }
+
+      .intro-card p {
+        margin-bottom: 12px;
+        font-size: 13px;
+        line-height: 1.75;
+      }
+
+      .daily-card {
+        margin-bottom: 10px;
+        padding: 12px 10px;
+      }
+
+      .daily-card .daily-label {
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+
+      .daily-card .daily-name {
+        font-size: clamp(20px, 5vw, 26px);
+        margin-bottom: 2px;
+      }
+
+      .daily-card .daily-dir {
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      .daily-card .daily-meaning {
+        font-size: 12px;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .daily-card .daily-extra {
+        margin-top: 4px;
+      }
+
+      .daily-card .daily-keyword,
+      .daily-card .daily-action {
+        font-size: 11px;
+        margin-bottom: 2px;
+      }
+
+      .daily-card .daily-btns {
+        margin-top: 8px;
+        gap: 6px;
+      }
+
+      .daily-card .daily-btns .btn {
+        padding: 7px 12px;
+        font-size: 11px;
+      }
+
+      .seed-row {
+        margin-bottom: 10px;
+        gap: 6px;
+      }
+
+      .seed-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+
+      textarea {
+        min-height: 60px;
+        font-size: 14px;
+        padding: 8px 0;
+      }
+
+      .action-row {
+        margin-top: 16px;
+        gap: 8px;
+      }
+
+      .start-btn, .ghost-btn {
+        padding: 10px 14px;
+        font-size: 12px;
+      }
+
+      .question-result {
+        inset: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100vh;
+        max-height: 100dvh;
+        border-radius: 0;
+        padding: 20px 16px;
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        transform: none;
+      }
+
+      .question-result.show {
+        transform: none;
+      }
+
+      .question-result .result-kicker {
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+
+      .question-result .result-card-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 14px;
+        margin-bottom: 6px;
+      }
+
+      .question-result .result-card-icon::before {
+        inset: 3px;
+        border-radius: 11px;
+      }
+
+      .question-result .result-card-icon::after {
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+        background:
+          linear-gradient(to right, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) top left,
+          linear-gradient(to bottom, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) top left,
+          linear-gradient(to left, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) top right,
+          linear-gradient(to bottom, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) top right,
+          linear-gradient(to right, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) bottom left,
+          linear-gradient(to top, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) bottom left,
+          linear-gradient(to left, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) bottom right,
+          linear-gradient(to top, rgba(241,214,138,.35) 0px, rgba(241,214,138,.35) 10px, transparent 10px) bottom right;
+        background-size: 50% 50%;
+        background-repeat: no-repeat;
+      }
+
+      .result-card-numeral {
+        font-size: 16px;
+      }
+
+      .result-card-symbol {
+        font-size: 36px;
+      }
+
+      .result-card-subtitle {
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+
+      .result-card-brief {
+        font-size: 12px;
+        line-height: 1.6;
+        margin-bottom: 8px;
+      }
+
+      .question-result h2 {
+        font-size: clamp(24px, 7vw, 36px);
+        margin-bottom: 6px;
+      }
+
+      .question-result .q {
+        font-size: 12px;
+        margin-bottom: 6px;
+      }
+
+      .question-result .a {
+        font-size: 14px;
+        line-height: 1.7;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .result-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .result-note {
+        padding: 10px 12px;
+        border-radius: 12px;
+      }
+
+      .result-note strong {
+        font-size: 12px;
+        margin-bottom: 2px;
+      }
+
+      .result-note span {
+        font-size: 12px;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .spread-actions {
+        margin-top: 14px;
+        gap: 10px;
+      }
+
+      .spread-actions .btn,
+      .spread-actions .restart-btn {
+        max-width: 100%;
+        padding: 10px 18px;
+        font-size: 12px;
+      }
+
+      .restart-btn {
+        padding: 10px 18px;
+        font-size: 12px;
+        margin-top: 10px;
+      }
+
+      .share-preview img { max-width: 92vw; max-height: 70vh; }
+      .share-preview .share-actions { flex-direction: column; gap: 10px; }
+    }
+
+    .daily-card {
+      margin-bottom: 20px;
+      padding: 24px;
+      border: 1px solid rgba(241,214,138,.22);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(241,214,138,.06), rgba(183,140,255,.08));
+      backdrop-filter: blur(8px);
+      text-align: center;
+      animation: dailyFadeIn .8s ease;
+    }
+
+    @keyframes dailyFadeIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .daily-label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .2em;
+      color: var(--gold);
+      margin-bottom: 10px;
+      opacity: .8;
+    }
+
+    .daily-card .daily-name {
+      font-size: clamp(26px, 5vw, 34px);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .daily-card .daily-dir {
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .daily-card .daily-meaning {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .daily-card .daily-extra {
+      display: none;
+      margin-bottom: 14px;
+    }
+
+    .daily-card .daily-extra.show {
+      display: block;
+    }
+
+    .daily-card .daily-keyword {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(245,239,255,.82);
+      margin-bottom: 4px;
+    }
+
+    .daily-card .daily-action {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .daily-card .daily-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .daily-card .daily-btns .btn {
+      min-width: 120px;
+    }
+
+    .share-preview {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background: rgba(0,0,0,.82);
+      backdrop-filter: blur(12px);
+    }
+
+    .share-preview.show {
+      display: grid;
+    }
+
+    .share-preview img {
+      max-width: min(360px, 92vw);
+      max-height: 70vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+      border: 1px solid rgba(241,214,138,.2);
+    }
+
+    .share-preview .share-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+
+    .share-preview .share-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: 0;
+      color: rgba(245,239,255,.6);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      line-height: 1;
+    }
+
+    .share-preview .share-close:hover {
+      color: var(--text);
     }
   </style>
 </head>
 <body>
   <div id="app">
     <canvas id="threeCanvas"></canvas>
+    <div class="fist-focus-ring" id="fistFocusRing"></div>
     <div class="grain"></div>
     <div class="vignette"></div>
+    <div class="mystic-frame" id="mysticFrame">
+      <div class="corner tl"></div>
+      <div class="corner tr"></div>
+      <div class="corner bl"></div>
+      <div class="corner br"></div>
+      <div class="line-h top"></div>
+      <div class="line-h bottom"></div>
+      <div class="line-v left"></div>
+      <div class="line-v right"></div>
+      <div class="diamond"></div>
+    </div>
+    <div class="screen-flash" id="screenFlash"></div>
+    <div id="sharePreview" class="share-preview">
+      <button class="share-close" id="shareClose">&times;</button>
+      <img id="shareImg" src="" alt="塔罗牌分享图">
+      <div class="share-actions">
+        <button id="shareSaveBtn" class="btn btn-accent">保存图片</button>
+        <button id="shareCloseBtn" class="btn btn-ghost">关闭</button>
+      </div>
+    </div>
 
     <section id="intro" class="intro-modal">
       <div class="intro-card">
         <div class="sigil"></div>
         <h1>星夜秘仪</h1>
         <p>让喧嚣慢慢沉下去。<br>在下方写下此刻最想询问的事。<br>用手势或指尖拨动星轨，让一张牌替你照见答案。</p>
+        <div id="dailyCard" class="daily-card" style="display:none;">
+          <div class="daily-label">✦ 今日塔罗 ✦</div>
+          <div id="dailyName" class="daily-name"></div>
+          <div id="dailyDir" class="daily-dir"></div>
+          <div id="dailyMeaning" class="daily-meaning"></div>
+          <div id="dailyExtra" class="daily-extra">
+            <div id="dailyKeyword" class="daily-keyword"></div>
+            <div id="dailyAction" class="daily-action"></div>
+          </div>
+          <div class="daily-btns">
+            <button id="dailyDetailBtn" class="btn btn-ghost">查看详情</button>
+            <button id="dailyStartBtn" class="btn btn-accent">开始占卜</button>
+          </div>
+        </div>
         <div class="seed-row" aria-label="问题灵感">
           <button class="seed-btn" data-seed="我现在最该看清什么？">✦ 看清什么</button>
           <button class="seed-btn" data-seed="这件事下一步应该怎么推进？">✦ 下一步</button>
@@ -547,6 +1239,9 @@
 
     <div id="resultBox" class="question-result">
       <div class="result-kicker">THE CARD OPENS</div>
+      <div id="resultCardIcon" class="result-card-icon"></div>
+      <div id="resultCardSubtitle" class="result-card-subtitle"></div>
+      <div id="resultCardBrief" class="result-card-brief"></div>
       <h2 id="resultTitle"></h2>
       <div id="resultQuestion" class="q"></div>
       <div id="resultAnswer" class="a"></div>
@@ -560,7 +1255,7 @@
           <span id="resultAction"></span>
         </div>
       </div>
-      <button id="restartBtn" class="restart-btn">重新开启</button>
+      <button id="restartBtn" class="restart-btn">✦ 新牌阵</button>
     </div>
   </div>
 
@@ -570,28 +1265,28 @@
 
   <script>
     const tarotDeck = [
-      { name: "愚者", meaning: "新的旅程正在打开。它提醒你允许自己尝试，但不要把冲动误认为勇气。" },
-      { name: "魔术师", meaning: "你手里已经有足够的工具。关键不是再等条件成熟，而是开始组合已有资源。" },
-      { name: "女祭司", meaning: "答案不急着说出口。多观察隐藏的信息，直觉会比表面逻辑更早抵达。" },
-      { name: "女皇", meaning: "事情需要被温柔地培育。给它时间，也给自己一点稳定的滋养。" },
-      { name: "皇帝", meaning: "边界、秩序和责任变得重要。你需要把松散的想法落到清晰规则里。" },
-      { name: "教皇", meaning: "传统经验或可靠的前辈能给你支点。别急着孤军奋战。" },
-      { name: "恋人", meaning: "选择背后是价值排序。真正的问题不是选谁，而是你想成为什么样的人。" },
-      { name: "战车", meaning: "方向已经出现，但需要纪律感。把分散的力气收回来，稳稳推进。" },
-      { name: "力量", meaning: "这不是硬碰硬的局面。温和、耐心、自控，反而是更强的力量。" },
-      { name: "隐者", meaning: "暂时后退不是逃避，而是为了看清。安静下来，答案会变得更具体。" },
-      { name: "命运之轮", meaning: "局势正在转动。你无法控制全部变化，但可以抓住变化中的窗口。" },
-      { name: "正义", meaning: "请回到事实与后果。公平不只对别人，也包括对自己诚实。" },
-      { name: "倒吊人", meaning: "停顿本身就是信息。换一个角度看，你会发现真正被卡住的地方。" },
-      { name: "死神", meaning: "某个阶段正在结束。它未必是坏事，旧结构退场后，新空间才会出现。" },
-      { name: "节制", meaning: "答案在调和之中。不要走极端，把节奏放慢一点会更稳。" },
-      { name: "恶魔", meaning: "有些东西看似吸引，其实在消耗你。看清依赖，才有松绑的可能。" },
-      { name: "高塔", meaning: "不稳定的结构可能被打破。震动虽然难受，却能暴露真正的问题。" },
-      { name: "星星", meaning: "希望不是空话，而是恢复感正在发生。请给自己一点重新相信的空间。" },
-      { name: "月亮", meaning: "情绪和想象会放大不确定。别急着下结论，先分清事实与投射。" },
-      { name: "太阳", meaning: "事情会变得更明亮。坦诚、直接、简单，可能是最有效的方式。" },
-      { name: "审判", meaning: "你正在面对一次重新评估。过去的经验不是包袱，而是提醒。" },
-      { name: "世界", meaning: "一个循环接近完成。你可以收束、确认成果，然后进入新的阶段。" }
+      { name: "愚者", meaning: "新的旅程正在打开。它提醒你允许自己尝试，但不要把冲动误认为勇气。", reversed: "鲁莽，失控，恐惧未知" },
+      { name: "魔术师", meaning: "你手里已经有足够的工具。关键不是再等条件成熟，而是开始组合已有资源。", reversed: "欺骗，滥用才能，缺乏计划" },
+      { name: "女祭司", meaning: "答案不急着说出口。多观察隐藏的信息，直觉会比表面逻辑更早抵达。", reversed: "过于理性，忽视直觉，秘密" },
+      { name: "女皇", meaning: "事情需要被温柔地培育。给它时间，也给自己一点稳定的滋养。", reversed: "过度依赖，缺乏创造力，冷漠" },
+      { name: "皇帝", meaning: "边界、秩序和责任变得重要。你需要把松散的想法落到清晰规则里。", reversed: "控制欲，固执，缺乏灵活性" },
+      { name: "教皇", meaning: "传统经验或可靠的前辈能给你支点。别急着孤军奋战。", reversed: "叛逆传统，过于教条，自以为是" },
+      { name: "恋人", meaning: "选择背后是价值排序。真正的问题不是选谁，而是你想成为什么样的人。", reversed: "不和谐，选择失误，价值观冲突" },
+      { name: "战车", meaning: "方向已经出现，但需要纪律感。把分散的力气收回来，稳稳推进。", reversed: "失控，方向不明，攻击性" },
+      { name: "力量", meaning: "这不是硬碰硬的局面。温和、耐心、自控，反而是更强的力量。", reversed: "自我怀疑，软弱，缺乏自制" },
+      { name: "隐者", meaning: "暂时后退不是逃避，而是为了看清。安静下来，答案会变得更具体。", reversed: "孤独，逃避社交，过于封闭" },
+      { name: "命运之轮", meaning: "局势正在转动。你无法控制全部变化，但可以抓住变化中的窗口。", reversed: "抗拒变化，厄运，外力干扰" },
+      { name: "正义", meaning: "请回到事实与后果。公平不只对别人，也包括对自己诚实。", reversed: "不公正，不负责任，偏见" },
+      { name: "倒吊人", meaning: "停顿本身就是信息。换一个角度看，你会发现真正被卡住的地方。", reversed: "拖延，自私，无意义的牺牲" },
+      { name: "死神", meaning: "某个阶段正在结束。它未必是坏事，旧结构退场后，新空间才会出现。", reversed: "抗拒结束，停滞，恐惧变化" },
+      { name: "节制", meaning: "答案在调和之中。不要走极端，把节奏放慢一点会更稳。", reversed: "失衡，过度，缺乏耐心" },
+      { name: "恶魔", meaning: "有些东西看似吸引，其实在消耗你。看清依赖，才有松绑的可能。", reversed: "束缚，上瘾，物质主义" },
+      { name: "高塔", meaning: "不稳定的结构可能被打破。震动虽然难受，却能暴露真正的问题。", reversed: "逃避灾难，恐惧改变，延期" },
+      { name: "星星", meaning: "希望不是空话，而是恢复感正在发生。请给自己一点重新相信的空间。", reversed: "缺乏信心，脱离现实，不切实际" },
+      { name: "月亮", meaning: "情绪和想象会放大不确定。别急着下结论，先分清事实与投射。", reversed: "幻觉，焦虑，误解" },
+      { name: "太阳", meaning: "事情会变得更明亮。坦诚、直接、简单，可能是最有效的方式。", reversed: "过度乐观，精力不足，延迟的成功" },
+      { name: "审判", meaning: "你正在面对一次重新评估。过去的经验不是包袱，而是提醒。", reversed: "自我怀疑，逃避评估，拒绝转变" },
+      { name: "世界", meaning: "一个循环接近完成。你可以收束、确认成果，然后进入新的阶段。", reversed: "未完成，缺乏结局，感到不完整" }
     ];
 
     const isMobileUA = /Android|iPhone|iPad|iPod|Mobile|HarmonyOS|MiuiBrowser|HuaweiBrowser/i.test(navigator.userAgent);
@@ -616,6 +1311,83 @@
       }
     };
 
+    let audioCtx = null;
+    let ambientOsc = null;
+    let ambientGain = null;
+
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playFistHum() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = 120;
+      gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.35);
+    }
+
+    function playFlipSweep() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.5);
+      gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.6);
+    }
+
+    function playPulseHit() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(60, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.22, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    }
+
+    function startAmbient() {
+      if (!audioCtx || ambientOsc) return;
+      ambientOsc = audioCtx.createOscillator();
+      ambientGain = audioCtx.createGain();
+      ambientOsc.type = "sine";
+      ambientOsc.frequency.value = 55;
+      ambientGain.gain.value = 0.04;
+      ambientOsc.connect(ambientGain);
+      ambientGain.connect(audioCtx.destination);
+      ambientOsc.start();
+    }
+
+    function stopAmbient() {
+      if (ambientOsc) {
+        ambientOsc.stop();
+        ambientOsc.disconnect();
+        ambientOsc = null;
+      }
+      if (ambientGain) {
+        ambientGain.disconnect();
+        ambientGain = null;
+      }
+    }
+
     const appState = {
       started: false,
       drawn: false,
@@ -629,7 +1401,17 @@
       highlightedIndex: 0,
       handX: 0.5,
       handTargetX: 0.5,
+      handY: 0,
+      handZ: 0,
+      handVelocityX: 0,
+      handPrevX: 0.5,
+      handLastMoveTime: 0,
+      smoothedSensitivity: 1.0,
+      currentDamping: 1.0,
+      dampingTarget: 1.0,
+      fistFocusRingVisible: false,
       manualMode: false,
+      shuffling: false,
       gesture: "unknown",
       gestureSamples: [],
       releaseFrames: 0,
@@ -638,7 +1420,26 @@
       lastPhaseChange: performance.now(),
       lastHandSeen: 0,
       chosenCardName: "",
-      cameraReady: false
+      cameraReady: false,
+      magicCircle: { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 },
+      drawnCards: [],
+      currentTarot: null,
+      maxSpread: 3
+    };
+
+    const gestureConfig = {
+      depthMin: -0.18,
+      depthMax: 0.06,
+      powerExponent: 0.55,
+      minSensitivity: 0.3,
+      maxSensitivity: 2.0,
+      sensitivitySmoothing: 0.12,
+      velocityGain: 0.6,
+      velocityThreshold: 0.3,
+      maxVelocityBonus: 1.5,
+      fistDamping: 0.12,
+      dampingAttack: 0.15,
+      dampingRelease: 0.07
     };
 
     const canvas = document.getElementById("threeCanvas");
@@ -656,7 +1457,7 @@
     camera.position.set(0, 1.7, 10.8);
     camera.lookAt(0, 0.3, 0);
 
-    const ambientLight = new THREE.AmbientLight(0xb78cff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xb78cff, 0.6);
     scene.add(ambientLight);
 
     const keyLight = new THREE.PointLight(0xffffff, 1.8, 18);
@@ -667,6 +1468,14 @@
     sideLight.position.set(-4, 2, 2);
     scene.add(sideLight);
 
+    const rimLight = new THREE.PointLight(0xf1d68a, 0.8, 15);
+    rimLight.position.set(3, -1, 4);
+    scene.add(rimLight);
+
+    const fillLight = new THREE.PointLight(0xff81d8, 0.4, 25);
+    fillLight.position.set(0, -3, -2);
+    scene.add(fillLight);
+
     const deckGroup = new THREE.Group();
     scene.add(deckGroup);
 
@@ -676,72 +1485,1201 @@
     const RADIUS = 4.35;
     const cards = [];
 
-    function makeRoundedCardTexture(type, tarot) {
-      const c = document.createElement("canvas");
-      c.width = 512;
-      c.height = 768;
-      const ctx = c.getContext("2d");
-      const grd = ctx.createLinearGradient(0, 0, 512, 768);
-      if (type === "back") {
-        grd.addColorStop(0, "#211342");
-        grd.addColorStop(.5, "#090717");
-        grd.addColorStop(1, "#3c1d58");
-      } else {
-        grd.addColorStop(0, "#f8ecce");
-        grd.addColorStop(.56, "#fffaf0");
-        grd.addColorStop(1, "#d8b66b");
-      }
-      ctx.fillStyle = grd;
-      roundRect(ctx, 26, 26, 460, 716, 34);
-      ctx.fill();
+    const arcanaSymbols = {
+      "愚者": "🦋", "魔术师": "♾", "女祭司": "☽", "女皇": "♀",
+      "皇帝": "♂", "教皇": "✝", "恋人": "♡", "战车": "⚡",
+      "力量": "🦁", "隐者": "🏔", "命运之轮": "☸", "正义": "⚖",
+      "倒吊人": "🔻", "死神": "☠", "节制": "☯", "恶魔": "⛧",
+      "高塔": "⚝", "星星": "★", "月亮": "☾", "太阳": "☀",
+      "审判": "☿", "世界": "⊕"
+    };
 
-      ctx.strokeStyle = type === "back" ? "rgba(255,255,255,.56)" : "rgba(72,41,12,.76)";
-      ctx.lineWidth = 8;
-      roundRect(ctx, 42, 42, 428, 684, 28);
-      ctx.stroke();
+    const arcanaAccentColors = {
+      "愚者": { main: "rgba(135,206,250,1)", glow: "rgba(135,206,250,.45)", gradientEnd: "rgba(200,230,255,.8)" },
+      "魔术师": { main: "rgba(220,80,60,1)", glow: "rgba(220,80,60,.45)", gradientEnd: "rgba(255,140,100,.8)" },
+      "女祭司": { main: "rgba(100,120,220,1)", glow: "rgba(100,120,220,.45)", gradientEnd: "rgba(160,170,255,.8)" },
+      "命运之轮": { main: "rgba(218,165,32,1)", glow: "rgba(218,165,32,.45)", gradientEnd: "rgba(255,215,100,.8)" },
+      "星星": { main: "rgba(0,200,210,1)", glow: "rgba(0,200,210,.45)", gradientEnd: "rgba(120,240,240,.8)" },
+      "太阳": { main: "rgba(255,200,50,1)", glow: "rgba(255,200,50,.5)", gradientEnd: "rgba(255,240,150,.8)" },
+      "月亮": { main: "rgba(190,170,230,1)", glow: "rgba(190,170,230,.45)", gradientEnd: "rgba(220,210,255,.8)" },
+      "女皇": { main: "rgba(220,100,140,1)", glow: "rgba(220,100,140,.45)", gradientEnd: "rgba(255,160,190,.8)" },
+      "皇帝": { main: "rgba(200,50,50,1)", glow: "rgba(200,50,50,.45)", gradientEnd: "rgba(240,120,100,.8)" },
+      "教皇": { main: "rgba(150,80,200,1)", glow: "rgba(150,80,200,.45)", gradientEnd: "rgba(200,140,240,.8)" },
+      "恋人": { main: "rgba(230,120,110,1)", glow: "rgba(230,120,110,.45)", gradientEnd: "rgba(255,180,170,.8)" },
+      "战车": { main: "rgba(70,100,170,1)", glow: "rgba(70,100,170,.45)", gradientEnd: "rgba(130,160,220,.8)" },
+      "力量": { main: "rgba(230,150,50,1)", glow: "rgba(230,150,50,.45)", gradientEnd: "rgba(255,200,120,.8)" },
+      "隐者": { main: "rgba(80,150,100,1)", glow: "rgba(80,150,100,.45)", gradientEnd: "rgba(140,200,160,.8)" },
+      "正义": { main: "rgba(60,180,120,1)", glow: "rgba(60,180,120,.45)", gradientEnd: "rgba(120,220,170,.8)" },
+      "倒吊人": { main: "rgba(60,170,180,1)", glow: "rgba(60,170,180,.45)", gradientEnd: "rgba(120,210,220,.8)" },
+      "死神": { main: "rgba(140,40,60,1)", glow: "rgba(140,40,60,.45)", gradientEnd: "rgba(200,100,120,.8)" },
+      "节制": { main: "rgba(100,180,230,1)", glow: "rgba(100,180,230,.45)", gradientEnd: "rgba(170,220,255,.8)" },
+      "恶魔": { main: "rgba(160,40,40,1)", glow: "rgba(160,40,40,.5)", gradientEnd: "rgba(220,100,80,.8)" },
+      "高塔": { main: "rgba(230,120,40,1)", glow: "rgba(230,120,40,.5)", gradientEnd: "rgba(255,180,100,.8)" },
+      "审判": { main: "rgba(240,200,80,1)", glow: "rgba(240,200,80,.45)", gradientEnd: "rgba(255,235,160,.8)" },
+      "世界": { main: "rgba(140,90,200,1)", glow: "rgba(140,90,200,.45)", gradientEnd: "rgba(190,150,240,.8)" }
+    };
 
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = type === "back" ? "rgba(183,140,255,.72)" : "rgba(132,82,22,.72)";
-      roundRect(ctx, 68, 72, 376, 624, 22);
-      ctx.stroke();
-
-      if (type === "back") {
+    const arcanaGlyphs = {
+      "愚者": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["愚者"];
         ctx.save();
-        ctx.translate(256, 384);
-        for (let i = 0; i < 16; i++) {
-          ctx.rotate(Math.PI / 8);
-          ctx.beginPath();
-          ctx.moveTo(0, -178);
-          ctx.quadraticCurveTo(38, -70, 0, 0);
-          ctx.quadraticCurveTo(-38, -70, 0, -178);
-          ctx.strokeStyle = `rgba(255,255,255,${0.18 + (i % 2) * 0.12})`;
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
-        ctx.beginPath();
-        ctx.arc(0, 0, 132, 0, Math.PI * 2);
-        ctx.arc(0, 0, 72, 0, Math.PI * 2);
-        ctx.strokeStyle = "rgba(255,255,255,.42)";
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
         ctx.lineWidth = 3;
+        const pts7 = [];
+        ctx.beginPath();
+        for (let i = 0; i < 7; i++) {
+          const ang = (i / 7) * Math.PI * 2 - Math.PI / 2;
+          const r = s * 0.48;
+          const x = cx + Math.cos(ang) * r;
+          const y = cy + Math.sin(ang) * r;
+          pts7.push({ x, y });
+          const ix = cx + Math.cos(ang) * r * 0.52;
+          const iy = cy + Math.sin(ang) * r * 0.52;
+          if (i === 0) ctx.moveTo(ix, iy); else ctx.lineTo(ix, iy);
+          ctx.lineTo(x, y);
+          const next = (i + 1) % 7;
+          const nAng = (next / 7) * Math.PI * 2 - Math.PI / 2;
+          ctx.lineTo(cx + Math.cos(nAng) * r * 0.52, cy + Math.sin(nAng) * r * 0.52);
+        }
+        ctx.closePath();
+        const grd = ctx.createLinearGradient(cx - s * 0.48, cy - s * 0.48, cx + s * 0.48, cy + s * 0.48);
+        grd.addColorStop(0, a.gradientEnd);
+        grd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        grd.addColorStop(1, a.main);
+        ctx.strokeStyle = grd;
         ctx.stroke();
-        ctx.fillStyle = "rgba(255,255,255,.92)";
-        star(ctx, 0, 0, 5, 34, 13);
+        ctx.restore();
+        for (let i = 0; i < 7; i++) {
+          const ang = (i / 7) * Math.PI * 2 - Math.PI / 2;
+          const x = cx + Math.cos(ang) * s * 0.48;
+          const y = cy + Math.sin(ang) * s * 0.48;
+          ctx.save();
+          ctx.shadowColor = a.glow;
+          ctx.shadowBlur = s * 0.06;
+          ctx.fillStyle = a.main;
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.032, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.18;
+        const cGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.18);
+        cGrd.addColorStop(0, a.main);
+        cGrd.addColorStop(0.6, a.glow);
+        cGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = cGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * 0.18, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
-
-        ctx.font = "700 34px Georgia, serif";
-        ctx.fillStyle = "rgba(255,255,255,.78)";
-        ctx.textAlign = "center";
-        ctx.fillText("ARCANA", 256, 662);
-      } else {
-        drawTarotFace(ctx, tarot);
+      },
+      "魔术师": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["魔术师"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        ctx.lineWidth = 3;
+        const inf = s * 0.42;
+        ctx.beginPath();
+        for (let t = 0; t <= Math.PI * 2; t += 0.04) {
+          const x = cx + inf * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+          const y = cy + inf * Math.sin(t) * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+          if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        const lGrd = ctx.createLinearGradient(cx - s * 0.42, cy, cx + s * 0.42, cy);
+        lGrd.addColorStop(0, a.gradientEnd);
+        lGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        lGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = lGrd;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.16;
+        const tGrd = ctx.createRadialGradient(cx, cy - s * 0.36, 0, cx, cy - s * 0.36, s * 0.14);
+        tGrd.addColorStop(0, a.main);
+        tGrd.addColorStop(0.7, a.glow);
+        tGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = tGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.36, s * 0.14, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.36, s * 0.12, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.06;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.24);
+        ctx.lineTo(cx, cy + s * 0.24);
+        ctx.stroke();
+        ctx.fillStyle = a.gradientEnd;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.28);
+        ctx.lineTo(cx - s * 0.04, cy - s * 0.2);
+        ctx.lineTo(cx + s * 0.04, cy - s * 0.2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + s * 0.28);
+        ctx.lineTo(cx - s * 0.04, cy + s * 0.2);
+        ctx.lineTo(cx + s * 0.04, cy + s * 0.2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      },
+      "女祭司": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["女祭司"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        ctx.lineWidth = 3;
+        const lGrd1 = ctx.createLinearGradient(cx - s * 0.42, cy - s * 0.08, cx + s * 0.42, cy - s * 0.08);
+        lGrd1.addColorStop(0, a.gradientEnd);
+        lGrd1.addColorStop(0.5, "rgba(210,170,90,.85)");
+        lGrd1.addColorStop(1, a.main);
+        ctx.strokeStyle = lGrd1;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.08, s * 0.42, Math.PI * 0.15, Math.PI * 0.85);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, cy + s * 0.16, s * 0.42, Math.PI * 1.15, Math.PI * 1.85);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.08, s * 0.28, Math.PI * 0.85, Math.PI * 2.15);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.14;
+        const rGrd = ctx.createRadialGradient(cx, cy - s * 0.08, 0, cx, cy - s * 0.08, s * 0.1);
+        rGrd.addColorStop(0, a.main);
+        rGrd.addColorStop(0.6, a.glow);
+        rGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = rGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.08, s * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        for (let i = 0; i < 3; i++) {
+          const ang = (i / 3) * Math.PI * 2 - Math.PI / 2;
+          const dx = cx + Math.cos(ang) * s * 0.35;
+          const dy = cy - s * 0.08 + Math.sin(ang) * s * 0.35;
+          ctx.save();
+          ctx.fillStyle = a.main;
+          ctx.beginPath();
+          ctx.arc(dx, dy, s * 0.018, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      },
+      "命运之轮": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["命运之轮"];
+        const r = s * 0.44;
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        ctx.lineWidth = 3;
+        const oGrd = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+        oGrd.addColorStop(0, a.gradientEnd);
+        oGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        oGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = oGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.72, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.38, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        for (let i = 0; i < 8; i++) {
+          const ang = (i / 8) * Math.PI * 2;
+          ctx.save();
+          ctx.strokeStyle = a.gradientEnd;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(ang) * r * 0.38, cy + Math.sin(ang) * r * 0.38);
+          ctx.lineTo(cx + Math.cos(ang) * r * 0.72, cy + Math.sin(ang) * r * 0.72);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.save();
+        ctx.fillStyle = a.main;
+        for (let i = 0; i < 8; i++) {
+          const ang = (i / 8) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(cx + Math.cos(ang) * r * 0.55, cy + Math.sin(ang) * r * 0.55, s * 0.016, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      },
+      "星星": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["星星"];
+        const draw7 = (x, y, r) => {
+          ctx.beginPath();
+          for (let i = 0; i < 14; i++) {
+            const ang = -Math.PI / 2 + i * Math.PI / 7;
+            const rad = i % 2 === 0 ? r : r * 0.42;
+            ctx.lineTo(x + Math.cos(ang) * rad, y + Math.sin(ang) * rad);
+          }
+          ctx.closePath();
+          ctx.fill();
+        };
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.14;
+        const sGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.38);
+        sGrd.addColorStop(0, a.main);
+        sGrd.addColorStop(0.6, a.gradientEnd);
+        sGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = sGrd;
+        draw7(cx, cy, s * 0.38);
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.fillStyle = a.gradientEnd;
+        draw7(cx, cy, s * 0.22);
+        ctx.restore();
+        for (let i = 0; i < 7; i++) {
+          const ang = (i / 7) * Math.PI * 2 - Math.PI / 2;
+          const x = cx + Math.cos(ang) * s * 0.62;
+          const y = cy + Math.sin(ang) * s * 0.62;
+          ctx.save();
+          ctx.shadowColor = a.glow;
+          ctx.shadowBlur = s * 0.06;
+          ctx.fillStyle = a.main;
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.04, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      },
+      "太阳": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["太阳"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.16;
+        const cGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.28);
+        cGrd.addColorStop(0, a.main);
+        cGrd.addColorStop(0.5, a.gradientEnd);
+        cGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = cGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * 0.28, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        for (let i = 0; i < 12; i++) {
+          const ang = (i / 12) * Math.PI * 2;
+          const inner = s * 0.36;
+          const outer = s * 0.52;
+          ctx.save();
+          ctx.shadowColor = a.glow;
+          ctx.shadowBlur = s * 0.06;
+          ctx.strokeStyle = i % 2 === 0 ? a.main : a.gradientEnd;
+          ctx.lineWidth = i % 2 === 0 ? 3 : 2;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(ang) * inner, cy + Math.sin(ang) * inner);
+          ctx.lineTo(cx + Math.cos(ang) * outer, cy + Math.sin(ang) * outer);
+          ctx.stroke();
+          ctx.restore();
+        }
+        for (let i = 0; i < 6; i++) {
+          const ang = (i / 6) * Math.PI * 2 + Math.PI / 12;
+          const dx = cx + Math.cos(ang) * s * 0.45;
+          const dy = cy + Math.sin(ang) * s * 0.45;
+          ctx.save();
+          ctx.fillStyle = a.main;
+          ctx.beginPath();
+          ctx.arc(dx, dy, s * 0.018, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      },
+      "月亮": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["月亮"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.18;
+        const mGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.42);
+        mGrd.addColorStop(0, a.main);
+        mGrd.addColorStop(0.6, a.gradientEnd);
+        mGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = mGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * 0.42, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = "rgba(210,170,90,.5)";
+        ctx.shadowBlur = s * 0.12;
+        const cGrd = ctx.createRadialGradient(cx + s * 0.18, cy - s * 0.06, 0, cx + s * 0.18, cy - s * 0.06, s * 0.34);
+        cGrd.addColorStop(0, "rgba(210,170,90,.9)");
+        cGrd.addColorStop(0.7, a.gradientEnd);
+        cGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = cGrd;
+        ctx.beginPath();
+        ctx.arc(cx + s * 0.18, cy - s * 0.06, s * 0.34, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        ctx.fillStyle = a.main;
+        for (let i = 0; i < 16; i++) {
+          const x = cx + (Math.random() - 0.5) * s * 0.7;
+          const y = cy + (Math.random() - 0.5) * s * 0.7;
+          ctx.save();
+          ctx.shadowColor = a.glow;
+          ctx.shadowBlur = s * 0.04;
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.015, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      },
+      "女皇": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["女皇"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.14;
+        const cGrd = ctx.createRadialGradient(cx, cy - s * 0.06, 0, cx, cy - s * 0.06, s * 0.28);
+        cGrd.addColorStop(0, a.main);
+        cGrd.addColorStop(0.6, a.gradientEnd);
+        cGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = cGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.06, s * 0.28, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        for (let i = 0; i < 3; i++) {
+          const ang = -Math.PI / 2 + (i / 3) * Math.PI * 2;
+          const ox = cx + Math.cos(ang) * s * 0.42;
+          const oy = cy - s * 0.06 + Math.sin(ang) * s * 0.42;
+          ctx.save();
+          ctx.shadowColor = a.glow;
+          ctx.shadowBlur = s * 0.08;
+          const oGrd = ctx.createRadialGradient(ox, oy, 0, ox, oy, s * 0.1);
+          oGrd.addColorStop(0, a.main);
+          oGrd.addColorStop(1, "rgba(0,0,0,0)");
+          ctx.fillStyle = oGrd;
+          ctx.beginPath();
+          ctx.arc(ox, oy, s * 0.1, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = a.main;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.save();
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.06, s * 0.48, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      },
+      "皇帝": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["皇帝"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        ctx.lineWidth = 3;
+        const bGrd = ctx.createLinearGradient(cx - s * 0.36, cy - s * 0.46, cx + s * 0.36, cy + s * 0.36);
+        bGrd.addColorStop(0, a.gradientEnd);
+        bGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        bGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = bGrd;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.46);
+        ctx.lineTo(cx + s * 0.36, cy - s * 0.14);
+        ctx.lineTo(cx + s * 0.22, cy - s * 0.14);
+        ctx.lineTo(cx + s * 0.22, cy + s * 0.36);
+        ctx.lineTo(cx - s * 0.22, cy + s * 0.36);
+        ctx.lineTo(cx - s * 0.22, cy - s * 0.14);
+        ctx.lineTo(cx - s * 0.36, cy - s * 0.14);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.14, cy + s * 0.08);
+        ctx.lineTo(cx + s * 0.14, cy + s * 0.08);
+        ctx.lineTo(cx + s * 0.14, cy + s * 0.28);
+        ctx.lineTo(cx - s * 0.14, cy + s * 0.28);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.3, s * 0.022, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx - s * 0.06, cy - s * 0.18, s * 0.016, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx + s * 0.06, cy - s * 0.18, s * 0.016, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      },
+      "教皇": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["教皇"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        ctx.lineWidth = 3;
+        const vGrd = ctx.createLinearGradient(cx, cy - s * 0.44, cx, cy + s * 0.44);
+        vGrd.addColorStop(0, a.gradientEnd);
+        vGrd.addColorStop(0.5, "rgba(210,170,90,.85)");
+        vGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = vGrd;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.44);
+        ctx.lineTo(cx, cy + s * 0.44);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.2, cy - s * 0.18);
+        ctx.lineTo(cx + s * 0.2, cy - s * 0.18);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.14, cy - s * 0.34);
+        ctx.lineTo(cx + s * 0.14, cy - s * 0.34);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.26, cy - s * 0.02);
+        ctx.lineTo(cx + s * 0.26, cy - s * 0.02);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        const hGrd = ctx.createRadialGradient(cx, cy - s * 0.44, 0, cx, cy - s * 0.44, s * 0.1);
+        hGrd.addColorStop(0, a.main);
+        hGrd.addColorStop(0.6, a.glow);
+        hGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = hGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.44, s * 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+        for (let i = 0; i < 2; i++) {
+          const dx = cx + (i === 0 ? -1 : 1) * s * 0.18;
+          ctx.save();
+          ctx.fillStyle = a.main;
+          ctx.beginPath();
+          ctx.arc(dx, cy + s * 0.18, s * 0.016, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      },
+      "恋人": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["恋人"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.14;
+        const hGrd = ctx.createLinearGradient(cx, cy - s * 0.4, cx, cy + s * 0.4);
+        hGrd.addColorStop(0, a.gradientEnd);
+        hGrd.addColorStop(0.5, "rgba(210,170,90,.8)");
+        hGrd.addColorStop(1, a.main);
+        ctx.fillStyle = hGrd;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + s * 0.42);
+        ctx.bezierCurveTo(cx - s * 0.5, cy + s * 0.1, cx - s * 0.5, cy - s * 0.38, cx, cy - s * 0.16);
+        ctx.bezierCurveTo(cx + s * 0.5, cy - s * 0.38, cx + s * 0.5, cy + s * 0.1, cx, cy + s * 0.42);
+        ctx.fill();
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx - s * 0.06, cy - s * 0.06, s * 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.04, s * 0.02, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      },
+      "战车": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["战车"];
+        const r = s * 0.32;
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        ctx.lineWidth = 3;
+        const oGrd = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+        oGrd.addColorStop(0, a.gradientEnd);
+        oGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        oGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = oGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.06;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        for (let i = 0; i < 8; i++) {
+          const ang = (i / 8) * Math.PI * 2;
+          ctx.save();
+          ctx.strokeStyle = a.gradientEnd;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(ang) * r * 0.6, cy + Math.sin(ang) * r * 0.6);
+          ctx.lineTo(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        const cGrd = ctx.createLinearGradient(cx - s * 0.42, cy + s * 0.38, cx + s * 0.42, cy - s * 0.44);
+        cGrd.addColorStop(0, a.main);
+        cGrd.addColorStop(0.5, a.gradientEnd);
+        cGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = cGrd;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.42, cy + s * 0.38);
+        ctx.lineTo(cx - s * 0.26, cy - s * 0.28);
+        ctx.lineTo(cx, cy - s * 0.44);
+        ctx.lineTo(cx + s * 0.26, cy - s * 0.28);
+        ctx.lineTo(cx + s * 0.42, cy + s * 0.38);
+        ctx.stroke();
+        ctx.restore();
+      },
+      "力量": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["力量"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        const hGrd = ctx.createRadialGradient(cx, cy - s * 0.04, 0, cx, cy - s * 0.04, s * 0.22);
+        hGrd.addColorStop(0, a.main);
+        hGrd.addColorStop(0.6, a.gradientEnd);
+        hGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = hGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.04, s * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.06;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.08, cy + s * 0.18);
+        ctx.lineTo(cx - s * 0.08, cy + s * 0.42);
+        ctx.lineTo(cx + s * 0.08, cy + s * 0.42);
+        ctx.lineTo(cx + s * 0.08, cy + s * 0.18);
+        ctx.stroke();
+        ctx.restore();
+        const inf = s * 0.38;
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        const iGrd = ctx.createLinearGradient(cx - inf, cy, cx + inf, cy);
+        iGrd.addColorStop(0, a.gradientEnd);
+        iGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        iGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = iGrd;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let t = 0; t <= Math.PI * 2; t += 0.04) {
+          const x = cx + inf * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+          const y = cy - s * 0.14 + inf * Math.sin(t) * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+          if (t === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      },
+      "隐者": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["隐者"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        const tGrd = ctx.createLinearGradient(cx - s * 0.14, cy - s * 0.42, cx + s * 0.14, cy - s * 0.22);
+        tGrd.addColorStop(0, a.gradientEnd);
+        tGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        tGrd.addColorStop(1, a.main);
+        ctx.fillStyle = tGrd;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.42);
+        ctx.lineTo(cx + s * 0.14, cy - s * 0.22);
+        ctx.lineTo(cx - s * 0.14, cy - s * 0.22);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.06;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.22);
+        ctx.lineTo(cx, cy + s * 0.36);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.2, cy + s * 0.36);
+        ctx.lineTo(cx + s * 0.2, cy + s * 0.36);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const ang = -Math.PI / 2 + (i / 5) * Math.PI;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy - s * 0.32);
+          ctx.lineTo(cx + Math.cos(ang) * s * 0.3, cy - s * 0.32 + Math.sin(ang) * s * 0.3);
+          ctx.stroke();
+        }
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx + s * 0.16, cy + s * 0.36, s * 0.016, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx - s * 0.16, cy + s * 0.36, s * 0.016, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      },
+      "正义": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["正义"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        const sGrd = ctx.createLinearGradient(cx, cy - s * 0.44, cx, cy + s * 0.16);
+        sGrd.addColorStop(0, a.gradientEnd);
+        sGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        sGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = sGrd;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.44);
+        ctx.lineTo(cx, cy + s * 0.16);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.36, cy - s * 0.14);
+        ctx.lineTo(cx + s * 0.36, cy - s * 0.14);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cx - s * 0.2, cy + s * 0.06, s * 0.14, Math.PI, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx + s * 0.2, cy - s * 0.34, s * 0.14, 0, Math.PI);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.3, cy + s * 0.16);
+        ctx.lineTo(cx + s * 0.3, cy + s * 0.16);
+        ctx.lineTo(cx + s * 0.2, cy + s * 0.4);
+        ctx.lineTo(cx - s * 0.2, cy + s * 0.4);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.14, s * 0.02, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      },
+      "倒吊人": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["倒吊人"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.14;
+        const hGrd = ctx.createRadialGradient(cx, cy + s * 0.12, 0, cx, cy + s * 0.12, s * 0.14);
+        hGrd.addColorStop(0, a.main);
+        hGrd.addColorStop(0.6, a.glow);
+        hGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = hGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy + s * 0.12, s * 0.14, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.06;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy + s * 0.26);
+        ctx.lineTo(cx, cy - s * 0.18);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.22, cy + s * 0.02);
+        ctx.lineTo(cx + s * 0.22, cy + s * 0.02);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.14, cy - s * 0.18);
+        ctx.lineTo(cx, cy - s * 0.04);
+        ctx.lineTo(cx + s * 0.14, cy - s * 0.18);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.38);
+        ctx.lineTo(cx, cy + s * 0.42);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.38, s * 0.018, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(cx, cy + s * 0.42, s * 0.018, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      },
+      "死神": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["死神"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.14;
+        const sGrd = ctx.createRadialGradient(cx, cy - s * 0.1, 0, cx, cy - s * 0.1, s * 0.22);
+        sGrd.addColorStop(0, a.main);
+        sGrd.addColorStop(0.5, a.gradientEnd);
+        sGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = sGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.1, s * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.06;
+        const eGrd = ctx.createRadialGradient(cx - s * 0.08, cy - s * 0.14, 0, cx - s * 0.08, cy - s * 0.14, s * 0.04);
+        eGrd.addColorStop(0, a.main);
+        eGrd.addColorStop(1, "rgba(210,170,90,.8)");
+        ctx.fillStyle = eGrd;
+        ctx.beginPath();
+        ctx.arc(cx - s * 0.08, cy - s * 0.14, s * 0.04, 0, Math.PI * 2);
+        ctx.arc(cx + s * 0.08, cy - s * 0.14, s * 0.04, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.28, cy + s * 0.14);
+        ctx.quadraticCurveTo(cx, cy + s * 0.08, cx + s * 0.28, cy + s * 0.14);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.04, cy + s * 0.14);
+        ctx.lineTo(cx - s * 0.04, cy + s * 0.38);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx + s * 0.04, cy + s * 0.14);
+        ctx.lineTo(cx + s * 0.04, cy + s * 0.38);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx, cy + s * 0.38, s * 0.016, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      },
+      "节制": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["节制"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        const tGrd = ctx.createLinearGradient(cx - s * 0.3, cy + s * 0.2, cx + s * 0.3, cy + s * 0.2);
+        tGrd.addColorStop(0, a.gradientEnd);
+        tGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        tGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = tGrd;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.3, cy + s * 0.2);
+        ctx.lineTo(cx, cy - s * 0.08);
+        ctx.lineTo(cx + s * 0.3, cy + s * 0.2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx - s * 0.3, cy + s * 0.2, s * 0.14, Math.PI, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx + s * 0.3, cy + s * 0.2, s * 0.14, Math.PI, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.08);
+        ctx.lineTo(cx, cy - s * 0.42);
+        ctx.stroke();
+        const hGrd = ctx.createRadialGradient(cx, cy - s * 0.42, 0, cx, cy - s * 0.42, s * 0.08);
+        hGrd.addColorStop(0, a.main);
+        hGrd.addColorStop(0.6, a.glow);
+        hGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = hGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.42, s * 0.08, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        for (let i = 0; i < 5; i++) {
+          const t = i / 4;
+          const ax = cx - s * 0.3 + t * s * 0.3;
+          const ay = cy + s * 0.2 - Math.sin(t * Math.PI) * s * 0.28;
+          ctx.save();
+          ctx.fillStyle = a.main;
+          ctx.beginPath();
+          ctx.arc(ax, ay, s * 0.02, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      },
+      "恶魔": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["恶魔"];
+        const r = s * 0.4;
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.14;
+        const sGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+        sGrd.addColorStop(0, a.main);
+        sGrd.addColorStop(0.5, a.gradientEnd);
+        sGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = sGrd;
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+          const ang = Math.PI / 2 + (i / 5) * Math.PI * 2;
+          const na = Math.PI / 2 + ((i + 2) / 5) * Math.PI * 2;
+          ctx.lineTo(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r);
+          ctx.lineTo(cx + Math.cos(na) * r * 0.38, cy + Math.sin(na) * r * 0.38);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * 1.12, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        ctx.beginPath();
+        ctx.arc(cx, cy - r * 0.08, s * 0.018, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      },
+      "高塔": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["高塔"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        const bGrd = ctx.createLinearGradient(cx - s * 0.16, cy + s * 0.42, cx + s * 0.16, cy - s * 0.44);
+        bGrd.addColorStop(0, a.gradientEnd);
+        bGrd.addColorStop(0.5, "rgba(210,170,90,.8)");
+        bGrd.addColorStop(1, a.main);
+        ctx.fillStyle = bGrd;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.16, cy + s * 0.42);
+        ctx.lineTo(cx - s * 0.16, cy - s * 0.18);
+        ctx.lineTo(cx - s * 0.24, cy - s * 0.18);
+        ctx.lineTo(cx, cy - s * 0.44);
+        ctx.lineTo(cx + s * 0.24, cy - s * 0.18);
+        ctx.lineTo(cx + s * 0.16, cy - s * 0.18);
+        ctx.lineTo(cx + s * 0.16, cy + s * 0.42);
+        ctx.closePath();
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.04, cy - s * 0.12);
+        ctx.lineTo(cx + s * 0.04, cy + s * 0.08);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx + s * 0.06, cy - s * 0.16);
+        ctx.lineTo(cx - s * 0.02, cy + s * 0.04);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        for (let i = 0; i < 3; i++) {
+          const dx = cx + (i - 1) * s * 0.08;
+          ctx.beginPath();
+          ctx.arc(dx, cy + s * 0.28, s * 0.014, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      },
+      "审判": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["审判"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        const bGrd = ctx.createLinearGradient(cx - s * 0.22, cy - s * 0.44, cx + s * 0.22, cy + s * 0.28);
+        bGrd.addColorStop(0, a.gradientEnd);
+        bGrd.addColorStop(0.5, "rgba(210,170,90,.8)");
+        bGrd.addColorStop(1, a.main);
+        ctx.fillStyle = bGrd;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.44);
+        ctx.lineTo(cx + s * 0.1, cy - s * 0.28);
+        ctx.lineTo(cx + s * 0.22, cy - s * 0.28);
+        ctx.lineTo(cx + s * 0.22, cy + s * 0.12);
+        ctx.quadraticCurveTo(cx + s * 0.22, cy + s * 0.28, cx + s * 0.08, cy + s * 0.28);
+        ctx.lineTo(cx - s * 0.08, cy + s * 0.28);
+        ctx.quadraticCurveTo(cx - s * 0.22, cy + s * 0.28, cx - s * 0.22, cy + s * 0.12);
+        ctx.lineTo(cx - s * 0.22, cy - s * 0.28);
+        ctx.lineTo(cx - s * 0.1, cy - s * 0.28);
+        ctx.closePath();
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = a.main;
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - s * 0.22);
+        ctx.lineTo(cx, cy + s * 0.08);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - s * 0.08, cy - s * 0.12);
+        ctx.lineTo(cx + s * 0.08, cy - s * 0.12);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        const hGrd = ctx.createRadialGradient(cx, cy - s * 0.22, 0, cx, cy - s * 0.22, s * 0.08);
+        hGrd.addColorStop(0, a.main);
+        hGrd.addColorStop(0.6, a.glow);
+        hGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = hGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy - s * 0.22, s * 0.08, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.restore();
+      },
+      "世界": (ctx, cx, cy, s) => {
+        const a = arcanaAccentColors["世界"];
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.12;
+        ctx.lineWidth = 3;
+        const oGrd = ctx.createLinearGradient(cx - s * 0.42, cy - s * 0.42, cx + s * 0.42, cy + s * 0.42);
+        oGrd.addColorStop(0, a.gradientEnd);
+        oGrd.addColorStop(0.5, "rgba(210,170,90,.9)");
+        oGrd.addColorStop(1, a.main);
+        ctx.strokeStyle = oGrd;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * 0.42, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.08;
+        ctx.strokeStyle = a.main;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * 0.32, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        for (let i = 0; i < 4; i++) {
+          const ang = (i / 4) * Math.PI * 2 - Math.PI / 4;
+          ctx.save();
+          ctx.shadowColor = a.glow;
+          ctx.shadowBlur = s * 0.06;
+          ctx.translate(cx + Math.cos(ang) * s * 0.37, cy + Math.sin(ang) * s * 0.37);
+          ctx.rotate(ang + Math.PI / 2);
+          ctx.strokeStyle = a.gradientEnd;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, s * 0.06, s * 0.1, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.save();
+        ctx.shadowColor = a.glow;
+        ctx.shadowBlur = s * 0.1;
+        const sGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.22);
+        sGrd.addColorStop(0, a.main);
+        sGrd.addColorStop(0.6, a.gradientEnd);
+        sGrd.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = sGrd;
+        ctx.beginPath();
+        star(ctx, cx, cy, 4, s * 0.22, s * 0.1);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.strokeStyle = a.gradientEnd;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, s * 0.52, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        ctx.save();
+        ctx.fillStyle = a.main;
+        for (let i = 0; i < 4; i++) {
+          const ang = (i / 4) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.arc(cx + Math.cos(ang) * s * 0.47, cy + Math.sin(ang) * s * 0.47, s * 0.014, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
       }
+    };
 
-      const texture = new THREE.CanvasTexture(c);
-      texture.encoding = THREE.sRGBEncoding;
-      texture.anisotropy = 8;
-      return texture;
-    }
+    const defaultGlyph = (ctx, cx, cy, s) => {
+      ctx.save();
+      ctx.shadowColor = "rgba(241,214,138,.45)";
+      ctx.shadowBlur = 16;
+      const outerGrd = ctx.createLinearGradient(cx - s * 0.4, cy - s * 0.4, cx + s * 0.4, cy + s * 0.4);
+      outerGrd.addColorStop(0, "rgba(241,214,138,.82)");
+      outerGrd.addColorStop(0.5, "rgba(183,140,255,.6)");
+      outerGrd.addColorStop(1, "rgba(241,214,138,.82)");
+      ctx.strokeStyle = outerGrd;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, s * 0.4, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.shadowColor = "rgba(183,140,255,.4)";
+      ctx.shadowBlur = 14;
+      const innerGrd = ctx.createLinearGradient(cx + s * 0.26, cy - s * 0.26, cx - s * 0.26, cy + s * 0.26);
+      innerGrd.addColorStop(0, "rgba(183,140,255,.6)");
+      innerGrd.addColorStop(0.5, "rgba(241,214,138,.82)");
+      innerGrd.addColorStop(1, "rgba(183,140,255,.6)");
+      ctx.strokeStyle = innerGrd;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, s * 0.26, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      ctx.save();
+      ctx.shadowColor = "rgba(241,214,138,.5)";
+      ctx.shadowBlur = 20;
+      const starGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, s * 0.4);
+      starGrd.addColorStop(0, "rgba(183,140,255,.5)");
+      starGrd.addColorStop(0.5, "rgba(241,214,138,.3)");
+      starGrd.addColorStop(1, "rgba(183,140,255,.1)");
+      ctx.fillStyle = starGrd;
+      ctx.beginPath();
+      for (let i = 0; i < 12; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 6;
+        const r = i % 2 === 0 ? s * 0.4 : s * 0.18;
+        ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "rgba(241,214,138,.82)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = "rgba(241,214,138,.6)";
+      for (let i = 0; i < 12; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 6;
+        const r = i % 2 === 0 ? s * 0.42 : s * 0.16;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(a) * r, cy + Math.sin(a) * r, s * 0.015, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    };
+
+    const romanNumerals = [
+      "0", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X",
+      "XI", "XII", "XIII", "XIV", "XV", "XVI", "XVII", "XVIII", "XIX", "XX", "XXI"
+    ];
 
     function roundRect(ctx, x, y, w, h, r) {
       ctx.beginPath();
@@ -763,37 +2701,355 @@
       ctx.closePath();
     }
 
-    function drawTarotFace(ctx, tarot) {
-      ctx.fillStyle = "rgba(69,41,14,.88)";
-      ctx.textAlign = "center";
-      ctx.font = "700 52px 'Microsoft YaHei', serif";
-      wrapText(ctx, tarot.name, 256, 128, 360, 62);
+    function makeRoundedCardTexture(type, tarot, cardIndex, isReversed) {
+      const c = document.createElement("canvas");
+      c.width = 512;
+      c.height = 768;
+      const ctx = c.getContext("2d");
+      const grd = ctx.createLinearGradient(0, 0, 512, 768);
+      if (type === "back") {
+        grd.addColorStop(0, "#1a0e35");
+        grd.addColorStop(.3, "#0d0918");
+        grd.addColorStop(.6, "#120828");
+        grd.addColorStop(1, "#2a1448");
+      } else {
+        grd.addColorStop(0, "#f8ecce");
+        grd.addColorStop(.35, "#fffaf0");
+        grd.addColorStop(.65, "#fef6e4");
+        grd.addColorStop(1, "#d8b66b");
+      }
+      ctx.fillStyle = grd;
+      roundRect(ctx, 26, 26, 460, 716, 34);
+      ctx.fill();
+
+      if (type === "back") {
+        drawCardBack(ctx);
+      } else {
+        drawTarotFace(ctx, tarot, cardIndex, isReversed);
+      }
+
+      const texture = new THREE.CanvasTexture(c);
+      texture.encoding = THREE.sRGBEncoding;
+      texture.anisotropy = 16;
+      return texture;
+    }
+
+    function drawCardBack(ctx) {
+      const cx = 256, cy = 384;
+
+      ctx.strokeStyle = "rgba(241,214,138,.42)";
+      ctx.lineWidth = 6;
+      roundRect(ctx, 38, 38, 436, 692, 28);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(183,140,255,.38)";
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, 54, 54, 404, 660, 22);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(241,214,138,.18)";
+      ctx.lineWidth = 1;
+      roundRect(ctx, 72, 72, 368, 624, 16);
+      ctx.stroke();
+
+      for (let i = 0; i < 4; i++) {
+        const a = i * Math.PI / 2;
+        const ox = cx + Math.cos(a) * 195;
+        const oy = cy + Math.sin(a) * 295;
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.rotate(a + Math.PI / 4);
+        ctx.strokeStyle = "rgba(241,214,138,.22)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.rect(-6, -6, 12, 12);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 0, 3, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(241,214,138,.18)";
+        ctx.fill();
+        ctx.restore();
+      }
 
       ctx.save();
-      ctx.translate(256, 350);
-      ctx.strokeStyle = "rgba(100,58,19,.86)";
-      ctx.lineWidth = 5;
+      ctx.translate(cx, cy);
+
+      ctx.strokeStyle = "rgba(183,140,255,.22)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(0, 0, 178, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, 162, 0, Math.PI * 2);
+      ctx.stroke();
+
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 162, Math.sin(a) * 162);
+        ctx.lineTo(Math.cos(a) * 178, Math.sin(a) * 178);
+        ctx.strokeStyle = `rgba(241,214,138,${0.2 + (i % 3 === 0 ? 0.18 : 0)})`;
+        ctx.lineWidth = i % 3 === 0 ? 1.5 : 0.8;
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = "rgba(241,214,138,.32)";
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+        const na = ((i + 2) / 6) * Math.PI * 2 - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 130, Math.sin(a) * 130);
+        ctx.lineTo(Math.cos(na) * 130, Math.sin(na) * 130);
+        ctx.stroke();
+      }
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + Math.PI / 6 - Math.PI / 2;
+        const na = ((i + 2) / 6) * Math.PI * 2 + Math.PI / 6 - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 130, Math.sin(a) * 130);
+        ctx.lineTo(Math.cos(na) * 130, Math.sin(na) * 130);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = "rgba(183,140,255,.42)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 130, 0, Math.PI * 2);
+      ctx.stroke();
+
+      for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const r = i % 2 === 0 ? 140 : 146;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a) * r, Math.sin(a) * r, i % 2 === 0 ? 2 : 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(241,214,138,${i % 2 === 0 ? 0.6 : 0.3})`;
+        ctx.fill();
+      }
+
+      for (let i = 0; i < 16; i++) {
+        ctx.rotate(Math.PI / 8);
+        ctx.beginPath();
+        ctx.moveTo(0, -100);
+        ctx.quadraticCurveTo(28, -48, 0, -8);
+        ctx.quadraticCurveTo(-28, -48, 0, -100);
+        ctx.strokeStyle = `rgba(183,140,255,${0.12 + (i % 2) * 0.08})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 72, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(241,214,138,.36)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 52, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(183,140,255,.28)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(241,214,138,.88)";
+      star(ctx, 0, 0, 7, 36, 15);
+      ctx.fill();
+      ctx.strokeStyle = "rgba(241,214,138,.42)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(183,140,255,.65)";
+      star(ctx, 0, 0, 7, 24, 10);
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(241,214,138,.92)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      ctx.font = "700 26px Georgia, serif";
+      ctx.fillStyle = "rgba(241,214,138,.56)";
+      ctx.textAlign = "center";
+      ctx.fillText("✦  ARCANA  ✦", 256, 662);
+
+      ctx.font = "400 14px Georgia, serif";
+      ctx.fillStyle = "rgba(183,140,255,.38)";
+      ctx.fillText("— MAJOR —", 256, 685);
+    }
+
+    function drawTarotFace(ctx, tarot, cardIndex, isReversed) {
+      if (isReversed) {
+        ctx.translate(256, 384);
+        ctx.rotate(Math.PI);
+        ctx.translate(-256, -384);
+      }
+      const idx = cardIndex != null ? cardIndex : tarotDeck.indexOf(tarot);
+      const numeral = romanNumerals[idx >= 0 ? idx : 0];
+      const cx = 256, cy = 360;
+      const accent = (arcanaAccentColors && arcanaAccentColors[tarot.name]) || { main: "rgba(241,214,138,1)", glow: "rgba(241,214,138,.45)", gradientEnd: "rgba(183,140,255,.8)" };
+
+      const outerBorderGrd = ctx.createLinearGradient(38, 38, 474, 730);
+      outerBorderGrd.addColorStop(0, "rgba(183,140,255,.52)");
+      outerBorderGrd.addColorStop(0.5, "rgba(241,214,138,.58)");
+      outerBorderGrd.addColorStop(1, "rgba(183,140,255,.52)");
+      ctx.strokeStyle = outerBorderGrd;
+      ctx.lineWidth = 6;
+      roundRect(ctx, 38, 38, 436, 692, 28);
+      ctx.stroke();
+
+      const innerBorderGrd = ctx.createLinearGradient(56, 56, 456, 712);
+      innerBorderGrd.addColorStop(0, "rgba(241,214,138,.32)");
+      innerBorderGrd.addColorStop(0.5, "rgba(183,140,255,.22)");
+      innerBorderGrd.addColorStop(1, "rgba(241,214,138,.32)");
+      ctx.strokeStyle = innerBorderGrd;
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, 56, 56, 400, 656, 20);
+      ctx.stroke();
+
+      ctx.fillStyle = accent.main;
+      ctx.textAlign = "center";
+      ctx.font = "400 22px Georgia, serif";
+      ctx.fillText(`— ${numeral} —`, cx, 100);
+
+      ctx.fillStyle = "rgba(88,52,18,.92)";
+      ctx.font = "700 48px 'Microsoft YaHei', serif";
+      wrapText(ctx, tarot.name, cx, 152, 360, 58);
+
+      const sepGrd1 = ctx.createLinearGradient(100, 0, 412, 0);
+      sepGrd1.addColorStop(0, "rgba(183,140,255,.08)");
+      sepGrd1.addColorStop(0.2, "rgba(241,214,138,.32)");
+      sepGrd1.addColorStop(0.5, accent.main.replace(/[\d.]+\)$/, ".45)"));
+      sepGrd1.addColorStop(0.8, "rgba(241,214,138,.32)");
+      sepGrd1.addColorStop(1, "rgba(183,140,255,.08)");
+      ctx.strokeStyle = sepGrd1;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(100, 178);
+      ctx.lineTo(412, 178);
+      ctx.stroke();
+      ctx.fillStyle = accent.main;
+      ctx.beginPath();
+      ctx.moveTo(100, 178);
+      ctx.lineTo(94, 174);
+      ctx.lineTo(94, 182);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(412, 178);
+      ctx.lineTo(418, 174);
+      ctx.lineTo(418, 182);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      const ringGrd = ctx.createLinearGradient(-130, -130, 130, 130);
+      ringGrd.addColorStop(0, "rgba(183,140,255,.52)");
+      ringGrd.addColorStop(0.5, accent.main.replace(/[\d.]+\)$/, ".6)"));
+      ringGrd.addColorStop(1, "rgba(183,140,255,.52)");
+      ctx.save();
+      ctx.shadowColor = accent.glow;
+      ctx.shadowBlur = 12;
+      ctx.strokeStyle = ringGrd;
+      ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(0, 0, 124, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(0, 0, 82, 0, Math.PI * 2);
-      ctx.stroke();
-      for (let i = 0; i < 12; i++) {
-        const a = i / 12 * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(Math.cos(a) * 54, Math.sin(a) * 54);
-        ctx.lineTo(Math.cos(a) * 148, Math.sin(a) * 148);
-        ctx.stroke();
-      }
-      ctx.fillStyle = "rgba(100,58,19,.9)";
-      star(ctx, 0, 0, 6, 58, 22);
-      ctx.fill();
       ctx.restore();
 
-      ctx.font = "400 28px 'Microsoft YaHei', sans-serif";
-      ctx.fillStyle = "rgba(69,41,14,.82)";
-      wrapText(ctx, tarot.meaning, 256, 570, 360, 42);
+      ctx.strokeStyle = "rgba(241,214,138,.28)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, 112, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const bgGlow = ctx.createRadialGradient(0, 0, 0, 0, 0, 120);
+      bgGlow.addColorStop(0, accent.glow);
+      bgGlow.addColorStop(0.6, accent.glow.replace(/[\d.]+\)$/, ".08)"));
+      bgGlow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = bgGlow;
+      ctx.beginPath();
+      ctx.arc(0, 0, 120, 0, Math.PI * 2);
+      ctx.fill();
+
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const isMain = i % 3 === 0;
+        if (isMain) {
+          ctx.save();
+          ctx.shadowColor = accent.glow;
+          ctx.shadowBlur = 6;
+          ctx.fillStyle = accent.main;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * 100, Math.sin(a) * 100, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          ctx.fillStyle = "rgba(241,214,138,.28)";
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * 100, Math.sin(a) * 100, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 24; i++) {
+        const a = (i / 24) * Math.PI * 2;
+        const r1 = 52, r2 = i % 4 === 0 ? 58 : 55;
+        ctx.strokeStyle = `rgba(183,140,255,${i % 4 === 0 ? .22 : .1})`;
+        ctx.lineWidth = i % 4 === 0 ? 1 : 0.5;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * r1, Math.sin(a) * r1);
+        ctx.lineTo(Math.cos(a) * r2, Math.sin(a) * r2);
+        ctx.stroke();
+      }
+
+      const glyphFn = arcanaGlyphs[tarot.name] || defaultGlyph;
+      ctx.save();
+      ctx.translate(0, 0);
+      glyphFn(ctx, 0, 0, 240);
+      ctx.restore();
+
+      ctx.restore();
+
+      const sepGrd2 = ctx.createLinearGradient(100, 0, 412, 0);
+      sepGrd2.addColorStop(0, "rgba(183,140,255,.08)");
+      sepGrd2.addColorStop(0.2, "rgba(241,214,138,.32)");
+      sepGrd2.addColorStop(0.5, accent.main.replace(/[\d.]+\)$/, ".45)"));
+      sepGrd2.addColorStop(0.8, "rgba(241,214,138,.32)");
+      sepGrd2.addColorStop(1, "rgba(183,140,255,.08)");
+      ctx.strokeStyle = sepGrd2;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(100, 530);
+      ctx.lineTo(412, 530);
+      ctx.stroke();
+      ctx.fillStyle = accent.main;
+      ctx.beginPath();
+      ctx.moveTo(100, 530);
+      ctx.lineTo(94, 526);
+      ctx.lineTo(94, 534);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(412, 530);
+      ctx.lineTo(418, 526);
+      ctx.lineTo(418, 534);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.font = "400 24px 'Microsoft YaHei', sans-serif";
+      ctx.fillStyle = "rgba(88,52,18,.82)";
+      wrapText(ctx, tarot.meaning, cx, 572, 360, 38);
+
+      ctx.save();
+      ctx.shadowColor = accent.glow;
+      ctx.shadowBlur = 10;
+      ctx.font = "400 18px Georgia, serif";
+      ctx.fillStyle = accent.main;
+      ctx.fillText("✦  ✦  ✦", cx, 710);
+      ctx.restore();
     }
 
     function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
@@ -823,8 +3079,8 @@
       const baseMat = new THREE.MeshStandardMaterial({
         color: 0xffffff,
         map: backTexture,
-        roughness: 0.35,
-        metalness: 0.16,
+        roughness: 0.28,
+        metalness: 0.22,
         emissive: 0x21114d,
         emissiveIntensity: 0.18
       });
@@ -835,12 +3091,27 @@
       const edges = new THREE.LineSegments(edgeGeo, edgeMat);
       group.add(edges);
 
+      const glowGeo = new THREE.PlaneGeometry(CARD_W * 1.4, CARD_H * 1.4);
+      const glowMat = new THREE.MeshBasicMaterial({
+        color: 0xb78cff,
+        transparent: true,
+        opacity: 0,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      const glowPlane = new THREE.Mesh(glowGeo, glowMat);
+      glowPlane.position.z = -0.04;
+      group.add(glowPlane);
+
       const angle = index / CARD_COUNT * Math.PI * 2;
       group.userData.baseAngle = angle;
       group.userData.mesh = mesh;
       group.userData.edges = edges;
       group.userData.edgeMat = edgeMat;
       group.userData.baseMat = baseMat;
+      group.userData.glowMat = glowMat;
+      group.userData.glowPlane = glowPlane;
       deckGroup.add(group);
       cards.push(group);
     }
@@ -852,6 +3123,12 @@
     const particlePositions = new Float32Array(particleCount * 3);
     const particleTargets = new Float32Array(particleCount * 3);
     const particleSeeds = new Float32Array(particleCount * 4);
+    const particleColors = new Float32Array(particleCount * 3);
+
+    const colorGold = new THREE.Color(0xf1d68a);
+    const colorPurple = new THREE.Color(0xb78cff);
+    const colorPink = new THREE.Color(0xff81d8);
+    const colorWhite = new THREE.Color(0xf5efff);
 
     for (let i = 0; i < particleCount; i++) {
       particleSeeds[i * 4] = Math.random();
@@ -865,20 +3142,72 @@
       particleTargets[i * 3] = p.x;
       particleTargets[i * 3 + 1] = p.y;
       particleTargets[i * 3 + 2] = p.z;
+
+      const t = particleSeeds[i * 4 + 3];
+      const c = new THREE.Color();
+      if (t < 0.3) c.lerpColors(colorPurple, colorGold, t / 0.3);
+      else if (t < 0.6) c.lerpColors(colorGold, colorPink, (t - 0.3) / 0.3);
+      else c.lerpColors(colorPink, colorWhite, (t - 0.6) / 0.4);
+      particleColors[i * 3] = c.r;
+      particleColors[i * 3 + 1] = c.g;
+      particleColors[i * 3 + 2] = c.b;
     }
 
     particleGeo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+    particleGeo.setAttribute("color", new THREE.BufferAttribute(particleColors, 3));
     particleGeo.setDrawRange(0, appState.activeParticles);
     const particleMat = new THREE.PointsMaterial({
-      color: appState.theme,
       size: 0.052,
       transparent: true,
       opacity: 0.9,
       depthWrite: false,
-      blending: THREE.AdditiveBlending
+      blending: THREE.AdditiveBlending,
+      vertexColors: true
     });
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
+
+    const constellationCount = 300;
+    const constellationPositions = new Float32Array(constellationCount * 6);
+    const constellationGeo = new THREE.BufferGeometry();
+    constellationGeo.setAttribute("position", new THREE.BufferAttribute(constellationPositions, 3));
+    constellationGeo.setDrawRange(0, 0);
+    const constellationMat = new THREE.LineBasicMaterial({
+      color: 0xb78cff,
+      transparent: true,
+      opacity: 0.12,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const constellationLines = new THREE.LineSegments(constellationGeo, constellationMat);
+    scene.add(constellationLines);
+
+    const starfieldCount = 800;
+    const starfieldGeo = new THREE.BufferGeometry();
+    const starfieldPositions = new Float32Array(starfieldCount * 3);
+    const starfieldSizes = new Float32Array(starfieldCount);
+    const starfieldPhases = new Float32Array(starfieldCount);
+    for (let i = 0; i < starfieldCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = 30 + Math.random() * 40;
+      starfieldPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      starfieldPositions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta) * 0.6;
+      starfieldPositions[i * 3 + 2] = r * Math.cos(phi);
+      starfieldSizes[i] = 0.8 + Math.random() * 2.2;
+      starfieldPhases[i] = Math.random() * Math.PI * 2;
+    }
+    starfieldGeo.setAttribute("position", new THREE.BufferAttribute(starfieldPositions, 3));
+    const starfieldMat = new THREE.PointsMaterial({
+      color: 0xf5efff,
+      size: 0.08,
+      transparent: true,
+      opacity: 0.5,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const starfield = new THREE.Points(starfieldGeo, starfieldMat);
+    scene.add(starfield);
 
     function applyRenderProfile(name) {
       const next = profiles[name] || profiles.visual;
@@ -948,13 +3277,10 @@
 
     function setTheme(hex) {
       appState.theme.set(hex);
-      particleMat.color.copy(appState.theme);
       ambientLight.color.copy(appState.theme);
       sideLight.color.copy(appState.theme);
       document.documentElement.style.setProperty("--theme", hex);
       document.documentElement.style.setProperty("--theme-soft", hexToRgba(hex, .22));
-      const colorValue = document.getElementById("colorValue");
-      if (colorValue) colorValue.textContent = hex.toLowerCase();
       for (const c of cards) c.userData.edgeMat.color.copy(appState.theme);
     }
 
@@ -966,7 +3292,110 @@
       return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     }
 
+    function shuffleDeck() {
+      if (appState.shuffling) return Promise.resolve();
+      appState.shuffling = true;
+      const duration = 2.0;
+
+      return new Promise(resolve => {
+        const tl = gsap.timeline({
+          onComplete: () => {
+            appState.shuffling = false;
+            resolve();
+          }
+        });
+
+      cards.forEach((card, i) => {
+        const stagger = i * 0.02;
+        const randAngle = Math.random() * Math.PI * 2;
+        const scatterDist = 2.5 + Math.random() * 4.5;
+        const scatterX = Math.sin(randAngle) * scatterDist;
+        const scatterZ = Math.cos(randAngle) * scatterDist - 2;
+        const scatterY = (Math.random() - 0.3) * 3.5 + 0.5;
+
+        tl.to(card.position, {
+          x: scatterX,
+          y: scatterY,
+          z: scatterZ,
+          duration: duration * 0.35,
+          ease: "power2.out"
+        }, stagger);
+
+        tl.to(card.rotation, {
+          x: (Math.random() - 0.5) * 0.8,
+          z: (Math.random() - 0.5) * 1.2,
+          duration: duration * 0.35,
+          ease: "power2.out"
+        }, stagger);
+
+        tl.to(card.scale, {
+          x: 1.06, y: 1.06, z: 1.06,
+          duration: duration * 0.25,
+          ease: "power2.inOut"
+        }, stagger);
+      });
+
+      const shufflePasses = 2;
+      for (let s = 0; s < shufflePasses; s++) {
+        const passTime = duration * (0.3 + s * 0.18);
+        cards.forEach((card, i) => {
+          const randAngle = Math.random() * Math.PI * 2;
+          const dist = 1.5 + Math.random() * 5;
+          const tx = Math.sin(randAngle) * dist;
+          const tz = Math.cos(randAngle) * dist - 1.5;
+          const ty = (Math.random() - 0.3) * 3 + 0.8;
+
+          tl.to(card.position, {
+            x: tx, y: ty, z: tz,
+            duration: duration * 0.13,
+            ease: "power1.inOut"
+          }, passTime + i * 0.008);
+
+          tl.to(card.rotation, {
+            y: Math.random() * Math.PI * 2,
+            duration: duration * 0.13,
+            ease: "power1.inOut"
+          }, passTime + i * 0.008);
+        });
+      }
+
+      const returnTime = duration * 0.62;
+      cards.forEach((card, i) => {
+        const returnStagger = i * 0.018;
+        const a = card.userData.baseAngle + appState.deckRotation;
+        const spiral = (i - CARD_COUNT / 2) * 0.025;
+        const targetX = Math.sin(a) * RADIUS;
+        const targetZ = Math.cos(a) * RADIUS;
+        const targetY = Math.sin(a * 2.0) * 0.12 + spiral;
+
+        tl.to(card.position, {
+          x: targetX,
+          y: targetY,
+          z: targetZ,
+          duration: duration * 0.32,
+          ease: "power3.inOut"
+        }, returnTime + returnStagger);
+
+        tl.to(card.rotation, {
+          x: 0,
+          y: a + Math.PI,
+          z: Math.sin(a) * 0.06,
+          duration: duration * 0.32,
+          ease: "power3.inOut"
+        }, returnTime + returnStagger);
+
+        tl.to(card.scale, {
+          x: 1.0, y: 1.0, z: 1.0,
+          duration: duration * 0.28,
+          ease: "power2.inOut"
+        }, returnTime + returnStagger);
+      });
+
+      });
+    }
+
     function layoutCards(dt) {
+      if (appState.shuffling) return;
       const lerp = 1 - Math.pow(0.0001, dt);
       appState.deckRotation += (appState.targetDeckRotation - appState.deckRotation) * lerp;
 
@@ -998,12 +3427,18 @@
       for (let i = 0; i < cards.length; i++) {
         const group = cards[i];
         const hot = i === appState.highlightedIndex;
-        const targetScale = hot ? 1.14 : 1.0;
+        const targetScale = hot ? 1.18 : 1.0;
         group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.13);
-        group.userData.baseMat.emissiveIntensity += ((hot ? 0.78 : 0.16) - group.userData.baseMat.emissiveIntensity) * 0.12;
-        group.userData.edgeMat.opacity += ((hot ? 0.9 : 0.24) - group.userData.edgeMat.opacity) * 0.12;
+        group.userData.baseMat.emissiveIntensity += ((hot ? 0.82 : 0.16) - group.userData.baseMat.emissiveIntensity) * 0.12;
+        group.userData.edgeMat.opacity += ((hot ? 0.95 : 0.24) - group.userData.edgeMat.opacity) * 0.12;
+
+        const glowTarget = hot ? 0.18 : 0;
+        group.userData.glowMat.opacity += (glowTarget - group.userData.glowMat.opacity) * 0.1;
+
         if (hot) {
-          group.position.y += 0.26;
+          group.position.y += 0.32;
+          group.userData.glowMat.color.setHex(0xb78cff);
+          group.userData.glowMat.opacity = 0.18 + Math.sin(performance.now() / 1000 * 3) * 0.06;
         }
       }
     }
@@ -1023,6 +3458,43 @@
       particleMat.opacity = profile.opacityBase + Math.sin(time * 1.7) * profile.opacityPulse;
       particles.rotation.y = time * (appState.renderProfile === "gestureLite" ? 0.035 : 0.075);
       particles.rotation.x = Math.sin(time * 0.21) * (appState.renderProfile === "gestureLite" ? 0.06 : 0.16);
+
+      updateConstellationLines();
+      animateStarfield(time);
+    }
+
+    function updateConstellationLines() {
+      const pos = particleGeo.attributes.position.array;
+      const cPos = constellationGeo.attributes.position.array;
+      let lineCount = 0;
+      const maxDist = 1.2;
+      const maxDistSq = maxDist * maxDist;
+      const checkCount = Math.min(appState.activeParticles, 120);
+      const step = Math.max(1, Math.floor(appState.activeParticles / checkCount));
+
+      for (let i = 0; i < checkCount && lineCount < constellationCount; i += step) {
+        const idx = i * 3;
+        const ax = pos[idx], ay = pos[idx + 1], az = pos[idx + 2];
+        for (let j = i + step; j < checkCount && lineCount < constellationCount; j += step) {
+          const jdx = j * 3;
+          const dx = ax - pos[jdx], dy = ay - pos[jdx + 1], dz = az - pos[jdx + 2];
+          const dSq = dx * dx + dy * dy + dz * dz;
+          if (dSq < maxDistSq) {
+            const li = lineCount * 6;
+            cPos[li] = ax; cPos[li + 1] = ay; cPos[li + 2] = az;
+            cPos[li + 3] = pos[jdx]; cPos[li + 4] = pos[jdx + 1]; cPos[li + 5] = pos[jdx + 2];
+            lineCount++;
+          }
+        }
+      }
+      constellationGeo.setDrawRange(0, lineCount * 2);
+      constellationGeo.attributes.position.needsUpdate = true;
+    }
+
+    function animateStarfield(time) {
+      starfieldMat.opacity = 0.35 + Math.sin(time * 0.3) * 0.12;
+      starfield.rotation.y = time * 0.008;
+      starfield.rotation.x = Math.sin(time * 0.05) * 0.04;
     }
 
     function scatterOtherCards(selected) {
@@ -1031,19 +3503,24 @@
         if (card === selected) continue;
         const world = new THREE.Vector3();
         card.getWorldPosition(world);
-        const base = i * 3;
+        const base = i * 170;
         for (let k = 0; k < 170 && base + k < appState.activeParticles; k++) {
           const pIndex = base + k;
-          particlePositions[pIndex * 3] = world.x + (Math.random() - .5) * .4;
-          particlePositions[pIndex * 3 + 1] = world.y + (Math.random() - .5) * .4;
-          particlePositions[pIndex * 3 + 2] = world.z + (Math.random() - .5) * .4;
-          const out = world.clone().normalize().multiplyScalar(6 + Math.random() * 5);
-          particleTargets[pIndex * 3] = out.x + (Math.random() - .5) * 5;
-          particleTargets[pIndex * 3 + 1] = out.y + (Math.random() - .5) * 5;
-          particleTargets[pIndex * 3 + 2] = out.z + (Math.random() - .5) * 5;
+          particlePositions[pIndex * 3] = world.x + (Math.random() - .5) * .5;
+          particlePositions[pIndex * 3 + 1] = world.y + (Math.random() - .5) * .5;
+          particlePositions[pIndex * 3 + 2] = world.z + (Math.random() - .5) * .5;
+          const out = world.clone().normalize().multiplyScalar(7 + Math.random() * 6);
+          const spread = 6 + Math.random() * 4;
+          particleTargets[pIndex * 3] = out.x + (Math.random() - .5) * spread;
+          particleTargets[pIndex * 3 + 1] = out.y + (Math.random() - .5) * spread;
+          particleTargets[pIndex * 3 + 2] = out.z + (Math.random() - .5) * spread;
         }
-        gsap.to(card.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.38, ease: "power2.in" });
-        gsap.to(card.rotation, { x: card.rotation.x + Math.random() * 3, y: card.rotation.y + Math.random() * 3, duration: 0.42 });
+        gsap.to(card.scale, { x: 0.01, y: 0.01, z: 0.01, duration: 0.35, ease: "power2.in" });
+        gsap.to(card.rotation, { x: card.rotation.x + Math.random() * 4, y: card.rotation.y + Math.random() * 4, duration: 0.4 });
+        if (card.userData.glowMat) {
+          card.userData.glowMat.opacity = 0.3;
+          gsap.to(card.userData.glowMat, { opacity: 0, duration: 0.35 });
+        }
       }
       particleGeo.attributes.position.needsUpdate = true;
     }
@@ -1054,15 +3531,24 @@
       updatePhase("drawn");
       setStatus("抽卡完成，正在翻开牌面", true);
 
+      playFlipSweep();
+      document.getElementById("screenFlash").classList.add("active");
+      setTimeout(() => document.getElementById("screenFlash").classList.remove("active"), 900);
+
       const selected = cards[appState.highlightedIndex];
       const tarot = pickTarot();
+      const isReversed = tarot.reversed;
+      const cardIdx = tarotDeck.findIndex(c => c.name === tarot.name);
       appState.chosenCardName = tarot.name;
-      const frontTexture = makeRoundedCardTexture("front", tarot);
+      const frontTexture = makeRoundedCardTexture("front", tarot, cardIdx, isReversed);
       disposeCardTextureIfNeeded(selected.userData.baseMat);
       selected.userData.baseMat.map = frontTexture;
-      selected.userData.baseMat.emissive.set(0x000000);
-      selected.userData.baseMat.emissiveIntensity = 0.04;
+      selected.userData.baseMat.emissive.set(0xf1d68a);
+      selected.userData.baseMat.emissiveIntensity = 0.35;
       selected.userData.baseMat.needsUpdate = true;
+
+      selected.userData.glowMat.color.set(0xf1d68a);
+      selected.userData.glowMat.opacity = 0.4;
 
       scatterOtherCards(selected);
       deckGroup.remove(selected);
@@ -1074,18 +3560,723 @@
       selected.rotation.set(0, 0, 0);
       selected.scale.set(1.18, 1.18, 1.18);
 
+      const cardIcon = document.getElementById("resultCardIcon");
+      const sym = arcanaSymbols[tarot.name];
+      const numeral = romanNumerals[cardIdx >= 0 ? cardIdx : 0];
+      if (cardIcon) {
+        cardIcon.innerHTML = `<span class="result-card-numeral">${numeral}</span><span class="result-card-symbol">${sym || "✦"}</span>`;
+      }
+
+      keyLight.intensity = 5;
+      rimLight.intensity = 3;
+      gsap.to(keyLight, { intensity: 1.8, duration: 1.5, ease: "power2.out" });
+      gsap.to(rimLight, { intensity: 0.8, duration: 1.5, ease: "power2.out" });
+
       gsap.timeline()
-        .to(selected.position, { x: 0, y: 0.42, z: 2.9, duration: 0.9, ease: "power3.inOut" }, 0)
-        .to(selected.scale, { x: 1.72, y: 1.72, z: 1.72, duration: 0.9, ease: "power3.inOut" }, 0)
-        .to(selected.rotation, { y: Math.PI * 2, z: 0, duration: 1.18, ease: "power2.inOut" }, 0.32)
-        .to(selected.position, { x: 0, y: 0.12, z: 6.85, duration: 0.92, ease: "expo.out" }, 1.18)
-        .to(selected.scale, { x: 4.15, y: 4.15, z: 4.15, duration: 0.92, ease: "expo.out" }, 1.18)
-        .to(selected.rotation, { z: 0.022, duration: 0.4, yoyo: true, repeat: 1, ease: "sine.inOut" }, 1.8)
-        .call(() => showResult(tarot), null, 2.38);
+        .to(selected.position, { x: 0, y: 0.42, z: 2.9, duration: 0.85, ease: "power3.inOut" }, 0)
+        .to(selected.scale, { x: 1.72, y: 1.72, z: 1.72, duration: 0.85, ease: "power3.inOut" }, 0)
+        .to(selected.userData.glowMat, { opacity: 0.6, duration: 0.4, ease: "power2.out" }, 0)
+        .to(selected.rotation, { y: isReversed ? Math.PI * 3 : Math.PI * 2, z: 0, duration: 1.1, ease: "power2.inOut" }, 0.28)
+        .to(selected.userData.glowMat, { opacity: 0.25, duration: 0.6, ease: "power2.inOut" }, 0.6)
+        .to(selected.position, { x: 0, y: 0.12, z: 4.5, duration: 0.88, ease: "expo.out" }, 1.1)
+        .to(selected.scale, { x: 2.4, y: 2.4, z: 2.4, duration: 0.88, ease: "expo.out" }, 1.1)
+        .to(selected.userData.glowMat, { opacity: 0.35, duration: 0.5, ease: "sine.inOut" }, 1.4)
+        .to(selected.rotation, { z: 0.022, duration: 0.4, yoyo: true, repeat: 1, ease: "sine.inOut" }, 1.7)
+        .to(selected.userData.glowMat, { opacity: 0, duration: 0.8, ease: "power2.in" }, 2.0)
+        .call(() => {
+          document.getElementById("mysticFrame").classList.add("visible");
+          showResult(tarot);
+        }, null, 2.3);
+
+      burstParticlesAtCard(selected);
+    }
+
+    function burstParticlesAtCard(card) {
+      const world = new THREE.Vector3();
+      card.getWorldPosition(world);
+      const pos = particleGeo.attributes.position.array;
+      for (let i = 0; i < appState.activeParticles; i++) {
+        const idx = i * 3;
+        const dx = pos[idx] - world.x;
+        const dy = pos[idx + 1] - world.y;
+        const dz = pos[idx + 2] - world.z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dist < 3) {
+          const angle = Math.atan2(dz, dx);
+          const force = (3 - dist) * 2.5;
+          particleTargets[idx] = pos[idx] + Math.cos(angle) * force + (Math.random() - 0.5) * 2;
+          particleTargets[idx + 1] = pos[idx + 1] + Math.random() * force * 0.8;
+          particleTargets[idx + 2] = pos[idx + 2] + Math.sin(angle) * force + (Math.random() - 0.5) * 2;
+        }
+      }
     }
 
     function pickTarot() {
-      return tarotDeck[Math.floor(Math.random() * tarotDeck.length)];
+      const idx = Math.floor(Math.random() * tarotDeck.length);
+      const card = tarotDeck[idx];
+      const isReversed = Math.random() < 0.5;
+      return { ...card, reversed: isReversed, displayMeaning: isReversed ? card.reversed : card.meaning };
+    }
+
+    function dailyHash(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+      }
+      return Math.abs(h);
+    }
+
+    function getDailyCard() {
+      const today = new Date().toISOString().slice(0, 10);
+      const cacheKey = "dailyCard_" + today;
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try { return JSON.parse(cached); } catch (_) {}
+      }
+      const hash = dailyHash(today);
+      const idx = hash % tarotDeck.length;
+      const card = tarotDeck[idx];
+      const isReversed = (hash >> 8) % 2 === 0;
+      const reading = buildReading(card);
+      const result = {
+        date: today,
+        name: card.name,
+        reversed: isReversed,
+        displayMeaning: isReversed ? card.reversed : card.meaning,
+        keyword: isReversed ? "逆位 · " + reading.keyword.split("·").pop().trim() : "正位 · " + reading.keyword.split("·").pop().trim(),
+        action: reading.action
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(result));
+      return result;
+    }
+
+    function showDailyCard() {
+      const daily = getDailyCard();
+      const el = document.getElementById("dailyCard");
+      document.getElementById("dailyName").textContent = daily.name;
+      const dirEl = document.getElementById("dailyDir");
+      if (daily.reversed) {
+        dirEl.innerHTML = '<span style="color:#ff6bba">⬇ 逆位</span>';
+      } else {
+        dirEl.innerHTML = '<span style="color:var(--gold)">⬆ 正位</span>';
+      }
+      document.getElementById("dailyMeaning").textContent = daily.displayMeaning;
+      document.getElementById("dailyKeyword").textContent = daily.keyword;
+      document.getElementById("dailyAction").textContent = daily.action;
+      el.style.display = "";
+    }
+
+    function generateShareImage(tarot) {
+      const W = 1080, H = 1920;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      const bg = ctx.createLinearGradient(0, 0, W * 0.3, H);
+      bg.addColorStop(0, "#03020a");
+      bg.addColorStop(0.35, "#0a0718");
+      bg.addColorStop(0.65, "#080614");
+      bg.addColorStop(1, "#110820");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      const nebulae = [
+        { x: W * 0.25, y: H * 0.15, r: 420, c: "rgba(120,60,200,0.06)" },
+        { x: W * 0.72, y: H * 0.35, r: 360, c: "rgba(241,214,138,0.04)" },
+        { x: W * 0.4, y: H * 0.6, r: 380, c: "rgba(60,80,200,0.05)" },
+        { x: W * 0.8, y: H * 0.82, r: 300, c: "rgba(183,140,255,0.05)" }
+      ];
+      nebulae.forEach(n => {
+        const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+        g.addColorStop(0, n.c);
+        g.addColorStop(1, "transparent");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      });
+
+      for (let i = 0; i < 240; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        const r = Math.random() * 1.0 + 0.3;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245,239,255," + (Math.random() * 0.25 + 0.06) + ")";
+        ctx.fill();
+      }
+
+      for (let i = 0; i < 60; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        const r = Math.random() * 0.8 + 1.0;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245,239,255," + (Math.random() * 0.4 + 0.2) + ")";
+        ctx.fill();
+      }
+
+      for (let i = 0; i < 10; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        const r = Math.random() * 1.5 + 2.0;
+        const alpha = Math.random() * 0.5 + 0.4;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245,239,255," + alpha + ")";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x - r * 4, y);
+        ctx.lineTo(x + r * 4, y);
+        ctx.moveTo(x, y - r * 4);
+        ctx.lineTo(x, y + r * 4);
+        ctx.strokeStyle = "rgba(245,239,255," + (alpha * 0.35) + ")";
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+
+      const frameMargin = 60;
+      const frameTop = 120;
+      const frameBottom = H - 120;
+      const frameW = W - frameMargin * 2;
+      const frameH = frameBottom - frameTop;
+      const frameR = 16;
+
+      ctx.strokeStyle = "rgba(241,214,138,0.18)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      roundRect(ctx, frameMargin, frameTop, frameW, frameH, frameR);
+      ctx.stroke();
+
+      const innerM = 16;
+      ctx.strokeStyle = "rgba(241,214,138,0.1)";
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      roundRect(ctx, frameMargin + innerM, frameTop + innerM, frameW - innerM * 2, frameH - innerM * 2, frameR - 4);
+      ctx.stroke();
+
+      const cornerLen = 36;
+      const corners = [
+        [frameMargin + innerM, frameTop + innerM],
+        [frameMargin + frameW - innerM, frameTop + innerM],
+        [frameMargin + innerM, frameBottom - innerM],
+        [frameMargin + frameW - innerM, frameBottom - innerM]
+      ];
+      ctx.strokeStyle = "rgba(241,214,138,0.4)";
+      ctx.lineWidth = 2;
+      corners.forEach(([cx, cy], idx) => {
+        ctx.beginPath();
+        const dx = idx % 2 === 0 ? 1 : -1;
+        const dy = idx < 2 ? 1 : -1;
+        ctx.moveTo(cx + cornerLen * dx, cy);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx, cy + cornerLen * dy);
+        ctx.stroke();
+      });
+
+      const symX = W / 2;
+      const symY = H * 0.44;
+      const symR = 160;
+
+      ctx.save();
+      if (tarot.reversed) {
+        ctx.translate(symX, symY);
+        ctx.rotate(Math.PI);
+        ctx.translate(-symX, -symY);
+      }
+
+      ctx.strokeStyle = "rgba(241,214,138,0.14)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(symX + Math.cos(a) * 50, symY + Math.sin(a) * 50);
+        ctx.lineTo(symX + Math.cos(a) * (symR + 40), symY + Math.sin(a) * (symR + 40));
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = "rgba(241,214,138,0.22)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(symX, symY, symR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(241,214,138,0.12)";
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.arc(symX, symY, symR - 14, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const glow2 = ctx.createRadialGradient(symX, symY, 0, symX, symY, symR + 60);
+      if (tarot.reversed) {
+        glow2.addColorStop(0, "rgba(183,140,255,0.08)");
+        glow2.addColorStop(0.6, "rgba(255,107,186,0.03)");
+      } else {
+        glow2.addColorStop(0, "rgba(241,214,138,0.1)");
+        glow2.addColorStop(0.6, "rgba(183,140,255,0.03)");
+      }
+      glow2.addColorStop(1, "transparent");
+      ctx.fillStyle = glow2;
+      ctx.beginPath();
+      ctx.arc(symX, symY, symR + 60, 0, Math.PI * 2);
+      ctx.fill();
+
+      const glyphFn = arcanaGlyphs[tarot.name] || arcanaGlyphs["愚者"];
+      ctx.save();
+      ctx.translate(symX, symY);
+      glyphFn(ctx, 0, 0, 300);
+      ctx.restore();
+
+      ctx.restore();
+
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "rgba(245,239,255,0.35)";
+      ctx.font = "800 26px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("✦  T A R O T  ✦", W / 2, 200);
+
+      const question = appState.userQuestion || "那个还没有说出口的问题";
+      ctx.fillStyle = "rgba(245,239,255,0.3)";
+      ctx.font = "400 22px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("「 " + question + " 」", W / 2, 270);
+
+      ctx.fillStyle = "rgba(241,214,138,0.15)";
+      ctx.font = "400 16px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("- - - - - - - - - - - - - - - -", W / 2, H * 0.24);
+
+      ctx.fillStyle = "#f1d68a";
+      ctx.font = "800 84px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText(tarot.name, W / 2, H * 0.63);
+
+      const dirText = tarot.reversed ? "⬇ 逆位" : "⬆ 正位";
+      ctx.fillStyle = tarot.reversed ? "#ff6bba" : "#f1d68a";
+      ctx.font = "700 34px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText(dirText, W / 2, H * 0.63 + 55);
+
+      const meaning = tarot.displayMeaning || tarot.meaning || "";
+      ctx.fillStyle = "rgba(245,239,255,0.78)";
+      ctx.font = "400 28px ui-sans-serif, system-ui, sans-serif";
+      const lines = wrapText(ctx, meaning, W - 200);
+      lines.forEach((line, i) => {
+        ctx.fillText(line, W / 2, H * 0.72 + i * 44);
+      });
+
+      const reading = buildReading(tarot);
+      const kwY = H * 0.72 + lines.length * 44 + 36;
+      ctx.fillStyle = "rgba(245,239,255,0.42)";
+      ctx.font = "400 24px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText(reading.keyword, W / 2, kwY);
+
+      const bottomDecoY = H * 0.86;
+      const lineGrad1 = ctx.createLinearGradient(W * 0.15, 0, W * 0.5, 0);
+      lineGrad1.addColorStop(0, "transparent");
+      lineGrad1.addColorStop(1, "rgba(241,214,138,0.25)");
+      ctx.strokeStyle = lineGrad1;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.15, bottomDecoY);
+      ctx.lineTo(W * 0.46, bottomDecoY);
+      ctx.stroke();
+
+      const lineGrad2 = ctx.createLinearGradient(W * 0.5, 0, W * 0.85, 0);
+      lineGrad2.addColorStop(0, "rgba(241,214,138,0.25)");
+      lineGrad2.addColorStop(1, "transparent");
+      ctx.strokeStyle = lineGrad2;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.54, bottomDecoY);
+      ctx.lineTo(W * 0.85, bottomDecoY);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(W / 2, bottomDecoY);
+      ctx.rotate(Math.PI / 4);
+      ctx.strokeStyle = "rgba(241,214,138,0.35)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-5, -5, 10, 10);
+      ctx.restore();
+
+      const lineGrad3 = ctx.createLinearGradient(W * 0.15, 0, W * 0.5, 0);
+      lineGrad3.addColorStop(0, "transparent");
+      lineGrad3.addColorStop(1, "rgba(241,214,138,0.12)");
+      ctx.strokeStyle = lineGrad3;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.18, bottomDecoY + 10);
+      ctx.lineTo(W * 0.47, bottomDecoY + 10);
+      ctx.stroke();
+
+      const lineGrad4 = ctx.createLinearGradient(W * 0.5, 0, W * 0.85, 0);
+      lineGrad4.addColorStop(0, "rgba(241,214,138,0.12)");
+      lineGrad4.addColorStop(1, "transparent");
+      ctx.strokeStyle = lineGrad4;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.53, bottomDecoY + 10);
+      ctx.lineTo(W * 0.82, bottomDecoY + 10);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(245,239,255,0.4)";
+      ctx.font = "700 28px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("星 门 塔 罗", W / 2, H * 0.91);
+
+      ctx.fillStyle = "rgba(245,239,255,0.18)";
+      ctx.font = "400 20px ui-sans-serif, system-ui, sans-serif";
+      const dateStr = new Date().toISOString().slice(0, 10);
+      ctx.fillText(dateStr, W / 2, H * 0.91 + 38);
+
+      return canvas;
+    }
+
+    function generateSpreadShareImage(drawnCards, userQuestion) {
+      const W = 1080, H = 1920;
+      const canvas = document.createElement("canvas");
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      const bg = ctx.createLinearGradient(0, 0, W * 0.3, H);
+      bg.addColorStop(0, "#03020a");
+      bg.addColorStop(0.35, "#0a0718");
+      bg.addColorStop(0.65, "#080614");
+      bg.addColorStop(1, "#110820");
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      const nebulae = [
+        { x: W * 0.2, y: H * 0.12, r: 400, c: "rgba(120,60,200,0.06)" },
+        { x: W * 0.75, y: H * 0.3, r: 340, c: "rgba(241,214,138,0.04)" },
+        { x: W * 0.35, y: H * 0.55, r: 360, c: "rgba(60,80,200,0.05)" },
+        { x: W * 0.8, y: H * 0.78, r: 320, c: "rgba(183,140,255,0.05)" }
+      ];
+      nebulae.forEach(n => {
+        const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+        g.addColorStop(0, n.c);
+        g.addColorStop(1, "transparent");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+      });
+
+      for (let i = 0; i < 240; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        const r = Math.random() * 1.0 + 0.3;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245,239,255," + (Math.random() * 0.25 + 0.06) + ")";
+        ctx.fill();
+      }
+
+      for (let i = 0; i < 60; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        const r = Math.random() * 0.8 + 1.0;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245,239,255," + (Math.random() * 0.4 + 0.2) + ")";
+        ctx.fill();
+      }
+
+      for (let i = 0; i < 10; i++) {
+        const x = Math.random() * W;
+        const y = Math.random() * H;
+        const r = Math.random() * 1.5 + 2.0;
+        const alpha = Math.random() * 0.5 + 0.4;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(245,239,255," + alpha + ")";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x - r * 4, y);
+        ctx.lineTo(x + r * 4, y);
+        ctx.moveTo(x, y - r * 4);
+        ctx.lineTo(x, y + r * 4);
+        ctx.strokeStyle = "rgba(245,239,255," + (alpha * 0.35) + ")";
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      }
+
+      const frameMargin = 60;
+      const frameTop = 120;
+      const frameBottom = H - 120;
+      const frameW = W - frameMargin * 2;
+      const frameH = frameBottom - frameTop;
+      const frameR = 16;
+
+      ctx.strokeStyle = "rgba(241,214,138,0.18)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      roundRect(ctx, frameMargin, frameTop, frameW, frameH, frameR);
+      ctx.stroke();
+
+      const innerM = 16;
+      ctx.strokeStyle = "rgba(241,214,138,0.1)";
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      roundRect(ctx, frameMargin + innerM, frameTop + innerM, frameW - innerM * 2, frameH - innerM * 2, frameR - 4);
+      ctx.stroke();
+
+      const cornerLen = 36;
+      const corners = [
+        [frameMargin + innerM, frameTop + innerM],
+        [frameMargin + frameW - innerM, frameTop + innerM],
+        [frameMargin + innerM, frameBottom - innerM],
+        [frameMargin + frameW - innerM, frameBottom - innerM]
+      ];
+      ctx.strokeStyle = "rgba(241,214,138,0.4)";
+      ctx.lineWidth = 2;
+      corners.forEach(([cx, cy], idx) => {
+        ctx.beginPath();
+        const dx = idx % 2 === 0 ? 1 : -1;
+        const dy = idx < 2 ? 1 : -1;
+        ctx.moveTo(cx + cornerLen * dx, cy);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx, cy + cornerLen * dy);
+        ctx.stroke();
+      });
+
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "rgba(245,239,255,0.35)";
+      ctx.font = "800 26px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("✦  T A R O T  ·  星 门 塔 罗  ✦", W / 2, 195);
+
+      const question = userQuestion || "那个还没有说出口的问题";
+      ctx.fillStyle = "rgba(245,239,255,0.3)";
+      ctx.font = "400 22px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("「 " + question + " 」", W / 2, 255);
+
+      ctx.fillStyle = "rgba(241,214,138,0.15)";
+      ctx.font = "400 16px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("- - - - - - - - - - - - - - - - - - - - -", W / 2, 295);
+
+      const positionLabels = ["过去", "现在", "未来"];
+      const colCenters = [180, 540, 900];
+      const cardW = 260, cardH = 340;
+      const cardTop = 340;
+
+      const accentGold = "#f1d68a";
+      const accentPink = "#ff6bba";
+
+      for (let i = 0; i < drawnCards.length; i++) {
+        const c = drawnCards[i];
+        const cx = colCenters[i];
+        const cardLeft = cx - cardW / 2;
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(241,214,138,0.22)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        roundRect(ctx, cardLeft, cardTop, cardW, cardH, 14);
+        ctx.stroke();
+
+        const innerGrad = ctx.createLinearGradient(cardLeft, cardTop, cardLeft, cardTop + cardH);
+        innerGrad.addColorStop(0, "rgba(18,14,35,0.85)");
+        innerGrad.addColorStop(0.5, "rgba(25,18,48,0.75)");
+        innerGrad.addColorStop(1, "rgba(18,14,35,0.85)");
+        ctx.fillStyle = innerGrad;
+        ctx.beginPath();
+        roundRect(ctx, cardLeft + 2, cardTop + 2, cardW - 4, cardH - 4, 12);
+        ctx.fill();
+
+        const glyphY = cardTop + cardH / 2;
+
+        if (c.reversed) {
+          ctx.translate(cx, glyphY);
+          ctx.rotate(Math.PI);
+          ctx.translate(-cx, -glyphY);
+        }
+
+        const glyphR = 80;
+        ctx.strokeStyle = "rgba(241,214,138,0.16)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(cx, glyphY, glyphR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(241,214,138,0.09)";
+        ctx.lineWidth = 0.6;
+        ctx.beginPath();
+        ctx.arc(cx, glyphY, glyphR - 10, 0, Math.PI * 2);
+        ctx.stroke();
+
+        const accent = arcanaAccentColors[c.name];
+        if (accent) {
+          const glowG = ctx.createRadialGradient(cx, glyphY, 0, cx, glyphY, glyphR + 30);
+          glowG.addColorStop(0, accent.glow);
+          glowG.addColorStop(1, "transparent");
+          ctx.fillStyle = glowG;
+          ctx.beginPath();
+          ctx.arc(cx, glyphY, glyphR + 30, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        const glyphFn = arcanaGlyphs[c.name] || arcanaGlyphs["愚者"];
+        ctx.save();
+        ctx.translate(cx, glyphY);
+        glyphFn(ctx, 0, 0, 260);
+        ctx.restore();
+
+        ctx.restore();
+
+        const textTop = cardTop + cardH + 20;
+
+        ctx.fillStyle = "rgba(245,239,255,0.45)";
+        ctx.font = "700 12px ui-sans-serif, system-ui, sans-serif";
+        ctx.letterSpacing = "2px";
+        ctx.fillText(positionLabels[i] || ("牌" + (i + 1)), cx, textTop);
+        ctx.letterSpacing = "0px";
+
+        ctx.fillStyle = accentGold;
+        ctx.font = "800 36px ui-sans-serif, system-ui, sans-serif";
+        ctx.fillText(c.name, cx, textTop + 40);
+
+        const dirText = c.reversed ? "⬇ 逆位" : "⬆ 正位";
+        ctx.fillStyle = c.reversed ? accentPink : accentGold;
+        ctx.font = "700 26px ui-sans-serif, system-ui, sans-serif";
+        ctx.fillText(dirText, cx, textTop + 76);
+
+        ctx.fillStyle = "rgba(245,239,255,0.72)";
+        ctx.font = "400 22px ui-sans-serif, system-ui, sans-serif";
+        const meaningLines = wrapText(ctx, c.meaning || "", cardW - 20);
+        const maxMeaningLines = 5;
+        const meaningToShow = meaningLines.slice(0, maxMeaningLines);
+        meaningToShow.forEach((line, li) => {
+          ctx.fillText(line, cx, textTop + 114 + li * 34);
+        });
+      }
+
+      const summaryY = 1060;
+
+      const sLineGrad1 = ctx.createLinearGradient(W * 0.15, 0, W * 0.5, 0);
+      sLineGrad1.addColorStop(0, "transparent");
+      sLineGrad1.addColorStop(1, "rgba(241,214,138,0.25)");
+      ctx.strokeStyle = sLineGrad1;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.15, summaryY);
+      ctx.lineTo(W * 0.46, summaryY);
+      ctx.stroke();
+
+      const sLineGrad2 = ctx.createLinearGradient(W * 0.5, 0, W * 0.85, 0);
+      sLineGrad2.addColorStop(0, "rgba(241,214,138,0.25)");
+      sLineGrad2.addColorStop(1, "transparent");
+      ctx.strokeStyle = sLineGrad2;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.54, summaryY);
+      ctx.lineTo(W * 0.85, summaryY);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(W / 2, summaryY);
+      ctx.rotate(Math.PI / 4);
+      ctx.strokeStyle = "rgba(241,214,138,0.35)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-5, -5, 10, 10);
+      ctx.restore();
+
+      ctx.fillStyle = "rgba(245,239,255,0.5)";
+      ctx.font = "800 30px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("✦  牌 阵 解 读  ✦", W / 2, summaryY + 50);
+
+      const keywords = drawnCards.map(c => {
+        const r = buildReading(c);
+        return r.keyword.split("/").map(k => k.trim()).slice(0, 2).join("/");
+      });
+
+      ctx.fillStyle = "rgba(245,239,255,0.6)";
+      ctx.font = "400 24px ui-sans-serif, system-ui, sans-serif";
+      const kwText = positionLabels.slice(0, drawnCards.length).map((label, i) => {
+        return label + " · " + keywords[i];
+      }).join("    ");
+      const kwLines = wrapText(ctx, kwText, W - 220);
+      kwLines.forEach((line, i) => {
+        ctx.fillText(line, W / 2, summaryY + 100 + i * 38);
+      });
+
+      const lastReading = buildReading(drawnCards[drawnCards.length - 1]);
+      ctx.fillStyle = "rgba(245,239,255,0.38)";
+      ctx.font = "400 22px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText(lastReading.action, W / 2, summaryY + 100 + kwLines.length * 38 + 40);
+
+      const bottomDecoY = H * 0.85;
+      const lineGrad3 = ctx.createLinearGradient(W * 0.15, 0, W * 0.5, 0);
+      lineGrad3.addColorStop(0, "transparent");
+      lineGrad3.addColorStop(1, "rgba(241,214,138,0.25)");
+      ctx.strokeStyle = lineGrad3;
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.15, bottomDecoY);
+      ctx.lineTo(W * 0.46, bottomDecoY);
+      ctx.stroke();
+
+      const lineGrad4 = ctx.createLinearGradient(W * 0.5, 0, W * 0.85, 0);
+      lineGrad4.addColorStop(0, "rgba(241,214,138,0.25)");
+      lineGrad4.addColorStop(1, "transparent");
+      ctx.strokeStyle = lineGrad4;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.54, bottomDecoY);
+      ctx.lineTo(W * 0.85, bottomDecoY);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(W / 2, bottomDecoY);
+      ctx.rotate(Math.PI / 4);
+      ctx.strokeStyle = "rgba(241,214,138,0.35)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-5, -5, 10, 10);
+      ctx.restore();
+
+      const lineGrad5 = ctx.createLinearGradient(W * 0.15, 0, W * 0.5, 0);
+      lineGrad5.addColorStop(0, "transparent");
+      lineGrad5.addColorStop(1, "rgba(241,214,138,0.12)");
+      ctx.strokeStyle = lineGrad5;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.18, bottomDecoY + 10);
+      ctx.lineTo(W * 0.47, bottomDecoY + 10);
+      ctx.stroke();
+
+      const lineGrad6 = ctx.createLinearGradient(W * 0.5, 0, W * 0.85, 0);
+      lineGrad6.addColorStop(0, "rgba(241,214,138,0.12)");
+      lineGrad6.addColorStop(1, "transparent");
+      ctx.strokeStyle = lineGrad6;
+      ctx.beginPath();
+      ctx.moveTo(W * 0.53, bottomDecoY + 10);
+      ctx.lineTo(W * 0.82, bottomDecoY + 10);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(245,239,255,0.4)";
+      ctx.font = "700 28px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText("星 门 塔 罗", W / 2, H * 0.89);
+
+      ctx.fillStyle = "rgba(245,239,255,0.18)";
+      ctx.font = "400 20px ui-sans-serif, system-ui, sans-serif";
+      const dateStr = new Date().toISOString().slice(0, 10);
+      ctx.fillText(dateStr, W / 2, H * 0.89 + 38);
+
+      return canvas;
+    }
+
+    function wrapText(ctx, text, maxWidth) {
+      const chars = text.split("");
+      const lines = [];
+      let line = "";
+      for (const ch of chars) {
+        const test = line + ch;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = ch;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function showSharePreview(canvas) {
+      const preview = document.getElementById("sharePreview");
+      document.getElementById("shareImg").src = canvas.toDataURL("image/png");
+      preview.classList.add("show");
+      preview._canvas = canvas;
     }
 
     function buildReading(tarot) {
@@ -1129,13 +4320,221 @@
 
     function showResult(tarot) {
       const reading = buildReading(tarot);
-      document.getElementById("resultTitle").textContent = tarot.name;
+      const isReversed = tarot.reversed;
+      const cardIdx = tarotDeck.findIndex(c => c.name === tarot.name);
+      const numeral = romanNumerals[cardIdx >= 0 ? cardIdx : 0];
+      const originalCard = cardIdx >= 0 ? tarotDeck[cardIdx] : null;
+      document.getElementById("resultTitle").innerHTML = tarot.name +
+        (isReversed ? ' <span style="font-size:0.6em;color:#ff6bba;letter-spacing:0">⬇ 逆位</span>' : ' <span style="font-size:0.6em;color:var(--gold);letter-spacing:0">⬆ 正位</span>');
       document.getElementById("resultQuestion").textContent = `你的问题：${appState.userQuestion || "那个还没有说出口的问题"}`;
-      document.getElementById("resultAnswer").textContent = tarot.meaning;
+      document.getElementById("resultAnswer").textContent = tarot.displayMeaning || tarot.meaning;
       document.getElementById("resultKeyword").textContent = reading.keyword;
       document.getElementById("resultAction").textContent = reading.action;
+      const subtitle = document.getElementById("resultCardSubtitle");
+      if (subtitle) subtitle.textContent = `${numeral} · ${isReversed ? "逆位" : "正位"}`;
+      const brief = document.getElementById("resultCardBrief");
+      if (brief) {
+        const fullMeaning = tarot.meaning || "";
+        const firstSentence = fullMeaning.split(/。/)[0] || "";
+        const reversedText = originalCard ? originalCard.reversed : "";
+        brief.textContent = isReversed ? (reversedText || reading.keyword) : (firstSentence || reading.keyword);
+      }
       document.getElementById("resultBox").classList.add("show");
-      setStatus("仪式完成，可以点击结果面板重新开启", true);
+      setStatus("仪式完成，点击「新牌阵」开启下一轮占卜", true);
+      appState.currentTarot = tarot;
+      appState.drawnCards.push({ name: tarot.name, reversed: tarot.reversed, meaning: tarot.displayMeaning || tarot.meaning });
+      updateSpreadButtons();
+    }
+
+    function updateSpreadButtons() {
+      const restartBtn = document.getElementById("restartBtn");
+      const existing = document.getElementById("spreadActions");
+      if (existing) {
+        existing.parentNode.insertBefore(restartBtn, existing);
+        existing.remove();
+      }
+
+      const count = appState.drawnCards.length;
+      if (count >= appState.maxSpread) {
+        showSpreadResult();
+        return;
+      }
+
+      const btnLabels = ["再抽一张 · 过去时", "再抽一张 · 现在时", "再抽一张 · 未来时"];
+      const nextLabel = btnLabels[count] || ("牌" + (count + 1));
+
+      const container = document.createElement("div");
+      container.id = "spreadActions";
+      container.className = "spread-actions";
+
+      const drawBtn = document.createElement("button");
+      drawBtn.className = "btn btn-accent";
+      drawBtn.textContent = nextLabel;
+      drawBtn.onclick = () => continueSpread();
+      container.appendChild(drawBtn);
+
+      if (count >= 1) {
+        const viewBtn = document.createElement("button");
+        viewBtn.className = "btn btn-ghost";
+        viewBtn.textContent = "查看解读";
+        viewBtn.onclick = () => showSpreadResult();
+        container.appendChild(viewBtn);
+      }
+
+      if (count === 1 && appState.currentTarot) {
+        const shareBtn = document.createElement("button");
+        shareBtn.className = "btn btn-ghost";
+        shareBtn.textContent = "✦ 分享";
+        shareBtn.onclick = () => {
+          const canvas = generateShareImage(appState.currentTarot);
+          showSharePreview(canvas);
+        };
+        container.appendChild(shareBtn);
+      }
+
+      container.appendChild(restartBtn);
+
+      document.getElementById("resultBox").appendChild(container);
+    }
+
+    function continueSpread() {
+      const saved = [...appState.drawnCards];
+      document.getElementById("resultBox").classList.remove("show");
+      document.getElementById("intro").classList.add("hidden");
+      document.getElementById("mysticFrame").classList.remove("visible");
+      document.getElementById("screenFlash").classList.remove("active");
+
+      appState.drawn = false;
+      appState.drawnCards = saved;
+      appState.handX = 0.5;
+      appState.handTargetX = 0.5;
+      appState.handZ = 0;
+      appState.handVelocityX = 0;
+      appState.handPrevX = 0.5;
+      appState.handLastMoveTime = 0;
+      appState.smoothedSensitivity = 1.0;
+      appState.currentDamping = 1.0;
+      appState.dampingTarget = 1.0;
+      appState.fistFocusRingVisible = false;
+      appState.targetDeckRotation = 0;
+      appState.particleMode = "cosmos";
+      appState.gesture = "unknown";
+      appState.gestureSamples = [];
+      appState.releaseFrames = 0;
+      appState.gesturePhase = "waitingOpen";
+      appState.lastGestureChange = performance.now();
+      appState.lastPhaseChange = performance.now();
+
+      for (const card of cards) {
+        gsap.killTweensOf(card.position);
+        gsap.killTweensOf(card.rotation);
+        gsap.killTweensOf(card.scale);
+        if (card.userData.glowMat) {
+          gsap.killTweensOf(card.userData.glowMat);
+          card.userData.glowMat.opacity = 0;
+        }
+        if (card.parent !== deckGroup) {
+          if (card.parent) card.parent.remove(card);
+          deckGroup.add(card);
+        }
+        disposeCardTextureIfNeeded(card.userData.baseMat);
+        card.userData.baseMat.map = backTexture;
+        card.userData.baseMat.emissive.set(0x21114d);
+        card.userData.baseMat.emissiveIntensity = 0.18;
+        card.userData.baseMat.needsUpdate = true;
+        card.userData.edgeMat.opacity = 0.28;
+        card.scale.set(1, 1, 1);
+      }
+      deckGroup.scale.set(1, 1, 1);
+      constellationGeo.setDrawRange(0, 0);
+
+      updatePhase("waitingOpen");
+      setStatus("已抽取 " + saved.length + " 张牌，继续选择第 " + (saved.length + 1) + " 张", true);
+    }
+
+    function showSpreadResult() {
+      const drawn = appState.drawnCards;
+      if (drawn.length === 0) return;
+
+      const positionLabels = ["过去", "现在", "未来"];
+      const resultBox = document.getElementById("resultBox");
+      const spreadActions = document.getElementById("spreadActions");
+      if (spreadActions) {
+        resultBox.appendChild(document.getElementById("restartBtn"));
+        spreadActions.remove();
+      }
+
+      if (drawn.length === 1) {
+        document.getElementById("resultTitle").innerHTML = drawn[0].name +
+          (drawn[0].reversed ? ' <span style="font-size:0.6em;color:#ff6bba;letter-spacing:0">⬇ 逆位</span>' : ' <span style="font-size:0.6em;color:var(--gold);letter-spacing:0">⬆ 正位</span>');
+        document.getElementById("resultAnswer").textContent = drawn[0].meaning;
+        document.getElementById("resultKeyword").textContent = drawn[0].reversed ? "逆位 · 审视内在" : "正位 · 顺势而行";
+        document.getElementById("resultAction").textContent = drawn[0].reversed ? "留意当下的阻力与阴影" : "保持信心，继续前进";
+        setStatus("牌面已揭示", true);
+        return;
+      }
+
+      let html = '<div class="result-kicker">牌 阵 · ' + positionLabels.slice(0, drawn.length).join(" · ") + '</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(' + drawn.length + ',1fr);gap:16px;margin-top:16px;">';
+
+      for (let i = 0; i < drawn.length; i++) {
+        const c = drawn[i];
+        const label = positionLabels[i] || ("牌" + (i + 1));
+        const dir = c.reversed
+          ? '<span style="color:#ff6bba;font-size:0.75em">⬇ 逆位</span>'
+          : '<span style="color:var(--gold);font-size:0.75em">⬆ 正位</span>';
+        html += '<div style="text-align:center;padding:12px 8px;border:1px solid rgba(241,214,138,.18);border-radius:12px;background:rgba(18,14,35,.4);">';
+        html += '<div style="font-size:11px;font-weight:800;letter-spacing:.16em;color:rgba(245,239,255,.52);margin-bottom:8px;">' + label + '</div>';
+        html += '<div style="font-size:clamp(18px,3vw,26px);font-weight:700;color:var(--text);margin-bottom:4px;">' + c.name + '</div>';
+        html += '<div style="margin-bottom:8px;">' + dir + '</div>';
+        html += '<div style="font-size:13px;color:var(--muted);line-height:1.5;">' + c.meaning + '</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+
+      document.getElementById("resultTitle").innerHTML = "✦ " + positionLabels.slice(0, drawn.length).join(" · ") + " 牌阵 ✦";
+      document.getElementById("resultTitle").style.fontSize = "clamp(24px, 4vw, 36px)";
+      document.getElementById("resultQuestion").textContent = "";
+      document.getElementById("resultAnswer").innerHTML = "";
+      document.getElementById("resultKeyword").innerHTML = "";
+      document.getElementById("resultAction").innerHTML = "";
+      document.getElementById("resultCardIcon").style.display = "none";
+      const subtitleEl = document.getElementById("resultCardSubtitle");
+      if (subtitleEl) subtitleEl.style.display = "none";
+      const briefEl = document.getElementById("resultCardBrief");
+      if (briefEl) briefEl.style.display = "none";
+      const gridEl = document.querySelector(".result-grid");
+      if (gridEl) gridEl.style.display = "none";
+
+      let spreadDiv = document.getElementById("spreadResult");
+      if (!spreadDiv) {
+        spreadDiv = document.createElement("div");
+        spreadDiv.id = "spreadResult";
+        const restartBtn = document.getElementById("restartBtn");
+        resultBox.insertBefore(spreadDiv, restartBtn);
+      }
+      spreadDiv.innerHTML = html;
+      spreadDiv.style.marginTop = "12px";
+
+      let spreadShareContainer = document.getElementById("spreadShareActions");
+      if (spreadShareContainer) spreadShareContainer.remove();
+      if (drawn.length >= 2) {
+        spreadShareContainer = document.createElement("div");
+        spreadShareContainer.id = "spreadShareActions";
+        spreadShareContainer.style.cssText = "display:flex;justify-content:center;gap:12px;margin-top:16px;";
+        const spreadShareBtn = document.createElement("button");
+        spreadShareBtn.className = "btn btn-ghost";
+        spreadShareBtn.textContent = "✦ 分享牌阵";
+        spreadShareBtn.onclick = () => {
+          const canvas = generateSpreadShareImage(appState.drawnCards, appState.userQuestion);
+          showSharePreview(canvas);
+        };
+        spreadShareContainer.appendChild(spreadShareBtn);
+        const restartBtn = document.getElementById("restartBtn");
+        resultBox.insertBefore(spreadShareContainer, restartBtn);
+      }
+
+      setStatus("牌阵已全部揭示", true);
     }
 
     let prevTime = performance.now();
@@ -1152,11 +4551,19 @@
       deckGroup.rotation.x = Math.sin(t * 0.4) * 0.035;
       layoutCards(dt);
       animateParticles(t);
+      updateMagicCircle(t);
+
       const handEase = appState.renderProfile === "gestureLite" ? 0.1 : 0.14;
       appState.handX += (appState.handTargetX - appState.handX) * handEase;
       appState.targetDeckRotation = (appState.handX - 0.5) * Math.PI * 2.15;
       camera.position.x += ((appState.handX - 0.5) * 0.55 - camera.position.x) * 0.035;
+      camera.position.y = 1.7 + Math.sin(t * 0.28) * 0.06;
       camera.lookAt(0, 0.35, 0);
+
+      rimLight.position.x = 3 + Math.sin(t * 0.6) * 1.5;
+      rimLight.position.z = 4 + Math.cos(t * 0.4) * 1;
+      fillLight.intensity = 0.4 + Math.sin(t * 0.8) * 0.15;
+
       renderer.render(scene, camera);
       requestAnimationFrame(renderLoop);
     }
@@ -1181,14 +4588,19 @@
       setStatus("手机端推荐直接抽牌，体验更稳定", true);
     }
 
+    showDailyCard();
+
     document.getElementById("startBtn").addEventListener("click", async () => {
       appState.userQuestion = document.getElementById("questionInput").value.trim();
       document.getElementById("intro").classList.add("hidden");
       appState.started = true;
       appState.manualMode = false;
+      initAudio();
+      startAmbient();
       applyRenderProfile(isMobileUA ? "gestureLite" : "visual");
       updatePhase("waitingOpen");
       setStatus(isMobileUA ? "手机手势模式已降档，优先保证识别" : "正在请求摄像头权限", false);
+      shuffleDeck();
       await startHandTracking();
     });
 
@@ -1200,25 +4612,98 @@
       resetReading();
     });
 
+    document.getElementById("dailyDetailBtn").addEventListener("click", () => {
+      const extra = document.getElementById("dailyExtra");
+      const btn = document.getElementById("dailyDetailBtn");
+      if (extra.classList.contains("show")) {
+        extra.classList.remove("show");
+        btn.textContent = "查看详情";
+      } else {
+        extra.classList.add("show");
+        btn.textContent = "收起";
+      }
+    });
+
+    document.getElementById("dailyStartBtn").addEventListener("click", () => {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        startManualMode();
+      } else {
+        document.getElementById("startBtn").click();
+      }
+    });
+
+    document.getElementById("shareClose").addEventListener("click", () => {
+      document.getElementById("sharePreview").classList.remove("show");
+    });
+
+    document.getElementById("shareCloseBtn").addEventListener("click", () => {
+      document.getElementById("sharePreview").classList.remove("show");
+    });
+
+    document.getElementById("shareSaveBtn").addEventListener("click", () => {
+      const preview = document.getElementById("sharePreview");
+      const canvas = preview._canvas;
+      if (!canvas) return;
+      const link = document.createElement("a");
+      const today = new Date().toISOString().slice(0, 10);
+      const tarotName = document.getElementById("resultTitle").textContent.replace(/[⬆⬇ 正位逆位]+/g, "").trim();
+      link.download = "星门塔罗-" + tarotName + "-" + today + ".png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+
     function startManualMode() {
       appState.userQuestion = document.getElementById("questionInput").value.trim();
       document.getElementById("intro").classList.add("hidden");
+      document.querySelector(".video-wrap").style.display = "none";
       appState.started = true;
       appState.manualMode = true;
+      initAudio();
+      startAmbient();
       applyRenderProfile("visual");
       updatePhase("fistSeen");
       setStatus("移动鼠标或手指选择牌位，点击画面抽牌", true);
+      shuffleDeck();
     }
 
     function resetReading() {
       document.getElementById("resultBox").classList.remove("show");
       document.getElementById("intro").classList.remove("hidden");
+      document.getElementById("mysticFrame").classList.remove("visible");
+      document.querySelector(".video-wrap").style.display = "";
+      stopAmbient();
+      document.getElementById("screenFlash").classList.remove("active");
       document.getElementById("questionInput").value = "";
+      const spreadResult = document.getElementById("spreadResult");
+      if (spreadResult) spreadResult.remove();
+      const spreadActions = document.getElementById("spreadActions");
+      if (spreadActions) {
+        document.getElementById("resultBox").appendChild(document.getElementById("restartBtn"));
+        spreadActions.remove();
+      }
+      const gridEl = document.querySelector(".result-grid");
+      if (gridEl) gridEl.style.display = "";
+      const resultTitleEl = document.getElementById("resultTitle");
+      if (resultTitleEl) resultTitleEl.style.fontSize = "";
+      const cardIconEl = document.getElementById("resultCardIcon");
+      if (cardIconEl) {
+        cardIconEl.style.display = "";
+        cardIconEl.innerHTML = "";
+      }
+      const subEl = document.getElementById("resultCardSubtitle");
+      if (subEl) subEl.style.display = "";
+      const briefRestore = document.getElementById("resultCardBrief");
+      if (briefRestore) briefRestore.style.display = "";
       appState.started = false;
       appState.drawn = false;
       appState.manualMode = false;
+      appState.shuffling = false;
+      appState.handY = 0;
+      appState.currentTarot = null;
       appState.userQuestion = "";
       appState.chosenCardName = "";
+      appState.drawnCards = [];
       appState.gesture = "unknown";
       appState.gestureSamples = [];
       appState.releaseFrames = 0;
@@ -1227,8 +4712,17 @@
       appState.lastPhaseChange = performance.now();
       appState.handX = 0.5;
       appState.handTargetX = 0.5;
+      appState.handZ = 0;
+      appState.handVelocityX = 0;
+      appState.handPrevX = 0.5;
+      appState.handLastMoveTime = 0;
+      appState.smoothedSensitivity = 1.0;
+      appState.currentDamping = 1.0;
+      appState.dampingTarget = 1.0;
+      appState.fistFocusRingVisible = false;
       appState.targetDeckRotation = 0;
       appState.particleMode = "cosmos";
+      appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
       applyRenderProfile("visual");
       updatePhase("waitingOpen");
       setStatus(appState.cameraReady ? "摄像头保持开启，写下新问题即可继续" : "等待开始感知", appState.cameraReady);
@@ -1237,6 +4731,10 @@
         gsap.killTweensOf(card.position);
         gsap.killTweensOf(card.rotation);
         gsap.killTweensOf(card.scale);
+        if (card.userData.glowMat) {
+          gsap.killTweensOf(card.userData.glowMat);
+          card.userData.glowMat.opacity = 0;
+        }
         if (card.parent !== deckGroup) {
           if (card.parent) card.parent.remove(card);
           deckGroup.add(card);
@@ -1250,6 +4748,7 @@
         card.scale.set(1, 1, 1);
       }
       deckGroup.scale.set(1, 1, 1);
+      constellationGeo.setDrawRange(0, 0);
       updateParticleTargets(appState.particleMode, performance.now() / 1000);
     }
 
@@ -1268,7 +4767,7 @@
 
     canvas.addEventListener("pointermove", e => updatePointerSelection(e.clientX));
     canvas.addEventListener("pointerdown", () => {
-      if (appState.manualMode && appState.started && !appState.drawn) {
+      if (appState.manualMode && appState.started && !appState.drawn && !appState.shuffling) {
         pulseDeck();
         drawSelectedCard();
       }
@@ -1372,6 +4871,7 @@
       } catch (err) {
         console.error(err);
         appState.manualMode = true;
+        document.querySelector(".video-wrap").style.display = "none";
         updatePhase("fistSeen");
         const message = err && err.message ? err.message : "";
         if (location.protocol !== "https:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
@@ -1406,6 +4906,21 @@
       requestAnimationFrame(handLoop);
     }
 
+    function computeSensitivity(palmZ, speed) {
+      const cfg = gestureConfig;
+      const rawProximity = Math.max(0, Math.min(1, (palmZ - cfg.depthMin) / (cfg.depthMax - cfg.depthMin)));
+      const distanceMultiplier = cfg.minSensitivity + (cfg.maxSensitivity - cfg.minSensitivity) * Math.pow(rawProximity, cfg.powerExponent);
+
+      let velocityBonus = 0;
+      if (speed > cfg.velocityThreshold) {
+        velocityBonus = cfg.velocityGain * Math.min((speed - cfg.velocityThreshold) / cfg.velocityThreshold, cfg.maxVelocityBonus);
+      }
+
+      const rawSensitivity = distanceMultiplier + velocityBonus;
+      appState.smoothedSensitivity += (rawSensitivity - appState.smoothedSensitivity) * cfg.sensitivitySmoothing;
+      return Math.max(cfg.minSensitivity, Math.min(cfg.maxSensitivity * 1.5, appState.smoothedSensitivity));
+    }
+
     function onHandResults(results) {
       handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
       if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
@@ -1420,15 +4935,39 @@
       drawHandOverlay(lm);
 
       const palm = getPalmCenter(lm);
-      // 视频预览被镜像，MediaPipe 坐标未镜像。这里使用 1 - x，使手往屏幕左移动时视觉更符合直觉。
       const mirroredX = 1 - palm.x;
       const moveDelta = mirroredX - appState.handTargetX;
-      const deadZone = appState.renderProfile === "gestureLite" ? 0.024 : 0.014;
-      if (Math.abs(moveDelta) > deadZone) {
-        appState.handTargetX += moveDelta * 0.32;
+
+      const now = performance.now();
+      const dtSec = appState.handLastMoveTime > 0 ? Math.min((now - appState.handLastMoveTime) / 1000, 0.1) : 0.05;
+      const rawSpeed = Math.abs(mirroredX - appState.handPrevX);
+      const instantSpeed = dtSec > 0 ? rawSpeed / dtSec : 0;
+      appState.handVelocityX = appState.handVelocityX * 0.7 + instantSpeed * 0.3;
+      appState.handPrevX = mirroredX;
+      appState.handLastMoveTime = now;
+
+      const sensitivity = computeSensitivity(palm.z, appState.handVelocityX);
+      appState.handZ = palm.z;
+
+      const dampingAlpha = appState.dampingTarget < appState.currentDamping
+        ? gestureConfig.dampingAttack
+        : gestureConfig.dampingRelease;
+      appState.currentDamping += (appState.dampingTarget - appState.currentDamping) * dampingAlpha;
+
+      const isGestureLite = appState.renderProfile === "gestureLite";
+      const baseDeadZone = isGestureLite ? 0.024 : 0.014;
+      const baseGain = isGestureLite ? 0.32 : 0.32;
+      const baseSettle = isGestureLite ? 0.08 : 0.08;
+      const effectiveDeadZone = baseDeadZone / (sensitivity * appState.currentDamping);
+      const effectiveGain = baseGain * sensitivity * appState.currentDamping;
+      const effectiveSettle = baseSettle * sensitivity * appState.currentDamping;
+
+      if (Math.abs(moveDelta) > effectiveDeadZone) {
+        appState.handTargetX += moveDelta * effectiveGain;
       } else {
-        appState.handTargetX += moveDelta * 0.08;
+        appState.handTargetX += moveDelta * effectiveSettle;
       }
+      appState.handY = palm.y;
 
       const rawGesture = classifyGesture(lm);
       const gesture = smoothGesture(rawGesture);
@@ -1491,10 +5030,9 @@
         const tipToPalm = dist(tip, palm) / handScale;
         avgTipPalm += tipToPalm;
 
-        // bent 条件写得宽一些：普通摄像头里手指略斜、手掌倾斜也能识别。
-        const isBentByWrist = tipToWrist < pipToWrist + palmLength * 0.10;
-        const isBentByPalm = tipToPalm < 1.18;
-        const isOpenByPalm = tipToPalm > 1.34 && dist(tip, mcp) > dist(pip, mcp) * 1.08;
+        const isBentByWrist = tipToWrist < pipToWrist + palmLength * 0.04;
+        const isBentByPalm = tipToPalm < 1.02;
+        const isOpenByPalm = tipToPalm > 1.30 && dist(tip, mcp) > dist(pip, mcp) * 1.06;
 
         if (isBentByWrist || isBentByPalm) bent++;
         if (isOpenByPalm) open++;
@@ -1502,23 +5040,139 @@
 
       avgTipPalm /= fingers.length;
 
-      // 拇指单独处理：握拳时拇指经常横在掌心，不一定满足和四指相同的规则。
       const thumbTipPalm = dist(lm[4], palm) / handScale;
       const thumbTipIndex = dist(lm[4], lm[5]) / handScale;
-      const thumbLooksClosed = thumbTipPalm < 1.25 || thumbTipIndex < 0.92;
-      const thumbLooksOpen = thumbTipPalm > 1.30 && thumbTipIndex > 0.82;
+      const thumbLooksClosed = thumbTipPalm < 1.05 || thumbTipIndex < 0.78;
+      const thumbLooksOpen = thumbTipPalm > 1.20 && thumbTipIndex > 0.80;
 
       if (thumbLooksClosed) bent += 0.6;
       if (thumbLooksOpen) open += 0.5;
 
-      const isFist = bent >= 3.4 && avgTipPalm < 1.32;
-      const isOpen = open >= 3.1 && avgTipPalm > 1.24;
-      const isOpening = open >= 2.2 && avgTipPalm > 1.14 && bent < 3.1;
+      const isFist = bent >= 3.8 && avgTipPalm < 1.10;
+      const isOpen = open >= 3.0 && avgTipPalm > 1.22;
+      const isOpening = open >= 2.2 && avgTipPalm > 1.14 && bent < 2.8;
 
       if (isFist) return "fist";
       if (isOpen) return "open";
       if (isOpening) return "opening";
       return "neutral";
+    }
+
+    function detectCircle(handX, handY) {
+      const mc = appState.magicCircle;
+      const now = performance.now();
+      mc.history.push({ x: handX, y: handY, t: now });
+      if (mc.history.length > 60) mc.history.shift();
+
+      if (mc.history.length < 20) return false;
+
+      const recent = mc.history.slice(-30);
+      const cx = recent.reduce((s, p) => s + p.x, 0) / recent.length;
+      const cy = recent.reduce((s, p) => s + p.y, 0) / recent.length;
+      const avgR = recent.reduce((s, p) => s + Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2), 0) / recent.length;
+
+      if (avgR < 0.03) return false;
+
+      let variance = 0;
+      for (const p of recent) {
+        const r = Math.sqrt((p.x - cx) ** 2 + (p.y - cy) ** 2);
+        variance += (r - avgR) ** 2;
+      }
+      variance /= recent.length;
+      const normalizedVariance = variance / (avgR * avgR);
+
+      if (normalizedVariance > 0.06) return false;
+
+      const t0 = recent[0].t;
+      const tLast = recent[recent.length - 1].t;
+      const dt = (tLast - t0) / 1000;
+      if (dt < 0.6) return false;
+
+      let crossCount = 0;
+      let prevAngle = Math.atan2(recent[0].y - cy, recent[0].x - cx);
+      for (let i = 1; i < recent.length; i++) {
+        const angle = Math.atan2(recent[i].y - cy, recent[i].x - cx);
+        if (Math.abs(angle - prevAngle) > Math.PI) crossCount++;
+        prevAngle = angle;
+      }
+
+      return crossCount >= 1 && dt > 0.8;
+    }
+
+    function updateMagicCircle(time) {
+      const mc = appState.magicCircle;
+      if (!appState.drawn && appState.gesture === "fist") {
+        const isCircle = detectCircle(appState.handX, appState.handY * 0.5 + 0.25);
+        if (isCircle) {
+          if (!mc.active) mc.active = true;
+          mc.circleCount++;
+          mc.history = [];
+          mc.targetRotation += Math.PI * 0.5;
+        }
+      }
+
+      if (mc.active) {
+        mc.rotation += (mc.targetRotation - mc.rotation) * 0.08;
+        const pos = particleGeo.attributes.position.array;
+        const magicCenter = new THREE.Vector3(0, 0.3, 0);
+        const ringCount = 60;
+        const ringRadius = 1.8 + Math.sin(time * 2) * 0.15;
+
+        for (let i = 0; i < ringCount; i++) {
+          const idx = i;
+          const angle = (i / ringCount) * Math.PI * 2 + mc.rotation;
+          const tx = magicCenter.x + Math.cos(angle) * ringRadius;
+          const ty = magicCenter.y + Math.sin(time * 1.5 + i * 0.3) * 0.1;
+          const tz = magicCenter.z + Math.sin(angle) * ringRadius;
+
+          const pIdx = idx * 3;
+          pos[pIdx] += (tx - pos[pIdx]) * 0.15;
+          pos[pIdx + 1] += (ty - pos[pIdx + 1]) * 0.15;
+          pos[pIdx + 2] += (tz - pos[pIdx + 2]) * 0.15;
+        }
+
+        for (let ring = 1; ring <= 2; ring++) {
+          const r = ringRadius * (0.6 + ring * 0.35);
+          const count = 40;
+          for (let i = 0; i < count; i++) {
+            const idx = 60 + (ring - 1) * count + i;
+            if (idx >= appState.activeParticles) break;
+            const angle = (i / count) * Math.PI * 2 - mc.rotation * (1 + ring * 0.5);
+            const pIdx = idx * 3;
+            pos[pIdx] += (magicCenter.x + Math.cos(angle) * r - pos[pIdx]) * 0.12;
+            pos[pIdx + 1] += (magicCenter.y + Math.sin(time * 2 + i * 0.5) * 0.06 - pos[pIdx + 1]) * 0.12;
+            pos[pIdx + 2] += (magicCenter.z + Math.sin(angle) * r - pos[pIdx + 2]) * 0.12;
+          }
+        }
+
+        particleGeo.attributes.position.needsUpdate = true;
+      }
+
+      if (mc.active && appState.gesture !== "fist") {
+        scatterMagicCircle();
+        mc.active = false;
+        mc.circleCount = 0;
+        mc.rotation = 0;
+        mc.targetRotation = 0;
+        mc.history = [];
+      }
+    }
+
+    function scatterMagicCircle() {
+      const pos = particleGeo.attributes.position.array;
+      const magicCenter = new THREE.Vector3(0, 0.3, 0);
+      const scatterCount = 140;
+      for (let i = 0; i < scatterCount; i++) {
+        const idx = i * 3;
+        const dx = pos[idx] - magicCenter.x;
+        const dy = pos[idx + 1] - magicCenter.y;
+        const dz = pos[idx + 2] - magicCenter.z;
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 1;
+        const force = 4 + Math.random() * 3;
+        particleTargets[idx] = pos[idx] + (dx / dist) * force + (Math.random() - 0.5) * 2;
+        particleTargets[idx + 1] = pos[idx + 1] + (dy / dist) * force * 0.5 + Math.random() * 2;
+        particleTargets[idx + 2] = pos[idx + 2] + (dz / dist) * force + (Math.random() - 0.5) * 2;
+      }
     }
 
     function smoothGesture(rawGesture) {
@@ -1540,7 +5194,7 @@
     }
 
     function updateGestureState(gesture, rawGesture) {
-      if (!appState.started || appState.drawn) return;
+      if (!appState.started || appState.drawn || appState.shuffling) return;
       const now = performance.now();
       if (appState.gesturePhase === "fistSeen") {
         const releaseSignal = rawGesture === "open" ? 2 : (rawGesture === "opening" || gesture === "open" ? 1 : 0);
@@ -1549,6 +5203,7 @@
           appState.gesture = "open";
           appState.lastGestureChange = now;
           appState.lastPhaseChange = now;
+          appState.dampingTarget = 1.0;
           drawSelectedCard();
           return;
         }
@@ -1584,6 +5239,7 @@
           appState.lastPhaseChange = now;
           appState.gestureSamples = [];
           appState.releaseFrames = 0;
+          appState.dampingTarget = gestureConfig.fistDamping;
           updatePhase("fistSeen");
           pulseDeck();
           setStatus("已握拳，松开手掌完成抽卡", true);
@@ -1594,28 +5250,71 @@
       if (appState.gesturePhase === "fistSeen") {
         if (gesture === "open") {
           appState.lastPhaseChange = now;
+          appState.dampingTarget = 1.0;
+          const ring = document.getElementById("fistFocusRing");
+          if (ring) ring.classList.remove("visible");
+          appState.fistFocusRingVisible = false;
           drawSelectedCard();
         } else if (gesture === "fist") {
-          appState.targetDeckRotation += 0.012;
+          appState.targetDeckRotation += appState.currentDamping < 0.5 ? 0.004 : 0.012;
           intensifyParticles();
+          if (!appState.fistFocusRingVisible && now - appState.lastPhaseChange > 500) {
+            const ring = document.getElementById("fistFocusRing");
+            if (ring) ring.classList.add("visible");
+            appState.fistFocusRingVisible = true;
+          }
         }
       }
     }
 
     function pulseDeck() {
-      gsap.fromTo(deckGroup.scale, { x: 1, y: 1, z: 1 }, { x: .86, y: .86, z: .86, duration: .18, yoyo: true, repeat: 1, ease: "power2.inOut" });
-      keyLight.intensity = 3.8;
-      gsap.to(keyLight, { intensity: 1.8, duration: .6, ease: "power2.out" });
+      playFistHum();
+      gsap.fromTo(deckGroup.scale, { x: 1, y: 1, z: 1 }, { x: .82, y: .82, z: .82, duration: .16, yoyo: true, repeat: 1, ease: "power2.inOut" });
+      keyLight.intensity = 4.5;
+      rimLight.intensity = 2.8;
+      gsap.to(keyLight, { intensity: 1.8, duration: .8, ease: "power2.out" });
+      gsap.to(rimLight, { intensity: 0.8, duration: .8, ease: "power2.out" });
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i];
+        if (card.userData.glowMat) {
+          card.userData.glowMat.opacity = 0.22;
+          gsap.to(card.userData.glowMat, { opacity: 0, duration: 0.5, ease: "power2.out" });
+        }
+      }
+
+      const canvas3d = document.getElementById("threeCanvas");
+      if (canvas3d) {
+        const rect = canvas3d.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height * 0.55;
+
+        const shockwave = document.createElement("div");
+        shockwave.style.cssText = "position:fixed;left:" + cx + "px;top:" + cy + "px;width:0;height:0;border-radius:50%;border:2px solid rgba(241,214,138,0.4);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);";
+        document.body.appendChild(shockwave);
+        gsap.to(shockwave, { width: 800, height: 800, opacity: 0, borderWidth: 0.5, duration: 0.6, ease: "power2.out", onComplete: () => shockwave.remove() });
+
+        const vignette = document.createElement("div");
+        vignette.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;background:radial-gradient(ellipse at center, transparent 40%, rgba(241,214,138,0.12) 70%, rgba(241,214,138,0.25) 100%);opacity:0;";
+        document.body.appendChild(vignette);
+        gsap.fromTo(vignette, { opacity: 0 }, { opacity: 1, duration: 0.15, yoyo: true, repeat: 1, ease: "power2.inOut", onComplete: () => vignette.remove() });
+      }
+
+      const fistPhase = document.querySelector('.phase[data-phase="fistSeen"]');
+      if (fistPhase) {
+        gsap.fromTo(fistPhase, { scale: 1 }, { scale: 1.15, duration: 0.2, yoyo: true, repeat: 1, ease: "power2.inOut" });
+      }
     }
 
     function intensifyParticles() {
-      particleMat.size += (0.082 - particleMat.size) * 0.08;
+      particleMat.size += (0.088 - particleMat.size) * 0.08;
       particleMat.opacity += (0.98 - particleMat.opacity) * 0.08;
+      const contraction = appState.currentDamping < 0.5 ? 0.93 : 0.96;
       for (let i = 0; i < appState.activeParticles; i += 4) {
-        particleTargets[i * 3] *= 0.965;
-        particleTargets[i * 3 + 1] *= 0.965;
-        particleTargets[i * 3 + 2] *= 0.965;
+        particleTargets[i * 3] *= contraction;
+        particleTargets[i * 3 + 1] *= contraction;
+        particleTargets[i * 3 + 2] *= contraction;
       }
+      constellationMat.opacity += (0.22 - constellationMat.opacity) * 0.06;
     }
 
     function drawHandOverlay(lm) {
@@ -1646,6 +5345,17 @@
       }
       handCtx.restore();
     }
+
+    window.__gestureConfig = gestureConfig;
+    window.__getGestureState = () => ({
+      handX: appState.handX,
+      handTargetX: appState.handTargetX,
+      handZ: appState.handZ,
+      handVelocityX: appState.handVelocityX,
+      smoothedSensitivity: appState.smoothedSensitivity,
+      gesturePhase: appState.gesturePhase,
+      gesture: appState.gesture
+    });
   </script>
 </body>
 </html>
