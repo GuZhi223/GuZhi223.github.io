@@ -16,6 +16,7 @@ Labels should be in the en.html folder
 
 Loader.addToManifest(Loader.manifest,{
 
+	// CSS ASSETS
 	cssAsset0: "assets/ui/button.png",
 	cssAsset1: "assets/ui/button_short.png",
 	cssAsset2: "assets/ui/button_long.png",
@@ -30,15 +31,14 @@ Loader.addToManifest(Loader.manifest,{
 	cssAsset11: "assets/ui/sandbox_hats.png",
 	cssAsset12: "assets/tournament/score_small.png",
 
+	// Music!
+	bg_music: "assets/sounds/bg_music.mp3",
+
+	// IMAGE BOXES
 	image1: "assets/evolution/evolution_intro.png",
 	image2: "assets/conclusion/summary.png",
 	image3: "assets/conclusion/truce.jpg",
 
-});
-
-Loader.manifestDeferred = {};
-Loader.addToManifest(Loader.manifestDeferred,{
-	bg_music: "assets/sounds/bg_music.mp3"
 });
 
 SLIDES.push({
@@ -85,11 +85,7 @@ SLIDES.push({
 			o.loading_button.activate();
 			o.loading_button.config.onclick = function(){
 				publish("start/game");
-				Loader.loadAssets(Loader.manifestDeferred, function(){
-					if(Loader.sounds.bg_music){
-						Loader.sounds.bg_music.volume(0.75).loop(true).play();
-					}
-				});
+				Loader.sounds.bg_music.volume(0.75).loop(true).play(); // play music!
 			};
 		});
 

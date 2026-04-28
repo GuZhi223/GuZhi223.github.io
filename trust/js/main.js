@@ -1,24 +1,24 @@
 var slideshow, slideSelect;
+window.onload = function(){
 
-Ticker.framerate=60;
-Ticker.paused=true;
-
-document.addEventListener('DOMContentLoaded', function(){
-
+	// PRELOADER
 	Q.all([
 		Loader.loadAssets(Loader.manifestPreload),
 		Words.convert("words.html")
 	]).then(function(){
 
+		// CHANGE DOM
 		document.body.removeChild($("#preloader"));
 		$("#main").style.display = "block";
 		$("#footer").style.display = "block";
 
+		// Slideshow
 		slideshow = new Slideshow({
 			dom: $("#slideshow"),
 			slides: SLIDES
 		});
 
+		// Slide Select
 		slideSelect = new SlideSelect({
 			dom: $("#select"),
 			slides: SLIDES
@@ -27,9 +27,14 @@ document.addEventListener('DOMContentLoaded', function(){
 		subscribe("start/game", function(){
 			slideSelect.dom.style.display = "block";
 			$("#translations").style.display = "none";
+
+			// [FOR DEBUGGING]
 			publish("slideshow/next");
+			//publish("slideshow/scratch", ["credits"]);
+
 		});
 
+		// SOUND
 		var _soundIsOn = true;
 		$("#sound").onclick = function(){
 			_soundIsOn = !_soundIsOn;
@@ -37,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function(){
 			$("#sound").setAttribute("sound", _soundIsOn?"on":"off");
 		};
 
+		// LOAD REAL THINGS
 		Loader.loadAssets(
 			Loader.manifest,
 			function(){
@@ -47,8 +53,9 @@ document.addEventListener('DOMContentLoaded', function(){
 			}
 		);
 
+		// First slide!
 		slideshow.nextSlide();
 
 	});
 
-});
+};
