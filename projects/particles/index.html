@@ -3427,18 +3427,18 @@
       for (let i = 0; i < cards.length; i++) {
         const group = cards[i];
         const hot = i === appState.highlightedIndex;
-        const targetScale = hot ? 1.18 : 1.0;
+        const targetScale = hot ? 1.12 : 1.0;
         group.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.13);
-        group.userData.baseMat.emissiveIntensity += ((hot ? 0.82 : 0.16) - group.userData.baseMat.emissiveIntensity) * 0.12;
-        group.userData.edgeMat.opacity += ((hot ? 0.95 : 0.24) - group.userData.edgeMat.opacity) * 0.12;
+        group.userData.baseMat.emissiveIntensity += ((hot ? 0.45 : 0.16) - group.userData.baseMat.emissiveIntensity) * 0.12;
+        group.userData.edgeMat.opacity += ((hot ? 0.55 : 0.24) - group.userData.edgeMat.opacity) * 0.12;
 
-        const glowTarget = hot ? 0.18 : 0;
+        const glowTarget = hot ? 0.10 : 0;
         group.userData.glowMat.opacity += (glowTarget - group.userData.glowMat.opacity) * 0.1;
 
         if (hot) {
           group.position.y += 0.32;
           group.userData.glowMat.color.setHex(0xb78cff);
-          group.userData.glowMat.opacity = 0.18 + Math.sin(performance.now() / 1000 * 3) * 0.06;
+          group.userData.glowMat.opacity = 0.10 + Math.sin(performance.now() / 1000 * 3) * 0.04;
         }
       }
     }
@@ -3544,11 +3544,11 @@
       disposeCardTextureIfNeeded(selected.userData.baseMat);
       selected.userData.baseMat.map = frontTexture;
       selected.userData.baseMat.emissive.set(0xf1d68a);
-      selected.userData.baseMat.emissiveIntensity = 0.35;
+      selected.userData.baseMat.emissiveIntensity = 0.14;
       selected.userData.baseMat.needsUpdate = true;
 
       selected.userData.glowMat.color.set(0xf1d68a);
-      selected.userData.glowMat.opacity = 0.4;
+      selected.userData.glowMat.opacity = 0.22;
 
       scatterOtherCards(selected);
       deckGroup.remove(selected);
@@ -3567,20 +3567,20 @@
         cardIcon.innerHTML = `<span class="result-card-numeral">${numeral}</span><span class="result-card-symbol">${sym || "✦"}</span>`;
       }
 
-      keyLight.intensity = 5;
-      rimLight.intensity = 3;
-      gsap.to(keyLight, { intensity: 1.8, duration: 1.5, ease: "power2.out" });
-      gsap.to(rimLight, { intensity: 0.8, duration: 1.5, ease: "power2.out" });
+      keyLight.intensity = 2.8;
+      rimLight.intensity = 1.5;
+      gsap.to(keyLight, { intensity: 1.2, duration: 1.5, ease: "power2.out" });
+      gsap.to(rimLight, { intensity: 0.6, duration: 1.5, ease: "power2.out" });
 
       gsap.timeline()
         .to(selected.position, { x: 0, y: 0.42, z: 2.9, duration: 0.85, ease: "power3.inOut" }, 0)
         .to(selected.scale, { x: 1.72, y: 1.72, z: 1.72, duration: 0.85, ease: "power3.inOut" }, 0)
-        .to(selected.userData.glowMat, { opacity: 0.6, duration: 0.4, ease: "power2.out" }, 0)
+        .to(selected.userData.glowMat, { opacity: 0.35, duration: 0.4, ease: "power2.out" }, 0)
         .to(selected.rotation, { y: isReversed ? Math.PI * 3 : Math.PI * 2, z: 0, duration: 1.1, ease: "power2.inOut" }, 0.28)
-        .to(selected.userData.glowMat, { opacity: 0.25, duration: 0.6, ease: "power2.inOut" }, 0.6)
+        .to(selected.userData.glowMat, { opacity: 0.15, duration: 0.6, ease: "power2.inOut" }, 0.6)
         .to(selected.position, { x: 0, y: 0.12, z: 4.5, duration: 0.88, ease: "expo.out" }, 1.1)
         .to(selected.scale, { x: 2.4, y: 2.4, z: 2.4, duration: 0.88, ease: "expo.out" }, 1.1)
-        .to(selected.userData.glowMat, { opacity: 0.35, duration: 0.5, ease: "sine.inOut" }, 1.4)
+        .to(selected.userData.glowMat, { opacity: 0.18, duration: 0.5, ease: "sine.inOut" }, 1.4)
         .to(selected.rotation, { z: 0.022, duration: 0.4, yoyo: true, repeat: 1, ease: "sine.inOut" }, 1.7)
         .to(selected.userData.glowMat, { opacity: 0, duration: 0.8, ease: "power2.in" }, 2.0)
         .call(() => {
