@@ -4416,6 +4416,13 @@
       appState.currentDamping = 1.0;
       appState.dampingTarget = 1.0;
       appState.fistFocusRingVisible = false;
+      appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
+      const focusRing = document.getElementById("fistFocusRing");
+      if (focusRing) focusRing.classList.remove("visible");
+      document.querySelectorAll('body > div[style*="z-index:9999"], body > div[style*="z-index:9998"]').forEach(el => {
+        gsap.killTweensOf(el);
+        el.remove();
+      });
       appState.targetDeckRotation = 0;
       appState.particleMode = "cosmos";
       appState.gesture = "unknown";
@@ -4720,6 +4727,15 @@
       appState.currentDamping = 1.0;
       appState.dampingTarget = 1.0;
       appState.fistFocusRingVisible = false;
+      appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
+      const focusRingEl = document.getElementById("fistFocusRing");
+      if (focusRingEl) focusRingEl.classList.remove("visible");
+      document.querySelectorAll('body > div[style*="z-index:9999"], body > div[style*="z-index:9998"]').forEach(el => {
+        gsap.killTweensOf(el);
+        el.remove();
+      });
+      const spreadShareActions = document.getElementById("spreadShareActions");
+      if (spreadShareActions) spreadShareActions.remove();
       appState.targetDeckRotation = 0;
       appState.particleMode = "cosmos";
       appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
