@@ -1403,6 +1403,8 @@
       handX: 0.5,
       handTargetX: 0.5,
       handY: 0,
+      handTargetY: 0.5,
+      targetDeckTilt: 0,
       handZ: 0,
       handVelocityX: 0,
       handPrevX: 0.5,
@@ -4413,6 +4415,9 @@
       appState.drawnCards = saved;
       appState.handX = 0.5;
       appState.handTargetX = 0.5;
+      appState.handY = 0;
+      appState.handTargetY = 0.5;
+      appState.targetDeckTilt = 0;
       appState.handZ = 0;
       appState.handVelocityX = 0;
       appState.handPrevX = 0.5;
@@ -4565,11 +4570,12 @@
 
       deckGroup.rotation.y = 0;
       deckGroup.rotation.x = Math.sin(t * 0.4) * 0.035;
+      deckGroup.rotation.z += (appState.targetDeckTilt - deckGroup.rotation.z) * 0.08;
       layoutCards(dt);
       animateParticles(t);
       updateMagicCircle(t);
 
-      const handEase = appState.renderProfile === "gestureLite" ? 0.1 : 0.14;
+      const handEase = appState.renderProfile === "gestureLite" ? 0.1 : (appState.manualMode ? 0.2 : 0.14);
       appState.handX += (appState.handTargetX - appState.handX) * handEase;
       appState.targetDeckRotation = (0.5 - appState.handX) * Math.PI * 2.15;
       camera.position.x += ((appState.handX - 0.5) * 0.55 - camera.position.x) * 0.035;
@@ -4728,6 +4734,9 @@
       appState.lastPhaseChange = performance.now();
       appState.handX = 0.5;
       appState.handTargetX = 0.5;
+      appState.handY = 0;
+      appState.handTargetY = 0.5;
+      appState.targetDeckTilt = 0;
       appState.handZ = 0;
       appState.handVelocityX = 0;
       appState.handPrevX = 0.5;
@@ -4787,15 +4796,18 @@
       });
     }
 
-    function updatePointerSelection(clientX) {
+    function updatePointerSelection(clientX, clientY) {
       if (!appState.started || appState.drawn) return;
       const x = Math.min(Math.max(clientX / window.innerWidth, 0), 1);
-      appState.handTargetX += (x - appState.handTargetX) * 0.55;
+      appState.handTargetX += (x - appState.handTargetX) * 0.7;
+      const y = Math.min(Math.max(clientY / window.innerHeight, 0), 1);
+      appState.handTargetY += (y - appState.handTargetY) * 0.4;
+      appState.targetDeckTilt = (0.5 - appState.handTargetY) * 0.5;
       if (appState.manualMode) intensifyParticles();
     }
 
     canvas.addEventListener("pointermove", e => {
-      updatePointerSelection(e.clientX);
+      updatePointerSelection(e.clientX, e.clientY);
       if (appState.touchIsTap) {
         const dx = e.clientX - appState.touchStartX;
         const dy = e.clientY - appState.touchStartY;
@@ -5013,6 +5025,8 @@
         appState.handTargetX += moveDelta * effectiveSettle;
       }
       appState.handY = palm.y;
+      appState.handTargetY += (palm.y - appState.handTargetY) * 0.3;
+      appState.targetDeckTilt = (0.5 - appState.handTargetY) * 0.5;
 
       const rawGesture = classifyGesture(lm);
       const gesture = smoothGesture(rawGesture);
