@@ -1417,6 +1417,7 @@
       touchStartY: 0,
       touchStartTime: 0,
       touchIsTap: false,
+      touchDeadzonePassed: false,
       manualMode: false,
       shuffling: false,
       gesture: "unknown",
@@ -3403,8 +3404,12 @@
 
     function layoutCards(dt) {
       if (appState.shuffling) return;
-      const lerp = 1 - Math.pow(0.0001, dt);
-      appState.deckRotation += (appState.targetDeckRotation - appState.deckRotation) * lerp;
+      if (appState.manualMode) {
+        appState.deckRotation = appState.targetDeckRotation;
+      } else {
+        const lerp = 1 - Math.pow(0.0001, dt);
+        appState.deckRotation += (appState.targetDeckRotation - appState.deckRotation) * lerp;
+      }
 
       if (!appState.drawn) {
         let bestIndex = 0;
@@ -4430,6 +4435,7 @@
       appState.touchStartY = 0;
       appState.touchStartTime = 0;
       appState.touchIsTap = false;
+      appState.touchDeadzonePassed = false;
       appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
       const focusRing = document.getElementById("fistFocusRing");
       if (focusRing) focusRing.classList.remove("visible");
@@ -4749,6 +4755,7 @@
       appState.touchStartY = 0;
       appState.touchStartTime = 0;
       appState.touchIsTap = false;
+      appState.touchDeadzonePassed = false;
       appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
       const focusRingEl = document.getElementById("fistFocusRing");
       if (focusRingEl) focusRingEl.classList.remove("visible");
@@ -4806,21 +4813,29 @@
       if (appState.manualMode) intensifyParticles();
     }
 
-    canvas.addEventListener("pointermove", e => {
-      updatePointerSelection(e.clientX, e.clientY);
-      if (appState.touchIsTap) {
-        const dx = e.clientX - appState.touchStartX;
-        const dy = e.clientY - appState.touchStartY;
-        if (Math.sqrt(dx * dx + dy * dy) > 15) {
-          appState.touchIsTap = false;
-        }
-      }
-    });
     canvas.addEventListener("pointerdown", e => {
       appState.touchStartX = e.clientX;
       appState.touchStartY = e.clientY;
       appState.touchStartTime = performance.now();
       appState.touchIsTap = true;
+      appState.touchDeadzonePassed = false;
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener("pointermove", e => {
+      const dx = e.clientX - appState.touchStartX;
+      const dy = e.clientY - appState.touchStartY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 15) {
+        appState.touchIsTap = false;
+      }
+      if (!appState.touchDeadzonePassed) {
+        if (dist > 8) {
+          appState.touchDeadzonePassed = true;
+        } else {
+          return;
+        }
+      }
+      updatePointerSelection(e.clientX, e.clientY);
     });
     canvas.addEventListener("pointerup", () => {
       if (appState.touchIsTap && (performance.now() - appState.touchStartTime) < 500 && appState.manualMode && appState.started && !appState.drawn && !appState.shuffling) {
@@ -4828,6 +4843,7 @@
         drawSelectedCard();
       }
       appState.touchIsTap = false;
+      appState.touchDeadzonePassed = false;
     });
 
     window.addEventListener("keydown", e => {
