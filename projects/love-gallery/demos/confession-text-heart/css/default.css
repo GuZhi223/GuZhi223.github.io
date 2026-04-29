@@ -1,0 +1,72 @@
+body{
+    margin:0;
+    padding:0;
+    background: #1a1a2e;
+    overflow: hidden;
+    font-family: 'STKaiti','KaiTi','楷体','STSong','宋体',serif;
+}
+#canvas{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+#words{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #ffc0cb;
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.8),
+                 0 0 20px rgba(255, 105, 180, 0.6),
+                 0 0 30px rgba(255, 105, 180, 0.4),
+                 0 0 40px rgba(255, 105, 180, 0.2);
+}
+.messages{
+    display: none;
+    padding: 20px;
+}
+.messages .letter{
+    display: none;
+}
+.messages .letter p{
+    font-size: 36px;
+    margin: 15px 0;
+    color: #ffc0cb;
+    font-family: 'STKaiti','KaiTi','楷体','STSong','宋体',serif;
+}
+.digit{
+    color: #ff69b4;
+    font-size: 48px;
+    font-weight: bold;
+    text-shadow: 0 0 15px rgba(255, 105, 180, 1),
+                 0 0 25px rgba(255, 105, 180, 0.8),
+                 0 0 35px rgba(255, 105, 180, 0.6);
+    font-family: 'Georgia', 'Times New Roman', serif;
+}
+.zxx_text,
+.zxx_text_0,
+.zxx_text_01,
+.zxx_text_02,
+.zxx_text_03{
+    display: none;
+    padding: 20px;
+}
+.zxx_text p,
+.zxx_text_0 p,
+.zxx_text_01 p,
+.zxx_text_02 p,
+.zxx_text_03 p{
+    font-size: 24px;
+    margin: 10px 0;
+    color: #ffc0cb;
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+    opacity: 0;
+    animation: textFadeIn 1s forwards;
+}
+@keyframes textFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

@@ -1,108 +1,492 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>爱心展示合集 | GuZhi223</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family: "Microsoft YaHei", Arial, sans-serif; color: #2f2430; background: #fff7f8; }
-        header { padding: 56px 20px 32px; text-align: center; background: linear-gradient(180deg, #ffe1e7, #fff7f8); }
-        .back { display: inline-flex; margin-bottom: 22px; color: #9d3150; text-decoration: none; font-weight: 700; }
-        h1 { margin: 0; font-size: clamp(30px, 5vw, 54px); letter-spacing: 0; }
-        p { margin: 14px auto 0; max-width: 680px; line-height: 1.8; color: #6f5965; }
-        main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 56px; }
-        .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
-        .toolbar span { color: #8d5264; font-weight: 700; }
-        input { width: min(360px, 100%); border: 1px solid #f0bcc8; border-radius: 8px; padding: 12px 14px; background: #fff; font: inherit; color: #2f2430; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
-        .demo-card a { min-height: 146px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; padding: 18px; border: 1px solid #f1c3cd; border-radius: 8px; background: #fff; color: inherit; text-decoration: none; box-shadow: 0 12px 30px rgba(160, 64, 92, .08); transition: transform .18s ease, border-color .18s ease; }
-        .demo-card a:hover { transform: translateY(-3px); border-color: #d94d74; }
-        .demo-card span { color: #a34a63; font-size: 13px; line-height: 1.45; }
-        .demo-card strong { font-size: 18px; line-height: 1.45; word-break: break-word; }
-        .demo-card small { color: #7a6570; }
-        .hidden { display: none; }
-        @media (max-width: 640px) { header { padding-top: 38px; } main { width: min(100% - 24px, 1120px); } .grid { grid-template-columns: 1fr; } }
+        :root {
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-strong: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-border-hover: rgba(255, 255, 255, 0.25);
+            --blur: 20px;
+            --radius: 20px;
+            --radius-sm: 14px;
+            --radius-pill: 999px;
+            --ink: #f0f2f5;
+            --muted: rgba(255, 255, 255, 0.55);
+            --blue: #5e9eff;
+            --green: #34d399;
+            --orange: #fb923c;
+            --purple: #a78bfa;
+            --pink: #f472b6;
+            --cyan: #22d3ee;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            min-height: 100vh;
+            color: var(--ink);
+            background: #080b16;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+            line-height: 1.65;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); will-change: transform; }
+        .orb--blue { width: 600px; height: 600px; background: radial-gradient(circle, rgba(94,158,255,0.4), transparent 70%); top: -15%; left: -10%; animation: drift1 24s ease-in-out infinite; }
+        .orb--purple { width: 500px; height: 500px; background: radial-gradient(circle, rgba(167,139,250,0.35), transparent 70%); top: 20%; right: -12%; animation: drift2 28s ease-in-out infinite; }
+        .orb--pink { width: 450px; height: 450px; background: radial-gradient(circle, rgba(244,114,182,0.3), transparent 70%); top: 55%; left: 15%; animation: drift3 26s ease-in-out infinite; }
+        .orb--green { width: 350px; height: 350px; background: radial-gradient(circle, rgba(52,211,153,0.2), transparent 70%); bottom: 0; right: 10%; animation: drift4 30s ease-in-out infinite; }
+
+        @keyframes drift1 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(80px, 60px) scale(1.08); } 66% { transform: translate(-40px, 30px) scale(0.95); } }
+        @keyframes drift2 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-70px, 50px) scale(0.92); } 66% { transform: translate(50px, -40px) scale(1.05); } }
+        @keyframes drift3 { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(60px, -60px) scale(1.06); } 66% { transform: translate(-50px, 40px) scale(0.94); } }
+        @keyframes drift4 { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-40px, -30px); } }
+
+        .page { position: relative; z-index: 1; width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+
+        .glass { background: var(--glass); backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur)); border: 1px solid var(--glass-border); border-radius: var(--radius); transition: var(--transition); }
+        .glass:hover { background: var(--glass-strong); border-color: var(--glass-border-hover); }
+
+        .divider { width: 100%; height: 1px; margin: 48px 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08) 30%, rgba(244,114,182,0.2) 50%, rgba(255,255,255,0.08) 70%, transparent); }
+
+        .hero { text-align: center; padding: 100px 0 20px; }
+
+        .hero__eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 16px; border-radius: var(--radius-pill);
+            background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.2);
+            color: var(--pink); font-size: 13px; font-weight: 700; margin-bottom: 24px;
+        }
+        .hero__eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pink); animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 56px); font-weight: 900; line-height: 1.1; letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.65) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .hero__lead { max-width: 640px; margin: 0 auto; color: var(--muted); font-size: 15px; line-height: 1.8; }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 18px; border-radius: var(--radius-pill);
+            background: var(--glass); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            color: var(--muted); font-size: 13px; font-weight: 700;
+            transition: var(--transition); margin-bottom: 28px;
+        }
+        .back-btn:hover { background: var(--glass-strong); border-color: var(--glass-border-hover); color: var(--ink); }
+
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 14px; margin-bottom: 24px; flex-wrap: wrap;
+        }
+        .toolbar__count { color: var(--muted); font-size: 14px; font-weight: 700; }
+        .toolbar__search {
+            width: min(360px, 100%); border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm); padding: 10px 16px;
+            background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            color: var(--ink); font: inherit; font-size: 14px; outline: none; transition: var(--transition);
+        }
+        .toolbar__search::placeholder { color: var(--muted); }
+        .toolbar__search:focus { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(244,114,182,0.1); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; padding-bottom: 20px; }
+
+        .work-card { display: flex; flex-direction: column; padding: 22px; border-radius: var(--radius); position: relative; overflow: hidden; cursor: pointer; }
+        .work-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; border-radius: var(--radius) var(--radius) 0 0; background: linear-gradient(90deg, var(--pink), var(--purple)); opacity: 0; transition: opacity 0.3s ease; }
+        .work-card:hover::after { opacity: 1; }
+        .work-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3); }
+        .work-card::before { content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; background: linear-gradient(135deg, rgba(244,114,182,0.4), rgba(167,139,250,0.3), rgba(94,158,255,0.2)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude; opacity: 0; transition: opacity 0.35s ease; pointer-events: none; }
+        .work-card:hover::before { opacity: 1; }
+
+        .work-card__head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+        .work-card__badge { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; color: #fff; font-size: 15px; }
+        .badge--blue { background: linear-gradient(135deg, var(--blue), var(--cyan)); }
+        .badge--pink { background: linear-gradient(135deg, var(--pink), var(--orange)); }
+        .badge--purple { background: linear-gradient(135deg, var(--purple), var(--pink)); }
+        .badge--orange { background: linear-gradient(135deg, var(--orange), var(--pink)); }
+        .badge--green { background: linear-gradient(135deg, var(--green), var(--cyan)); }
+        .badge--cyan { background: linear-gradient(135deg, var(--cyan), var(--blue)); }
+
+        .work-card__title { font-size: 15px; font-weight: 800; line-height: 1.4; }
+        .work-card__desc { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: 4px; }
+        .work-card__link { display: inline-flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 14px; color: var(--pink); font-size: 13px; font-weight: 800; transition: var(--transition); }
+        .work-card__link:hover { gap: 10px; }
+
+        .footer { padding: 24px 0 36px; text-align: center; color: rgba(255, 255, 255, 0.25); font-size: 13px; }
+
+        .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .stagger { transition-delay: calc(var(--i, 0) * 0.04s); }
+
+        .back-to-top { position: fixed; bottom: 28px; right: 28px; z-index: 90; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); color: var(--ink); font-size: 16px; display: grid; place-items: center; cursor: pointer; transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; transform: translateY(12px); pointer-events: none; }
+        .back-to-top.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .back-to-top:hover { background: rgba(255, 255, 255, 0.12); border-color: var(--glass-border-hover); box-shadow: 0 4px 20px rgba(244, 114, 182, 0.15); }
+
+        .cursor-glow { position: fixed; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(244,114,182,0.06), transparent 70%); pointer-events: none; z-index: 0; transform: translate(-50%, -50%); transition: opacity 0.3s ease; opacity: 0; }
+        body:hover .cursor-glow { opacity: 1; }
+
+        .no-results { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted); font-size: 15px; display: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+            .orb { animation: none !important; }
+            .reveal { opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 640px) {
+            .hero { padding: 80px 0 16px; }
+            .grid { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar__search { width: 100%; }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <a class="back" href="../../index.html">返回主页</a>
-        <h1>爱心展示合集</h1>
-        <p>这里收着一批从互联网上收集来的“低脂”爱心代码，基本都是轻量 HTML、CSS 和 JavaScript 小页面。发布前已排除明显不相关的大资源，并清理页面中的外部推广入口和访问统计脚本。</p>
-    </header>
-    <main>
-        <div class="toolbar">
-            <span id="count">共 50 个页面</span>
-            <input id="search" type="search" placeholder="搜索名称" autocomplete="off">
-        </div>
-        <section class="grid" id="grid">
-                    <article class="demo-card"><a href="demos/1  第1种爱心可以改名字的爱心代码/第1种爱心loveCodewithName可以改名字的爱心代码/index.html" target="_blank" rel="noopener"><span>1  第1种爱心可以改名字的爱心代码</span><strong>1  第1种爱心可以改名字的爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/10   满屏都是爱你的心》/index.html" target="_blank" rel="noopener"><span>10   满屏都是爱你的心》</span><strong>10   满屏都是爱你的心》</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/12 情侣纪念日代码/index.html" target="_blank" rel="noopener"><span>12 情侣纪念日代码</span><strong>12 情侣纪念日代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/13 爱心发射/index.html" target="_blank" rel="noopener"><span>13 爱心发射</span><strong>13 爱心发射</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/4  第4种缩放带名字动态爱心代码/第4种缩放带名字动态爱心代码/index.html" target="_blank" rel="noopener"><span>4  第4种缩放带名字动态爱心代码</span><strong>4  第4种缩放带名字动态爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/4  第4种缩放带名字动态爱心代码/第4种缩放带名字动态爱心代码/不带名字的动态缩放爱心效果.html" target="_blank" rel="noopener"><span>4  第4种缩放带名字动态爱心代码</span><strong>不带名字的动态缩放爱心效果</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/5 满屏文字爱心代码 - i love you 英文/index.html" target="_blank" rel="noopener"><span>5 满屏文字爱心代码 - i love you 英文</span><strong>5 满屏文字爱心代码 - i love you 英文</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/5 满屏文字爱心代码/index.html" target="_blank" rel="noopener"><span>5 满屏文字爱心代码</span><strong>5 满屏文字爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/5 满屏文字爱心固定 iloveyoufullfixed 固定/index.html" target="_blank" rel="noopener"><span>5 满屏文字爱心固定 iloveyoufullfixed 固定</span><strong>5 满屏文字爱心固定 iloveyoufullfixed 固定</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/68种语言说爱你代码文件 直接QQ浏览器打开看效果/.html" target="_blank" rel="noopener"><span>68种语言说爱你代码文件 直接QQ浏览器打开看效果</span><strong>68种语言说爱你代码文件 直接QQ浏览器打开看效果</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/8  表白文案红色爱心代码8/index.html" target="_blank" rel="noopener"><span>8  表白文案红色爱心代码8</span><strong>8  表白文案红色爱心代码8</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/9   红蓝线条爱心跳动/红蓝线条爱心跳动.html" target="_blank" rel="noopener"><span>9   红蓝线条爱心跳动</span><strong>红蓝线条爱心跳动</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/boysendlove 小人发射爱心biu/index.html" target="_blank" rel="noopener"><span>boysendlove 小人发射爱心biu</span><strong>boysendlove 小人发射爱心biu</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/Dinosaur_in_love  恋爱的恐龙/index.html" target="_blank" rel="noopener"><span>Dinosaur_in_love  恋爱的恐龙</span><strong>Dinosaur_in_love  恋爱的恐龙</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/kiss 浪漫表白亲吻/index.html" target="_blank" rel="noopener"><span>kiss 浪漫表白亲吻</span><strong>kiss 浪漫表白亲吻</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/love11 心跳爱心网页版/index.html" target="_blank" rel="noopener"><span>love11 心跳爱心网页版</span><strong>love11 心跳爱心网页版</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/love12 爱心名字用方框重点标记/爱心名字用方框重点标记.html" target="_blank" rel="noopener"><span>love12 爱心名字用方框重点标记</span><strong>爱心名字用方框重点标记</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/loveamazing  爱心文字掉落炫酷黑客效果/loveamazing  爱心文字掉落炫酷黑客效果.html" target="_blank" rel="noopener"><span>loveamazing  爱心文字掉落炫酷黑客效果</span><strong>loveamazing  爱心文字掉落炫酷黑客效果</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/lovedouble  粒子双爱心/粒子双爱心.html" target="_blank" rel="noopener"><span>lovedouble  粒子双爱心</span><strong>粒子双爱心</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/loveeverytime每次遇见你都心跳加速/index.html" target="_blank" rel="noopener"><span>loveeverytime每次遇见你都心跳加速</span><strong>loveeverytime每次遇见你都心跳加速</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/lovefulltxt 字幕雨爱心/index.html" target="_blank" rel="noopener"><span>lovefulltxt 字幕雨爱心</span><strong>lovefulltxt 字幕雨爱心</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/Love-on-Valentines-Day 情人节表白代码/Love-on-Valentines-Day-main/index.html" target="_blank" rel="noopener"><span>Love-on-Valentines-Day 情人节表白代码</span><strong>Love-on-Valentines-Day 情人节表白代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/lovered-红色爱心变幻钻石/index.html" target="_blank" rel="noopener"><span>lovered-红色爱心变幻钻石</span><strong>lovered-红色爱心变幻钻石</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/rose  浪漫玫瑰花/index.html" target="_blank" rel="noopener"><span>rose  浪漫玫瑰花</span><strong>rose  浪漫玫瑰花</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/rose2-玫瑰花浪漫至死不渝/rose2-main/index.html" target="_blank" rel="noopener"><span>rose2-玫瑰花浪漫至死不渝</span><strong>rose2-玫瑰花浪漫至死不渝</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/together粒子我们在一起吧/index.html" target="_blank" rel="noopener"><span>together粒子我们在一起吧</span><strong>together粒子我们在一起吧</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/爱情表白信/4/index.html" target="_blank" rel="noopener"><span>爱情表白信</span><strong>爱情表白信</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/爱心代码初始版/index.html" target="_blank" rel="noopener"><span>爱心代码初始版</span><strong>爱心代码初始版</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/爱心告白文字代码/ValentinesDay-master/index.html" target="_blank" rel="noopener"><span>爱心告白文字代码</span><strong>爱心告白文字代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/爱心流星雨背景_超好看/love.html" target="_blank" rel="noopener"><span>爱心流星雨背景_超好看</span><strong>love</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/白色爱心/白色爱心代码.html" target="_blank" rel="noopener"><span>白色爱心</span><strong>白色爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/璀璨爱心/璀璨爱心代码.html" target="_blank" rel="noopener"><span>璀璨爱心</span><strong>璀璨爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/动态爱心-2/动态爱心-2.html" target="_blank" rel="noopener"><span>动态爱心-2</span><strong>动态爱心-2</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/动态爱心-5/爱心.html" target="_blank" rel="noopener"><span>动态爱心-5</span><strong>爱心</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/动态爱心-6/五彩缤纷的爱心.html" target="_blank" rel="noopener"><span>动态爱心-6</span><strong>五彩缤纷的爱心</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/粉色光环爱心/粉色光环爱心代码.html" target="_blank" rel="noopener"><span>粉色光环爱心</span><strong>粉色光环爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/粉色旋转爱心/粉色旋转爱心代码.html" target="_blank" rel="noopener"><span>粉色旋转爱心</span><strong>粉色旋转爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/红色爱心 i love you/爱心红1.html" target="_blank" rel="noopener"><span>红色爱心 i love you</span><strong>爱心红1</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/蓝色变化钻石爱心/动态爱心-1.html" target="_blank" rel="noopener"><span>蓝色变化钻石爱心</span><strong>动态爱心-1</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/蓝色粒子爱心/蓝色粒子爱心1.html" target="_blank" rel="noopener"><span>蓝色粒子爱心</span><strong>蓝色粒子爱心1</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/蓝色钻石爱心/index.html" target="_blank" rel="noopener"><span>蓝色钻石爱心</span><strong>蓝色钻石爱心</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/李峋爱心 背景爱心飘动/aixin1.html" target="_blank" rel="noopener"><span>李峋爱心 背景爱心飘动</span><strong>aixin1</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/李峋爱心代码原始版/李峋爱心代码原始.html" target="_blank" rel="noopener"><span>李峋爱心代码原始版</span><strong>李峋爱心代码原始</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/律动爱心/律动爱心代码.html" target="_blank" rel="noopener"><span>律动爱心</span><strong>律动爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/魔方爱心和文字/代码表达爱.html" target="_blank" rel="noopener"><span>魔方爱心和文字</span><strong>代码表达爱</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/跳动爱心代码/跳动爱心代码.html" target="_blank" rel="noopener"><span>跳动爱心代码</span><strong>跳动爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/心电爱心/代码.html" target="_blank" rel="noopener"><span>心电爱心</span><strong>代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/心电爱心/心电爱心代码.html" target="_blank" rel="noopener"><span>心电爱心</span><strong>心电爱心代码</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/旋转爱心/love.html" target="_blank" rel="noopener"><span>旋转爱心</span><strong>love</strong><small>打开页面</small></a></article>
-                    <article class="demo-card"><a href="demos/烟花爱心/烟花爱心代码.html" target="_blank" rel="noopener"><span>烟花爱心</span><strong>烟花爱心代码</strong><small>打开页面</small></a></article>
+    <div class="orbs" aria-hidden="true">
+        <div class="orb orb--blue"></div>
+        <div class="orb orb--purple"></div>
+        <div class="orb orb--pink"></div>
+        <div class="orb orb--green"></div>
+    </div>
+    <div class="cursor-glow" aria-hidden="true"></div>
+    <button class="back-to-top" aria-label="回到顶部"><i class="fas fa-arrow-up"></i></button>
+
+    <div class="page">
+        <section class="hero">
+            <a class="back-btn reveal" href="../../index.html"><i class="fas fa-arrow-left"></i> 返回主页</a>
+            <div class="hero__eyebrow reveal" style="--i:1"><span class="dot"></span>从互联网收集的"低脂"爱心代码</div>
+            <h1 class="reveal" style="--i:2">爱心展示合集</h1>
+            <p class="hero__lead reveal" style="--i:3">这里收着一批从互联网上收集来的爱心 HTML 源码，基本都是轻量 HTML、CSS 和 JavaScript 小页面。发布前已清理页面中的外部推广入口和访问统计脚本。</p>
         </section>
-    </main>
+
+        <div class="divider"></div>
+
+        <div class="toolbar reveal">
+            <span class="toolbar__count" id="count">共 49 个页面</span>
+            <input class="toolbar__search" id="search" type="search" placeholder="搜索名称..." autocomplete="off">
+        </div>
+
+        <section class="grid" id="grid">
+            <article class="work-card glass reveal stagger" data-title="可改名字的爱心代码" style="--i:0">
+                <a class="work-card__overlay" href="demos/name-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">可改名字的爱心代码</div><div class="work-card__desc">支持自定义名字的爱心动画效果</div></div></div>
+                <a class="work-card__link" href="demos/name-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="满屏爱你的心" style="--i:1">
+                <a class="work-card__overlay" href="demos/fullscreen-love-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--blue"><i class="fas fa-heart"></i></div><div><div class="work-card__title">满屏爱你的心</div><div class="work-card__desc">满屏飘落爱心的浪漫效果</div></div></div>
+                <a class="work-card__link" href="demos/fullscreen-love-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="情侣纪念日倒计时" style="--i:2">
+                <a class="work-card__overlay" href="demos/anniversary/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">情侣纪念日倒计时</div><div class="work-card__desc">记录在一起的天数与纪念日</div></div></div>
+                <a class="work-card__link" href="demos/anniversary/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="爱心发射动效" style="--i:3">
+                <a class="work-card__overlay" href="demos/heart-shoot/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">爱心发射动效</div><div class="work-card__desc">点击发射爱心的交互特效</div></div></div>
+                <a class="work-card__link" href="demos/heart-shoot/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="缩放带名字动态爱心" style="--i:4">
+                <a class="work-card__overlay" href="demos/scale-heart-with-name/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--purple"><i class="fas fa-heart"></i></div><div><div class="work-card__title">缩放带名字动态爱心</div><div class="work-card__desc">带名字缩放动画的动态爱心</div></div></div>
+                <a class="work-card__link" href="demos/scale-heart-with-name/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="不带名字的缩放爱心" style="--i:5">
+                <a class="work-card__overlay" href="demos/scale-heart-with-name/不带名字的动态缩放爱心效果.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">不带名字的缩放爱心</div><div class="work-card__desc">纯动态缩放爱心效果</div></div></div>
+                <a class="work-card__link" href="demos/scale-heart-with-name/不带名字的动态缩放爱心效果.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="满屏文字爱心" style="--i:6">
+                <a class="work-card__overlay" href="demos/fullscreen-text-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--green"><i class="fas fa-heart"></i></div><div><div class="work-card__title">满屏文字爱心</div><div class="work-card__desc">文字排列成爱心的满屏效果</div></div></div>
+                <a class="work-card__link" href="demos/fullscreen-text-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="满屏 I Love You 英文爱心" style="--i:7">
+                <a class="work-card__overlay" href="demos/fullscreen-i-love-you/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">满屏 I Love You 英文爱心</div><div class="work-card__desc">英文 I Love You 满屏飘落</div></div></div>
+                <a class="work-card__link" href="demos/fullscreen-i-love-you/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="固定版满屏 I Love You" style="--i:8">
+                <a class="work-card__overlay" href="demos/fullscreen-i-love-you-fixed/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--blue"><i class="fas fa-heart"></i></div><div><div class="work-card__title">固定版满屏 I Love You</div><div class="work-card__desc">固定位置的满屏英文爱心</div></div></div>
+                <a class="work-card__link" href="demos/fullscreen-i-love-you-fixed/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="68种语言说爱你" style="--i:9">
+                <a class="work-card__overlay" href="demos/love-68-languages/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">68种语言说爱你</div><div class="work-card__desc">用68种不同语言表达爱意</div></div></div>
+                <a class="work-card__link" href="demos/love-68-languages/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="表白文案红色爱心" style="--i:10">
+                <a class="work-card__overlay" href="demos/confession-red-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">表白文案红色爱心</div><div class="work-card__desc">红色爱心搭配表白文案</div></div></div>
+                <a class="work-card__link" href="demos/confession-red-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="红蓝线条爱心跳动" style="--i:11">
+                <a class="work-card__overlay" href="demos/red-blue-line-heartbeat/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">红蓝线条爱心跳动</div><div class="work-card__desc">红蓝线条构成的跳动爱心</div></div></div>
+                <a class="work-card__link" href="demos/red-blue-line-heartbeat/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="小人发射爱心" style="--i:12">
+                <a class="work-card__overlay" href="demos/boy-shoot-hearts/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--green"><i class="fas fa-heart"></i></div><div><div class="work-card__title">小人发射爱心</div><div class="work-card__desc">可爱小人biu biu发射爱心</div></div></div>
+                <a class="work-card__link" href="demos/boy-shoot-hearts/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="恋爱的恐龙" style="--i:13">
+                <a class="work-card__overlay" href="demos/dinosaur-in-love/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--purple"><i class="fas fa-heart"></i></div><div><div class="work-card__title">恋爱的恐龙</div><div class="work-card__desc">恐龙恋爱的趣味动画</div></div></div>
+                <a class="work-card__link" href="demos/dinosaur-in-love/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="情人节表白代码" style="--i:14">
+                <a class="work-card__overlay" href="demos/valentines-day/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">情人节表白代码</div><div class="work-card__desc">情人节主题的表白页面</div></div></div>
+                <a class="work-card__link" href="demos/valentines-day/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="浪漫表白亲吻" style="--i:15">
+                <a class="work-card__overlay" href="demos/romantic-kiss/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">浪漫表白亲吻</div><div class="work-card__desc">浪漫亲吻动画效果</div></div></div>
+                <a class="work-card__link" href="demos/romantic-kiss/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="3D 心跳爱心" style="--i:16">
+                <a class="work-card__overlay" href="demos/heartbeat-3d/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--blue"><i class="fas fa-heart"></i></div><div><div class="work-card__title">3D 心跳爱心</div><div class="work-card__desc">3D 立体心跳跳动效果</div></div></div>
+                <a class="work-card__link" href="demos/heartbeat-3d/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="爱心名字方框标记" style="--i:17">
+                <a class="work-card__overlay" href="demos/heart-name-highlight/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">爱心名字方框标记</div><div class="work-card__desc">用方框重点标记名字的爱心</div></div></div>
+                <a class="work-card__link" href="demos/heart-name-highlight/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="爱心文字掉落黑客效果" style="--i:18">
+                <a class="work-card__overlay" href="demos/matrix-heart-rain/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--green"><i class="fas fa-heart"></i></div><div><div class="work-card__title">爱心文字掉落黑客效果</div><div class="work-card__desc">矩阵风格爱心文字雨</div></div></div>
+                <a class="work-card__link" href="demos/matrix-heart-rain/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="粒子双爱心" style="--i:19">
+                <a class="work-card__overlay" href="demos/particle-double-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--purple"><i class="fas fa-heart"></i></div><div><div class="work-card__title">粒子双爱心</div><div class="work-card__desc">粒子特效构成的双爱心</div></div></div>
+                <a class="work-card__link" href="demos/particle-double-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="每次遇见你都心跳加速" style="--i:20">
+                <a class="work-card__overlay" href="demos/heartbeat-every-time/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">每次遇见你都心跳加速</div><div class="work-card__desc">遇见你时心跳加速的浪漫效果</div></div></div>
+                <a class="work-card__link" href="demos/heartbeat-every-time/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="字幕雨爱心" style="--i:21">
+                <a class="work-card__overlay" href="demos/subtitle-rain-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">字幕雨爱心</div><div class="work-card__desc">字幕雨效果排列成爱心</div></div></div>
+                <a class="work-card__link" href="demos/subtitle-rain-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="红色爱心变幻钻石" style="--i:22">
+                <a class="work-card__overlay" href="demos/red-heart-to-diamond/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--blue"><i class="fas fa-heart"></i></div><div><div class="work-card__title">红色爱心变幻钻石</div><div class="work-card__desc">红色爱心变幻为钻石的动效</div></div></div>
+                <a class="work-card__link" href="demos/red-heart-to-diamond/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="浪漫玫瑰花" style="--i:23">
+                <a class="work-card__overlay" href="demos/romantic-rose/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">浪漫玫瑰花</div><div class="work-card__desc">浪漫的玫瑰花动画效果</div></div></div>
+                <a class="work-card__link" href="demos/romantic-rose/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="玫瑰花浪漫至死不渝" style="--i:24">
+                <a class="work-card__overlay" href="demos/romantic-rose-2/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--green"><i class="fas fa-heart"></i></div><div><div class="work-card__title">玫瑰花浪漫至死不渝</div><div class="work-card__desc">至死不渝的浪漫玫瑰</div></div></div>
+                <a class="work-card__link" href="demos/romantic-rose-2/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="粒子我们在一起" style="--i:25">
+                <a class="work-card__overlay" href="demos/particle-together/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">粒子我们在一起</div><div class="work-card__desc">粒子特效表达在一起的浪漫</div></div></div>
+                <a class="work-card__link" href="demos/particle-together/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="动态爱心 2" style="--i:26">
+                <a class="work-card__overlay" href="demos/dynamic-heart-2/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--purple"><i class="fas fa-heart"></i></div><div><div class="work-card__title">动态爱心 (2)</div><div class="work-card__desc">动态爱心动画效果</div></div></div>
+                <a class="work-card__link" href="demos/dynamic-heart-2/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="动态爱心 3" style="--i:27">
+                <a class="work-card__overlay" href="demos/dynamic-heart-3/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">动态爱心 (3)</div><div class="work-card__desc">另一种动态爱心效果</div></div></div>
+                <a class="work-card__link" href="demos/dynamic-heart-3/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="五彩缤纷的爱心" style="--i:28">
+                <a class="work-card__overlay" href="demos/dynamic-heart-4/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">五彩缤纷的爱心</div><div class="work-card__desc">多彩颜色的爱心动画</div></div></div>
+                <a class="work-card__link" href="demos/dynamic-heart-4/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="律动爱心" style="--i:29">
+                <a class="work-card__overlay" href="demos/rhythm-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--blue"><i class="fas fa-heart"></i></div><div><div class="work-card__title">律动爱心</div><div class="work-card__desc">随节奏律动的爱心效果</div></div></div>
+                <a class="work-card__link" href="demos/rhythm-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="心电爱心" style="--i:30">
+                <a class="work-card__overlay" href="demos/ecg-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--green"><i class="fas fa-heart"></i></div><div><div class="work-card__title">心电爱心</div><div class="work-card__desc">心电图线条勾勒的爱心</div></div></div>
+                <a class="work-card__link" href="demos/ecg-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="旋转爱心" style="--i:31">
+                <a class="work-card__overlay" href="demos/rotating-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">旋转爱心</div><div class="work-card__desc">3D 旋转的爱心动画</div></div></div>
+                <a class="work-card__link" href="demos/rotating-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="李峋爱心 背景飘动" style="--i:32">
+                <a class="work-card__overlay" href="demos/li-xun-floating-hearts/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">李峋爱心·背景飘动</div><div class="work-card__desc">李峋同款爱心背景飘动效果</div></div></div>
+                <a class="work-card__link" href="demos/li-xun-floating-hearts/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="李峋爱心原始版" style="--i:33">
+                <a class="work-card__overlay" href="demos/li-xun-original/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--purple"><i class="fas fa-heart"></i></div><div><div class="work-card__title">李峋爱心原始版</div><div class="work-card__desc">李峋同款爱心原始代码</div></div></div>
+                <a class="work-card__link" href="demos/li-xun-original/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="烟花爱心" style="--i:34">
+                <a class="work-card__overlay" href="demos/firework-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">烟花爱心</div><div class="work-card__desc">烟花绽放形成爱心的效果</div></div></div>
+                <a class="work-card__link" href="demos/firework-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="爱心代码初始版" style="--i:35">
+                <a class="work-card__overlay" href="demos/heart-original/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--blue"><i class="fas fa-heart"></i></div><div><div class="work-card__title">爱心代码初始版</div><div class="work-card__desc">基础爱心动画初始版本</div></div></div>
+                <a class="work-card__link" href="demos/heart-original/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="爱心告白文字代码" style="--i:36">
+                <a class="work-card__overlay" href="demos/confession-text-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--green"><i class="fas fa-heart"></i></div><div><div class="work-card__title">爱心告白文字代码</div><div class="work-card__desc">告白文字配合爱心动画</div></div></div>
+                <a class="work-card__link" href="demos/confession-text-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="爱心流星雨背景" style="--i:37">
+                <a class="work-card__overlay" href="demos/heart-meteor-shower/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">爱心流星雨背景</div><div class="work-card__desc">流星雨中飘落爱心的超美背景</div></div></div>
+                <a class="work-card__link" href="demos/heart-meteor-shower/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="爱情表白信" style="--i:38">
+                <a class="work-card__overlay" href="demos/love-letter/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">爱情表白信</div><div class="work-card__desc">带动画的爱情表白信</div></div></div>
+                <a class="work-card__link" href="demos/love-letter/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="璀璨爱心" style="--i:39">
+                <a class="work-card__overlay" href="demos/brilliant-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--purple"><i class="fas fa-heart"></i></div><div><div class="work-card__title">璀璨爱心</div><div class="work-card__desc">璀璨夺目的爱心特效</div></div></div>
+                <a class="work-card__link" href="demos/brilliant-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="白色爱心" style="--i:40">
+                <a class="work-card__overlay" href="demos/white-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">白色爱心</div><div class="work-card__desc">纯白色调的爱心动画</div></div></div>
+                <a class="work-card__link" href="demos/white-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="粉色光环爱心" style="--i:41">
+                <a class="work-card__overlay" href="demos/pink-halo-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">粉色光环爱心</div><div class="work-card__desc">粉色光环环绕的爱心效果</div></div></div>
+                <a class="work-card__link" href="demos/pink-halo-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="粉色旋转爱心" style="--i:42">
+                <a class="work-card__overlay" href="demos/pink-rotating-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">粉色旋转爱心</div><div class="work-card__desc">粉色旋转的爱心动画</div></div></div>
+                <a class="work-card__link" href="demos/pink-rotating-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="红色爱心 I Love You" style="--i:43">
+                <a class="work-card__overlay" href="demos/red-i-love-you/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--blue"><i class="fas fa-heart"></i></div><div><div class="work-card__title">红色爱心 I Love You</div><div class="work-card__desc">红色爱心搭配 I Love You 文字</div></div></div>
+                <a class="work-card__link" href="demos/red-i-love-you/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="蓝色变化钻石爱心" style="--i:44">
+                <a class="work-card__overlay" href="demos/blue-morphing-diamond/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--green"><i class="fas fa-heart"></i></div><div><div class="work-card__title">蓝色变化钻石爱心</div><div class="work-card__desc">蓝色爱心变幻为钻石</div></div></div>
+                <a class="work-card__link" href="demos/blue-morphing-diamond/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="蓝色粒子爱心" style="--i:45">
+                <a class="work-card__overlay" href="demos/blue-particle-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--cyan"><i class="fas fa-heart"></i></div><div><div class="work-card__title">蓝色粒子爱心</div><div class="work-card__desc">蓝色粒子构成的爱心</div></div></div>
+                <a class="work-card__link" href="demos/blue-particle-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="蓝色钻石爱心" style="--i:46">
+                <a class="work-card__overlay" href="demos/blue-diamond-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--purple"><i class="fas fa-heart"></i></div><div><div class="work-card__title">蓝色钻石爱心</div><div class="work-card__desc">蓝色钻石质感的爱心效果</div></div></div>
+                <a class="work-card__link" href="demos/blue-diamond-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="跳动爱心" style="--i:47">
+                <a class="work-card__overlay" href="demos/beating-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--pink"><i class="fas fa-heart"></i></div><div><div class="work-card__title">跳动爱心</div><div class="work-card__desc">心跳般跳动的爱心效果</div></div></div>
+                <a class="work-card__link" href="demos/beating-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <article class="work-card glass reveal stagger" data-title="魔方爱心和文字" style="--i:48">
+                <a class="work-card__overlay" href="demos/rubiks-heart/index.html" target="_blank" rel="noopener"></a>
+                <div class="work-card__head"><div class="work-card__badge badge--orange"><i class="fas fa-heart"></i></div><div><div class="work-card__title">魔方爱心和文字</div><div class="work-card__desc">魔方风格的爱心与文字效果</div></div></div>
+                <a class="work-card__link" href="demos/rubiks-heart/index.html" target="_blank" rel="noopener">打开页面 <i class="fas fa-arrow-right"></i></a>
+            </article>
+            <div class="no-results" id="noResults"><i class="fas fa-search" style="font-size:32px;margin-bottom:12px;display:block;opacity:0.3;"></i>没有找到匹配的页面</div>
+        </section>
+
+        <footer class="footer">&copy; 2026 爱心展示合集 · 整理自互联网 · 已清理推广内容</footer>
+    </div>
+
     <script>
-        const input = document.querySelector('#search');
-        const cards = [...document.querySelectorAll('.demo-card')];
-        const count = document.querySelector('#count');
-        input.addEventListener('input', () => {
-            const key = input.value.trim().toLowerCase();
-            let shown = 0;
-            cards.forEach(card => {
-                const hit = card.textContent.toLowerCase().includes(key);
-                card.classList.toggle('hidden', !hit);
-                if (hit) shown += 1;
+        var input = document.getElementById('search');
+        var cards = document.querySelectorAll('.work-card');
+        var countEl = document.getElementById('count');
+        var noResults = document.getElementById('noResults');
+        input.addEventListener('input', function() {
+            var key = input.value.trim().toLowerCase();
+            var shown = 0;
+            cards.forEach(function(card) {
+                var text = (card.getAttribute('data-title') + ' ' + card.textContent).toLowerCase();
+                var hit = !key || text.indexOf(key) !== -1;
+                card.style.display = hit ? '' : 'none';
+                if (hit) shown++;
             });
-            count.textContent = `显示 ${shown} / ${cards.length} 个页面`;
+            countEl.textContent = key ? '显示 ' + shown + ' / ' + cards.length + ' 个页面' : '共 ' + cards.length + ' 个页面';
+            noResults.style.display = shown === 0 ? 'block' : 'none';
+        });
+
+        var revealEls = document.querySelectorAll('.reveal');
+        var revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.05 });
+        revealEls.forEach(function(el) { revealObserver.observe(el); });
+
+        requestAnimationFrame(function() {
+            revealEls.forEach(function(el) {
+                var rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    el.classList.add('visible');
+                    revealObserver.unobserve(el);
+                }
+            });
+        });
+
+        var cursorGlow = document.querySelector('.cursor-glow');
+        var backToTop = document.querySelector('.back-to-top');
+        var orbs = document.querySelector('.orbs');
+
+        window.addEventListener('scroll', function() {
+            var y = window.scrollY;
+            orbs.style.transform = 'translateY(' + (y * 0.15) + 'px)';
+            backToTop.classList.toggle('show', y > 500);
+        }, { passive: true });
+
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
         });
     </script>
-</body>
-</html>
+</body></html>

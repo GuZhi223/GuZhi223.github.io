@@ -1,0 +1,23 @@
+# Checklist
+
+- [x] `gestureConfig` 包含 `fistDamping`、`dampingAttack`、`dampingRelease` 参数
+- [x] `appState` 包含 `currentDamping` 和 `fistFocusRingVisible` 字段
+- [x] `resetReading()` 和 `continueSpread()` 重置 `currentDamping` 为 1.0
+- [x] 进入 `fistSeen` 阶段时 `dampingTarget` 设为 `gestureConfig.fistDamping`
+- [x] 离开 `fistSeen` 阶段时 `dampingTarget` 恢复为 1.0
+- [x] `onHandResults()` 每帧对 `currentDamping` 进行 EMA 平滑过渡
+- [x] 阻尼生效时使用 `dampingAttack` 系数（快速进入），释放时使用 `dampingRelease` 系数（慢速恢复）
+- [x] `effectiveDeadZone` 计算叠加了 `currentDamping` 因子
+- [x] `effectiveGain` 计算叠加了 `currentDamping` 因子
+- [x] `pulseDeck()` 中包含光圈冲击波扩散效果（金色圆环 0→800px，约 0.6s）
+- [x] `pulseDeck()` 中包含屏幕边缘辉光脉冲效果（约 0.3s yoyo 消退）
+- [x] 阶段指示器"聚焦"标签在激活时有 scale 脉冲动画
+- [x] `.fist-focus-ring` DOM 元素和 CSS 样式存在（金色半透明圆环 + 旋转 + 呼吸脉动）
+- [x] 握拳持续超过 0.5s 后聚焦光环显示
+- [x] 松开握拳后聚焦光环在 0.3s 内淡出消失
+- [x] `intensifyParticles()` 在阻尼状态（`currentDamping < 0.5`）下收缩系数加速到 0.93
+- [x] 阻尼状态下 `targetDeckRotation` 增量从 0.012 降至 0.004
+- [x] 握拳后手部轻微移动不再导致牌堆高亮快速切换
+- [x] 松开手后灵敏度在约 400ms 内平滑恢复
+- [x] 非握拳状态下灵敏度行为与改动前完全一致（`currentDamping` 保持 1.0）
+- [x] `window.__gestureConfig` 可访问到新增的 `fistDamping` 等参数
