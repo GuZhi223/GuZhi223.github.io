@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>触摸输入诊断</title>
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --green: #34d399;
+  --cyan: #22d3ee;
+  --red: #f87171;
+  --blue: #5e9eff;
+  --orange: #fb923c;
+  --bg: #0a0a1a;
+  --panel-bg: rgba(15, 15, 35, 0.75);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", "Courier New", monospace;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+.top-bar {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  background: rgba(10, 10, 26, 0.9);
+  border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 10;
+}
+
+.top-bar h1 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cyan);
+  white-space: nowrap;
+}
+
+.top-bar .instr {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: right;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main-area {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.touch-zone-wrap {
+  flex: 6 1 0;
+  min-height: 0;
+  position: relative;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+#touchZone {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  -ms-touch-action: none;
+  cursor: crosshair;
+  position: relative;
+  display: block;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+#fingerCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.chart-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#chartCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+.data-area {
+  flex: 4 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 12px;
+}
+
+.panel-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.label {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0 2px;
+}
+
+.btn {
+  flex: 1;
+  padding: 7px 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn.clear {
+  color: var(--red);
+}
+
+.btn.export {
+  color: var(--green);
+}
+
+.touch-label {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: rgba(255,255,255,0.2);
+  pointer-events: none;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-bar">
+    <h1>触摸输入诊断</h1>
+    <span class="instr">在下方区域滑动，观察数据变化</span>
+  </div>
+  <div class="main-area">
+    <div class="touch-zone-wrap">
+      <div id="touchZone">
+        <canvas id="fingerCanvas"></canvas>
+        <canvas id="chartCanvas"></canvas>
+        <div class="touch-label">触摸区域 — 在此处滑动</div>
+      </div>
+    </div>
+    <div class="data-area">
+      <div class="panel" id="panelRealtime">
+        <div class="panel-title">实时数据</div>
+        <div class="panel-grid">
+          <div class="panel-row"><span class="label">当前 X</span><span class="value" id="v-curX">0.00</span></div>
+          <div class="panel-row"><span class="label">当前 Y</span><span class="value" id="v-curY">0.00</span></div>
+          <div class="panel-row"><span class="label">速度</span><span class="value" id="v-vel">0 px/s</span></div>
+          <div class="panel-row"><span class="label">采样间隔</span><span class="value" id="v-dt">0 ms</span></div>
+          <div class="panel-row"><span class="label">方向</span><span class="value" id="v-dir">静止</span></div>
+        </div>
+      </div>
+      <div class="panel" id="panelStats">
+        <div class="panel-title">统计</div>
+        <div class="panel-grid">
+          <div class="panel-row"><span class="label">采样率</span><span class="value" id="s-rate">0 ms (0 Hz)</span></div>
+          <div class="panel-row"><span class="label">平均速度</span><span class="value" id="s-avgVel">0 px/s</span></div>
+          <div class="panel-row"><span class="label">最大速度</span><span class="value" id="s-maxVel">0 px/s</span></div>
+          <div class="panel-row"><span class="label">滑动距离</span><span class="value" id="s-dist">0 px</span></div>
+          <div class="panel-row"><span class="label">延迟差</span><span class="value" id="s-lag">0 ms (0 帧)</span></div>
+          <div class="panel-row"><span class="label">惯性持续</span><span class="value" id="s-inertia">0 ms</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn clear" id="btnClear">清空数据</button>
+        <button class="btn export" id="btnExport">导出 CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  const BUFFER_SIZE = 300;
+  const CHART_TIME_WINDOW = 3000;
+  const INERTIA_DURATION = 2000;
+  const INERTIA_SAMPLE_INTERVAL = 16;
+
+  const fingerCanvas = document.getElementById("fingerCanvas");
+  const chartCanvas = document.getElementById("chartCanvas");
+  const touchZone = document.getElementById("touchZone");
+  const fingerCtx = fingerCanvas.getContext("2d");
+  const chartCtx = chartCanvas.getContext("2d");
+
+  const dpr = window.devicePixelRatio || 1;
+
+  let canvasW = 0, canvasH = 0, chartH = 0;
+
+  function resizeCanvases() {
+    const rect = touchZone.getBoundingClientRect();
+    canvasW = rect.width;
+    canvasH = rect.height;
+
+    fingerCanvas.width = canvasW * dpr;
+    fingerCanvas.height = canvasH * dpr;
+    fingerCanvas.style.width = canvasW + "px";
+    fingerCanvas.style.height = canvasH + "px";
+    fingerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    chartCanvas.width = canvasW * dpr;
+    chartCanvas.height = canvasH * dpr;
+    chartCanvas.style.width = canvasW + "px";
+    chartCanvas.style.height = canvasH + "px";
+    chartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    chartH = canvasH * 0.33;
+  }
+
+  resizeCanvases();
+  window.addEventListener("resize", resizeCanvases);
+
+  let buffer = new Array(BUFFER_SIZE);
+  let bufIdx = 0;
+  let bufCount = 0;
+
+  for (let i = 0; i < BUFFER_SIZE; i++) {
+    buffer[i] = null;
+  }
+
+  let isDown = false;
+  let startX = 0, startY = 0, startTime = 0;
+  let lastX = 0, lastY = 0, lastTime = 0;
+  let currentNormX = 0.5, currentNormY = 0.5;
+
+  let simTargetX = 0.5;
+  let simHandX = 0.5;
+  let simDeckRot = 0;
+
+  let maxVelocity = 0;
+  let totalDistance = 0;
+  let velocitySum = 0;
+  let velocityCount = 0;
+  let deltaTimeSum = 0;
+  let deltaTimeCount = 0;
+
+  let inertiaPoints = [];
+  let inertiaStartTime = 0;
+  let inertiaActive = false;
+  let lastVelocity = 0;
+  let lastSmoothVel = 0;
+
+  let trailPoints = [];
+
+  function pushPoint(data) {
+    buffer[bufIdx] = data;
+    bufIdx = (bufIdx + 1) % BUFFER_SIZE;
+    if (bufCount < BUFFER_SIZE) bufCount++;
+  }
+
+  function getPoint(offset) {
+    if (offset >= bufCount) return null;
+    const idx = (bufIdx - 1 - offset + BUFFER_SIZE * 2) % BUFFER_SIZE;
+    return buffer[idx];
+  }
+
+  function computeSmoothVel(idx) {
+    let sum = 0, cnt = 0;
+    for (let k = idx; k <= idx + 2 && k < bufCount; k++) {
+      const p = getPoint(k);
+      if (p) { sum += p.velocity; cnt++; }
+    }
+    return cnt > 0 ? sum / cnt : 0;
+  }
+
+  function getTimestamp() { return performance.now(); }
+
+  function onPointerDown(e) {
+    e.preventDefault();
+    isDown = true;
+    inertiaActive = false;
+    inertiaPoints = [];
+
+    const t = getTimestamp();
+    startX = e.clientX;
+    startY = e.clientY;
+    startTime = t;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    lastTime = t;
+
+    currentNormX = e.clientX / window.innerWidth;
+    currentNormY = e.clientY / window.innerHeight;
+
+    touchZone.setPointerCapture(e.pointerId);
+
+    trailPoints = [{ x: e.clientX, y: e.clientY, t: t, alpha: 1 }];
+
+    const xNormSnap = Math.min(Math.max(e.clientX / window.innerWidth, 0), 1);
+    simTargetX += (xNormSnap - simTargetX) * 0.85;
+    simHandX += (simTargetX - simHandX) * 0.6;
+
+    pushPoint({
+      time: t,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      normX: currentNormX,
+      normY: currentNormY,
+      deltaX: 0,
+      deltaY: 0,
+      deltaMs: 0,
+      velocity: 0,
+      velSmooth: 0,
+      simTargetX: simTargetX,
+      simHandX: simHandX,
+      pointerType: e.pointerType
+    });
+  }
+
+  function onPointerMove(e) {
+    if (!isDown) return;
+    e.preventDefault();
+
+    const t = getTimestamp();
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    const dt = t - lastTime;
+
+    currentNormX = Math.max(0, Math.min(1, e.clientX / window.innerWidth));
+    currentNormY = Math.max(0, Math.min(1, e.clientY / window.innerHeight));
+
+    const rawNormX = currentNormX;
+    simTargetX += (rawNormX - simTargetX) * 0.85;
+    simHandX += (simTargetX - simHandX) * 0.65;
+
+    const vel = dt > 0 ? (dx / dt) * 1000 : 0;
+
+    totalDistance += Math.abs(dx);
+    maxVelocity = Math.max(maxVelocity, Math.abs(vel));
+    velocitySum += Math.abs(vel);
+    velocityCount++;
+    deltaTimeSum += dt;
+    deltaTimeCount++;
+
+    const pt = {
+      time: t,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      normX: rawNormX,
+      normY: currentNormY,
+      deltaX: dx,
+      deltaY: dy,
+      deltaMs: dt,
+      velocity: vel,
+      velSmooth: 0,
+      simTargetX: simTargetX,
+      simHandX: simHandX,
+      pointerType: e.pointerType
+    };
+    pushPoint(pt);
+
+    const newSmooth = computeSmoothVel(0);
+    buffer[(bufIdx - 1 + BUFFER_SIZE) % BUFFER_SIZE].velSmooth = newSmooth;
+    lastSmoothVel = newSmooth;
+    lastVelocity = vel;
+
+    trailPoints.push({ x: e.clientX, y: e.clientY, t: t, alpha: 1 });
+    if (trailPoints.length > 15) trailPoints.shift();
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+    lastTime = t;
+  }
+
+  function onPointerUp(e) {
+    if (!isDown) return;
+    e.preventDefault();
+    isDown = false;
+
+    const releaseVel = lastSmoothVel;
+    if (Math.abs(releaseVel) > 20) {
+      inertiaActive = true;
+      inertiaStartTime = getTimestamp();
+      let vel = releaseVel;
+      let posX = lastX;
+      const friction = 0.96;
+      let t = inertiaStartTime;
+
+      inertiaPoints = [];
+
+      for (let i = 0; i < 120; i++) {
+        vel *= friction;
+        t += INERTIA_SAMPLE_INTERVAL;
+        const dx = vel * (INERTIA_SAMPLE_INTERVAL / 1000);
+        posX += dx;
+
+        const normX = Math.max(0, Math.min(1, posX / window.innerWidth));
+        simTargetX += (normX - simTargetX) * 0.7;
+        simHandX += (simTargetX - simHandX) * 0.45;
+
+        inertiaPoints.push({
+          time: t,
+          clientX: posX,
+          clientY: lastY,
+          normX: normX,
+          velocity: vel,
+          velSmooth: vel,
+          simTargetX: simTargetX,
+          simHandX: simHandX,
+          alpha: 1 - (i / 120)
+        });
+
+        if (Math.abs(vel) < 5) break;
+      }
+    }
+  }
+
+  function onPointerCancel(e) {
+    isDown = false;
+    inertiaActive = false;
+    inertiaPoints = [];
+  }
+
+  touchZone.addEventListener("pointerdown", onPointerDown, { passive: false });
+  touchZone.addEventListener("pointermove", onPointerMove, { passive: false });
+  touchZone.addEventListener("pointerup", onPointerUp, { passive: false });
+  touchZone.addEventListener("pointercancel", onPointerCancel, { passive: false });
+
+  touchZone.addEventListener("touchstart", function(e) { e.preventDefault(); }, { passive: false });
+  touchZone.addEventListener("touchmove", function(e) { e.preventDefault(); }, { passive: false });
+
+  function drawFingerTracker() {
+    fingerCtx.clearRect(0, 0, canvasW, canvasH);
+
+    if (trailPoints.length < 1 && !isDown) return;
+
+    const now = getTimestamp();
+
+    const rect = touchZone.getBoundingClientRect();
+
+    for (let i = 0; i < trailPoints.length; i++) {
+      const p = trailPoints[i];
+      const age = now - p.t;
+      const a = Math.max(0, 1 - age / 600) * p.alpha;
+      if (a <= 0) continue;
+
+      const r = 3 + a * 4;
+      const px = p.x - rect.left;
+      const py = p.y - rect.top;
+
+      fingerCtx.beginPath();
+      fingerCtx.arc(px, py, r, 0, Math.PI * 2);
+      fingerCtx.fillStyle = "rgba(34, 211, 238, " + (a * 0.6) + ")";
+      fingerCtx.fill();
+    }
+
+    if (isDown && trailPoints.length > 0) {
+      const lp = trailPoints[trailPoints.length - 1];
+      const px = lp.x - rect.left;
+      const py = lp.y - rect.top;
+
+      const grad = fingerCtx.createRadialGradient(px, py, 0, px, py, 28);
+      grad.addColorStop(0, "rgba(34, 211, 238, 0.7)");
+      grad.addColorStop(0.4, "rgba(34, 211, 238, 0.25)");
+      grad.addColorStop(1, "rgba(34, 211, 238, 0)");
+      fingerCtx.beginPath();
+      fingerCtx.arc(px, py, 28, 0, Math.PI * 2);
+      fingerCtx.fillStyle = grad;
+      fingerCtx.fill();
+
+      fingerCtx.beginPath();
+      fingerCtx.arc(px, py, 8, 0, Math.PI * 2);
+      fingerCtx.fillStyle = "rgba(34, 211, 238, 0.9)";
+      fingerCtx.fill();
+
+      fingerCtx.beginPath();
+      fingerCtx.arc(px, py, 4, 0, Math.PI * 2);
+      fingerCtx.fillStyle = "#fff";
+      fingerCtx.fill();
+    }
+
+    if (inertiaActive && inertiaPoints.length > 0) {
+      const elapsed = now - inertiaStartTime;
+      if (elapsed > INERTIA_DURATION) {
+        inertiaActive = false;
+      } else {
+        const rect = touchZone.getBoundingClientRect();
+        for (let i = 0; i < inertiaPoints.length; i++) {
+          const ip = inertiaPoints[i];
+          const age = now - ip.time;
+          const a = Math.max(0, 1 - age / 800) * ip.alpha;
+          if (a <= 0) continue;
+
+          const px = ip.clientX - rect.left;
+          const py = ip.clientY - rect.top;
+          const r = 2 + a * 3;
+
+          fingerCtx.beginPath();
+          fingerCtx.arc(px, py, r, 0, Math.PI * 2);
+          fingerCtx.fillStyle = "rgba(251, 146, 60, " + (a * 0.5) + ")";
+          fingerCtx.fill();
+        }
+      }
+    }
+  }
+
+  function getAllPoints() {
+    const pts = [];
+    for (let i = bufCount - 1; i >= 0; i--) {
+      const p = getPoint(i);
+      if (p) pts.push(p);
+    }
+    return pts;
+  }
+
+  function drawCharts() {
+    chartCtx.clearRect(0, 0, canvasW, canvasH);
+
+    const pad = { top: 8, bottom: 18, left: 36, right: 8 };
+    const h1 = chartH - pad.top - pad.bottom;
+    const w = canvasW - pad.left - pad.right;
+
+    const now = getTimestamp();
+    const tMin = now - CHART_TIME_WINDOW;
+    const tRange = CHART_TIME_WINDOW;
+
+    const pts = getAllPoints();
+
+    chartCtx.fillStyle = "rgba(10, 10, 26, 0.55)";
+    chartCtx.fillRect(0, 0, canvasW, chartH);
+
+    drawChart1_Position(chartCtx, pts, pad, w, h1, tMin, tRange, now);
+    drawChart2_Velocity(chartCtx, pts, pad, w, h1, tMin, tRange, now);
+    drawChart3_Delta(chartCtx, pts, pad, w, h1, tMin, tRange, now);
+  }
+
+  function timeToX(t, tMin, tRange, padLeft, w) {
+    return padLeft + ((t - tMin) / tRange) * w;
+  }
+
+  function drawChart1_Position(ctx, pts, pad, w, h, tMin, tRange, now) {
+    const top = pad.top;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, top, canvasW, h);
+    ctx.clip();
+
+    ctx.fillStyle = "rgba(255,255,255,0.03)";
+    ctx.fillRect(pad.left, top, w, h);
+
+    for (let i = 0; i <= 4; i++) {
+      const y = top + (i / 4) * h;
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + w, y);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      ctx.font = "9px " + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = "right";
+      ctx.fillText((1 - i / 4).toFixed(2), pad.left - 3, y + 3);
+    }
+
+    drawLine(ctx, pts, "normX", "#34d399", tMin, tRange, pad.left, top, w, h, 0, 1, now);
+    drawLine(ctx, pts, "simHandX", "#f87171", tMin, tRange, pad.left, top, w, h, 0, 1, now);
+
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.font = "bold 10px " + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = "left";
+    ctx.fillText("X Position", pad.left + 4, top + 12);
+
+    ctx.fillStyle = "#34d399";
+    ctx.fillText("● 原始", pad.left + 80, top + 12);
+    ctx.fillStyle = "#f87171";
+    ctx.fillText("● 插值", pad.left + 135, top + 12);
+
+    ctx.restore();
+  }
+
+  function drawChart2_Velocity(ctx, pts, pad, w, h, tMin, tRange, now) {
+    const top = pad.top + h + pad.bottom + 4;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, top, canvasW, h);
+    ctx.clip();
+
+    ctx.fillStyle = "rgba(255,255,255,0.02)";
+    ctx.fillRect(pad.left, top, w, h);
+
+    let maxV = 500;
+    for (let i = 0; i < pts.length; i++) {
+      const v = Math.abs(pts[i].velSmooth);
+      if (v > maxV) maxV = v;
+    }
+    maxV = Math.ceil(maxV / 500) * 500;
+
+    for (let i = 0; i <= 4; i++) {
+      const y = top + (i / 4) * h;
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + w, y);
+      ctx.stroke();
+
+      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      ctx.font = "9px " + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = "right";
+      ctx.fillText(Math.round(maxV * (1 - i / 4)), pad.left - 3, y + 3);
+    }
+
+    const zeroY = top + h * 0.5;
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, zeroY);
+    ctx.lineTo(pad.left + w, zeroY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    drawLine(ctx, pts, "velSmooth", "#22d3ee", tMin, tRange, pad.left, top, w, h, -maxV, maxV, now);
+
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.font = "bold 10px " + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = "left";
+    ctx.fillText("Velocity (px/s)", pad.left + 4, top + 12);
+
+    ctx.restore();
+  }
+
+  function drawChart3_Delta(ctx, pts, pad, w, h, tMin, tRange, now) {
+    const top = pad.top + (h + pad.bottom + 4) * 2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, top, canvasW, h);
+    ctx.clip();
+
+    ctx.fillStyle = "rgba(255,255,255,0.015)";
+    ctx.fillRect(pad.left, top, w, h);
+
+    let maxD = 10;
+    for (let i = 0; i < pts.length; i++) {
+      const d = Math.abs(pts[i].deltaX);
+      if (d > maxD) maxD = d;
+    }
+    maxD = Math.ceil(maxD / 5) * 5;
+
+    for (let i = 0; i <= 4; i++) {
+      const y = top + (i / 4) * h;
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + w, y);
+      ctx.stroke();
+    }
+
+    const centerY = top + h * 0.5;
+    ctx.strokeStyle = "rgba(255,255,255,0.12)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, centerY);
+    ctx.lineTo(pad.left + w, centerY);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "rgba(255,255,255,0.25)";
+    ctx.font = "9px " + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = "right";
+    ctx.fillText("+" + maxD, pad.left - 3, top + 10);
+    ctx.fillText("0", pad.left - 3, centerY + 3);
+    ctx.fillText("-" + maxD, pad.left - 3, top + h);
+
+    const barMinWidth = 1;
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      if (p.time < tMin) continue;
+
+      const x = timeToX(p.time, tMin, tRange, pad.left, w);
+      let nextX = x + 3;
+      if (i > 0) {
+        nextX = timeToX(p.time + p.deltaMs, tMin, tRange, pad.left, w);
+      }
+      const bw = Math.max(barMinWidth, Math.min(nextX - x, 12));
+
+      const val = p.deltaX;
+      const normVal = val / maxD;
+      const barH = Math.abs(normVal) * (h * 0.45);
+
+      if (val >= 0) {
+        ctx.fillStyle = "rgba(94, 158, 255, 0.7)";
+        ctx.fillRect(x, centerY - barH, bw, barH);
+      } else {
+        ctx.fillStyle = "rgba(251, 146, 60, 0.7)";
+        ctx.fillRect(x, centerY, bw, barH);
+      }
+    }
+
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.font = "bold 10px " + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = "left";
+    ctx.fillText("Delta per frame", pad.left + 4, top + 12);
+
+    ctx.fillStyle = "#5e9eff";
+    ctx.fillText("▲ 正", pad.left + 115, top + 12);
+    ctx.fillStyle = "#fb923c";
+    ctx.fillText("▼ 负", pad.left + 155, top + 12);
+
+    ctx.restore();
+  }
+
+  function drawLine(ctx, pts, key, color, tMin, tRange, x0, y0, w, h, yMin, yMax, now) {
+    if (pts.length < 2) return;
+
+    const yRange = yMax - yMin;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+
+    let started = false;
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i];
+      if (p.time < tMin) continue;
+
+      const px = x0 + ((p.time - tMin) / tRange) * w;
+      const val = typeof p[key] === "number" ? p[key] : 0;
+      const py = y0 + h - ((val - yMin) / yRange) * h;
+
+      if (!started) {
+        ctx.moveTo(px, py);
+        started = true;
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+    ctx.stroke();
+
+    ctx.strokeStyle = color.replace(")", ", 0.15)").replace("rgb", "rgba");
+    if (!ctx.strokeStyle.includes("rgba")) {
+      ctx.globalAlpha = 0.15;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 1.5;
+    }
+  }
+
+  function updateUI() {
+    const lastPt = bufCount > 0 ? getPoint(0) : null;
+    const norm = (v) => typeof v === "number" ? v.toFixed(2) : "0.00";
+
+    document.getElementById("v-curX").textContent = lastPt ? norm(lastPt.normX) : "0.00";
+    document.getElementById("v-curY").textContent = lastPt ? norm(lastPt.normY) : "0.00";
+
+    const currentVel = lastPt ? Math.abs(lastPt.velSmooth) : 0;
+    document.getElementById("v-vel").textContent = Math.round(currentVel) + " px/s";
+    document.getElementById("v-dt").textContent = (lastPt && lastPt.deltaMs > 0) ? lastPt.deltaMs.toFixed(1) + " ms" : "0 ms";
+
+    let dirText = "静止";
+    if (lastPt && Math.abs(lastPt.velSmooth) > 10) {
+      dirText = lastPt.velSmooth > 0 ? "→ 右" : "← 左";
+    }
+    document.getElementById("v-dir").textContent = dirText;
+
+    const avgDt = deltaTimeCount > 0 ? deltaTimeSum / deltaTimeCount : 0;
+    const hz = avgDt > 0 ? (1000 / avgDt) : 0;
+    document.getElementById("s-rate").textContent = avgDt.toFixed(1) + " ms (" + Math.round(hz) + " Hz)";
+
+    const avgVel = velocityCount > 0 ? velocitySum / velocityCount : 0;
+    document.getElementById("s-avgVel").textContent = Math.round(avgVel) + " px/s";
+    document.getElementById("s-maxVel").textContent = Math.round(maxVelocity) + " px/s";
+    document.getElementById("s-dist").textContent = Math.round(totalDistance) + " px";
+
+    if (bufCount >= 2) {
+      const p0 = getPoint(0);
+      const p1 = getPoint(1);
+      if (p0 && p1) {
+        const lagMs = Math.abs(p0.normX - p0.simHandX) * 500;
+        const lagFrames = lagMs / (avgDt || 16);
+        document.getElementById("s-lag").textContent = lagMs.toFixed(1) + " ms (" + lagFrames.toFixed(1) + " 帧)";
+      }
+    }
+
+    if (inertiaActive) {
+      const elapsed = getTimestamp() - inertiaStartTime;
+      document.getElementById("s-inertia").textContent = Math.min(elapsed, INERTIA_DURATION).toFixed(0) + " ms";
+    } else if (inertiaStartTime > 0) {
+      const elapsed = getTimestamp() - inertiaStartTime;
+      if (elapsed < INERTIA_DURATION + 500) {
+        document.getElementById("s-inertia").textContent = inertiaPoints.length > 0 ? INERTIA_DURATION + " ms" : "0 ms";
+      }
+    }
+  }
+
+  function animate() {
+    drawFingerTracker();
+    drawCharts();
+    updateUI();
+    requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
+
+  function clearData() {
+    for (let i = 0; i < BUFFER_SIZE; i++) buffer[i] = null;
+    bufIdx = 0;
+    bufCount = 0;
+    maxVelocity = 0;
+    totalDistance = 0;
+    velocitySum = 0;
+    velocityCount = 0;
+    deltaTimeSum = 0;
+    deltaTimeCount = 0;
+    trailPoints = [];
+    inertiaPoints = [];
+    inertiaActive = false;
+    inertiaStartTime = 0;
+    simTargetX = 0.5;
+    simHandX = 0.5;
+    currentNormX = 0.5;
+    currentNormY = 0.5;
+    lastVelocity = 0;
+    lastSmoothVel = 0;
+
+    document.getElementById("v-curX").textContent = "0.00";
+    document.getElementById("v-curY").textContent = "0.00";
+    document.getElementById("v-vel").textContent = "0 px/s";
+    document.getElementById("v-dt").textContent = "0 ms";
+    document.getElementById("v-dir").textContent = "静止";
+    document.getElementById("s-rate").textContent = "0 ms (0 Hz)";
+    document.getElementById("s-avgVel").textContent = "0 px/s";
+    document.getElementById("s-maxVel").textContent = "0 px/s";
+    document.getElementById("s-dist").textContent = "0 px";
+    document.getElementById("s-lag").textContent = "0 ms (0 帧)";
+    document.getElementById("s-inertia").textContent = "0 ms";
+  }
+
+  function exportCSV() {
+    const pts = getAllPoints();
+    if (pts.length === 0) {
+      alert("没有数据可导出");
+      return;
+    }
+
+    let csv = "timestamp,rawX,rawY,normalizedX,velocity,simTargetX,simHandX,deltaMs\n";
+    for (const p of pts) {
+      csv += [
+        p.time.toFixed(2),
+        p.clientX.toFixed(1),
+        p.clientY.toFixed(1),
+        p.normX.toFixed(4),
+        p.velocity.toFixed(2),
+        p.simTargetX.toFixed(4),
+        p.simHandX.toFixed(4),
+        p.deltaMs.toFixed(2)
+      ].join(",") + "\n";
+    }
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "touch-data-" + Date.now() + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("btnClear").addEventListener("click", clearData);
+  document.getElementById("btnExport").addEventListener("click", exportCSV);
+
+})();
+</script>
+</body>
+</html>
