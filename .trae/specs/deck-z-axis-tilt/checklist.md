@@ -1,0 +1,8 @@
+- [x] appState 中新增 handTargetY 和 targetDeckTilt 字段
+- [x] resetReading() 和 continueSpread() 中重置新字段
+- [x] onHandResults() 中 palm.y 平滑更新到 handTargetY 并计算 targetDeckTilt
+- [x] updatePointerSelection() 接受 clientY 参数并计算 handTargetY 和 targetDeckTilt
+- [x] 渲染循环中 targetDeckTilt 平滑插值应用到 deckGroup.rotation.z
+- [x] Z 轴倾斜范围限制在 ±0.25 弧度
+- [x] 触控 handTargetX 插值系数从 0.55 提高到 0.7
+- [x] 手动模式 handEase 从 0.14 提高到 0.2
