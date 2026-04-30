@@ -951,6 +951,7 @@
             tmpCanvas.width = gridW;
             tmpCanvas.height = gridH;
             const tmpCtx = tmpCanvas.getContext("2d");
+            tmpCtx.imageSmoothingEnabled = false;
             tmpCtx.drawImage(img, 0, 0, gridW, gridH);
             const imageData = tmpCtx.getImageData(0, 0, gridW, gridH);
             const pixels = [];
@@ -998,7 +999,39 @@
                 result.push(row);
             }
 
-            return result;
+            return this.cleanNoise(result);
+        },
+
+        cleanNoise(data) {
+            const gridH = data.length;
+            const gridW = data[0].length;
+            const dirs = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+
+            for (let round = 0; round < 2; round++) {
+                const snapshot = data.map(row => row.map(c => c.code));
+                for (let y = 0; y < gridH; y++) {
+                    for (let x = 0; x < gridW; x++) {
+                        const self = snapshot[y][x];
+                        const counts = new Map();
+                        let hasSameNeighbor = false;
+                        for (const [dy, dx] of dirs) {
+                            const ny = y + dy, nx = x + dx;
+                            if (ny < 0 || ny >= gridH || nx < 0 || nx >= gridW) continue;
+                            const nCode = snapshot[ny][nx];
+                            counts.set(nCode, (counts.get(nCode) || 0) + 1);
+                            if (nCode === self) hasSameNeighbor = true;
+                        }
+                        if (!hasSameNeighbor && counts.size > 0) {
+                            let bestCode = self, bestCount = 0;
+                            for (const [code, count] of counts) {
+                                if (count > bestCount) { bestCount = count; bestCode = code; }
+                            }
+                            data[y][x] = PERLER_COLORS.find(c => c.code === bestCode) || data[y][x];
+                        }
+                    }
+                }
+            }
+            return data;
         },
 
         selectTopColors(pixels, maxColors) {
@@ -1114,6 +1147,25 @@
                     }
                 }
             }
+
+            ctx.strokeStyle = "rgba(0,0,0,0.35)";
+            ctx.lineWidth = 1.5;
+            for (let x = 0; x <= gridW; x++) {
+                if (x % 5 === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(x * cs, 0);
+                    ctx.lineTo(x * cs, canvasH);
+                    ctx.stroke();
+                }
+            }
+            for (let y = 0; y <= gridH; y++) {
+                if (y % 5 === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y * cs);
+                    ctx.lineTo(canvasW, y * cs);
+                    ctx.stroke();
+                }
+            }
         },
 
         renderStats() {
@@ -1188,8 +1240,12 @@
             const exportCellSize = 20;
             const padding = 30;
             const headerH = 50;
+            const footerLineH = 24;
+            const footerPad = 20;
+            const statsRows = this.usedColors ? this.usedColors.length : 0;
+            const totalFooterH = statsRows > 0 ? headerH + statsRows * footerLineH + footerPad * 2 : 0;
             const canvasW = gridW * exportCellSize + padding * 2;
-            const canvasH = gridH * exportCellSize + padding * 2 + headerH;
+            const canvasH = gridH * exportCellSize + padding * 2 + headerH + totalFooterH;
 
             const exportCanvas = document.createElement("canvas");
             exportCanvas.width = canvasW;
@@ -1234,9 +1290,64 @@
                 }
             }
 
+            ctx.strokeStyle = "rgba(0,0,0,0.3)";
+            ctx.lineWidth = 1.5;
+            for (let x = 0; x <= gridW; x++) {
+                if (x % 5 === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(offsetX + x * exportCellSize, offsetY);
+                    ctx.lineTo(offsetX + x * exportCellSize, offsetY + gridH * exportCellSize);
+                    ctx.stroke();
+                }
+            }
+            for (let y = 0; y <= gridH; y++) {
+                if (y % 5 === 0) {
+                    ctx.beginPath();
+                    ctx.moveTo(offsetX, offsetY + y * exportCellSize);
+                    ctx.lineTo(offsetX + gridW * exportCellSize, offsetY + y * exportCellSize);
+                    ctx.stroke();
+                }
+            }
+
             ctx.strokeStyle = "#e5e7eb";
             ctx.lineWidth = 1;
             ctx.strokeRect(offsetX, offsetY, gridW * exportCellSize, gridH * exportCellSize);
+
+            if (statsRows > 0) {
+                const footerY = offsetY + gridH * exportCellSize + footerPad;
+                ctx.strokeStyle = "#d1d5db";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padding, footerY - 10);
+                ctx.lineTo(canvasW - padding, footerY - 10);
+                ctx.stroke();
+
+                ctx.fillStyle = "#1f2937";
+                ctx.font = "bold 15px sans-serif";
+                ctx.textAlign = "left";
+                ctx.textBaseline = "top";
+                ctx.fillText("颜色用量清单", padding, footerY);
+
+                const listY = footerY + 28;
+                for (let i = 0; i < statsRows; i++) {
+                    const c = this.usedColors[i];
+                    const rowY = listY + i * footerLineH;
+                    ctx.fillStyle = `rgb(${c.rgb[0]},${c.rgb[1]},${c.rgb[2]})`;
+                    ctx.fillRect(padding, rowY + 2, 16, 16);
+                    ctx.strokeStyle = "#9ca3af";
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeRect(padding, rowY + 2, 16, 16);
+
+                    ctx.fillStyle = "#1f2937";
+                    ctx.font = "13px sans-serif";
+                    ctx.textAlign = "left";
+                    ctx.textBaseline = "top";
+                    ctx.fillText(`${c.code}  ${c.name}`, padding + 24, rowY + 2);
+
+                    ctx.textAlign = "right";
+                    ctx.fillText(`${c.count} 颗`, canvasW - padding, rowY + 2);
+                }
+            }
 
             const link = document.createElement("a");
             link.download = `拼豆图纸_${gridW}x${gridH}.png`;
