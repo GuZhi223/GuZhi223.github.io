@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼豆图纸生成器</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: #eef2ff;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.15rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .left-panel {
+            position: sticky;
+            top: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: #fafafa;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover,
+        .upload-area.drag-over {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .upload-area i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .upload-area p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .upload-area .upload-hint {
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .upload-preview {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .upload-area.has-image {
+            padding: 15px;
+        }
+
+        .upload-area.has-image .upload-placeholder {
+            display: none;
+        }
+
+        .upload-area.has-image .upload-preview {
+            display: block;
+        }
+
+        .upload-area input[type="file"] {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-label .label-hint {
+            font-weight: 400;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+            background-color: #f9fafb;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            background-color: #fff;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .toggle-label {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            border-radius: 26px;
+            transition: var(--transition);
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            margin-top: 10px;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            min-height: 400px;
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .canvas-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+        }
+
+        .canvas-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .canvas-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .canvas-placeholder p {
+            font-size: 1rem;
+        }
+
+        .canvas-controls {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .canvas-controls button {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .canvas-controls button:hover {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .zoom-info {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .pattern-info {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            border-radius: 8px;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .stats-table-wrapper {
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .stats-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: var(--text-muted);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .stats-table tbody tr:hover {
+            background-color: #f5f3ff;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            vertical-align: middle;
+            border: 1px solid rgba(0,0,0,0.1);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+        }
+
+        .color-code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .bead-count {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .total-row td {
+            font-weight: 700;
+            background-color: #f9fafb;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0.4;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 18px 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .left-panel {
+                position: static;
+            }
+
+            header h1 {
+                font-size: 1.6rem;
+            }
+
+            .canvas-container {
+                min-height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 10px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1><i class="fa-solid fa-grip"></i> 拼豆图纸生成器</h1>
+        <p>将图片转换为拼豆图纸</p>
+    </header>
+
+    <main class="main-layout">
+        <aside class="left-panel">
+            <div class="card">
+                <h2 class="section-title"><i class="fa-solid fa-image"></i> 图片上传</h2>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-placeholder">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>点击或拖拽图片到此处</p>
+                        <p class="upload-hint">支持 JPG / PNG / GIF</p>
+                    </div>
+                    <img class="upload-preview" id="uploadPreview" alt="预览">
+                    <input type="file" id="fileInput" accept="image/jpeg,image/png,image/gif">
+                </div>
+
+                <h2 class="section-title"><i class="fa-solid fa-sliders"></i> 参数设置</h2>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        图纸高度
+                        <span class="label-hint" id="heightHint">纵向珠子数</span>
+                    </label>
+                    <input type="number" id="gridHeight" class="form-control" value="32" min="10" max="100" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        图纸宽度
+                        <span class="label-hint" id="widthHint">自动计算</span>
+                    </label>
+                    <input type="number" id="gridWidth" class="form-control" placeholder="保持比例自动计算" min="10" max="200" step="1">
+                </div>
+
+                <div class="toggle-row">
+                    <span class="toggle-label">保持原图比例</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="keepRatio" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="form-group">
+                    <label class="form-label">颜色数量限制</label>
+                    <select id="colorCount" class="form-control">
+                        <option value="8">8 色</option>
+                        <option value="12">12 色</option>
+                        <option value="16" selected>16 色（推荐）</option>
+                        <option value="20">20 色</option>
+                        <option value="24">24 色</option>
+                        <option value="32">32 色</option>
+                    </select>
+                </div>
+
+                <div class="toggle-row">
+                    <span class="toggle-label">显示网格线</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="showGrid" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <span class="toggle-label">显示色号标注</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="showCode">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="divider"></div>
+
+                <button class="btn" id="generateBtn" disabled>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 生成拼豆图纸
+                </button>
+                <button class="btn btn-outline" id="exportBtn" style="display:none;">
+                    <i class="fa-solid fa-download"></i> 导出 PNG
+                </button>
+            </div>
+        </aside>
+
+        <section class="center-panel">
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div class="canvas-container" id="canvasContainer">
+                    <div class="canvas-placeholder" id="canvasPlaceholder">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                        <p>上传图片并点击"生成拼豆图纸"</p>
+                    </div>
+                    <canvas id="patternCanvas" style="display:none;"></canvas>
+                    <div class="zoom-info" id="zoomInfo" style="display:none;">100%</div>
+                    <div class="pattern-info" id="patternInfo" style="display:none;"></div>
+                    <div class="canvas-controls" id="canvasControls" style="display:none;">
+                        <button id="zoomInBtn" title="放大"><i class="fa-solid fa-plus"></i></button>
+                        <button id="zoomOutBtn" title="缩小"><i class="fa-solid fa-minus"></i></button>
+                        <button id="resetViewBtn" title="重置视图"><i class="fa-solid fa-expand"></i></button>
+                    </div>
+                    <div class="loading-overlay" id="loadingOverlay">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="statsCard" style="display:none;">
+                <h2 class="section-title"><i class="fa-solid fa-chart-pie"></i> 颜色统计</h2>
+                <div class="stats-table-wrapper">
+                    <table class="stats-table" id="statsTable">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">色块</th>
+                                <th>色号</th>
+                                <th>颜色名称</th>
+                                <th style="text-align:right;">珠子数量</th>
+                                <th style="text-align:right;">占比</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const PERLER_COLORS = [
+        { code: "S01", name: "白色", rgb: [255, 255, 255] },
+        { code: "S02", name: "米白", rgb: [255, 245, 220] },
+        { code: "S03", name: "黄色", rgb: [255, 222, 0] },
+        { code: "S04", name: "橙色", rgb: [255, 145, 0] },
+        { code: "S05", name: "红色", rgb: [220, 30, 30] },
+        { code: "S06", name: "粉红", rgb: [255, 140, 170] },
+        { code: "S07", name: "紫色", rgb: [120, 50, 160] },
+        { code: "S08", name: "深蓝", rgb: [30, 50, 140] },
+        { code: "S09", name: "蓝色", rgb: [50, 100, 200] },
+        { code: "S10", name: "浅蓝", rgb: [120, 180, 230] },
+        { code: "S11", name: "深绿", rgb: [20, 100, 40] },
+        { code: "S12", name: "绿色", rgb: [50, 160, 60] },
+        { code: "S13", name: "浅绿", rgb: [140, 200, 100] },
+        { code: "S14", name: "棕色", rgb: [120, 70, 30] },
+        { code: "S15", name: "肤色", rgb: [220, 180, 140] },
+        { code: "S16", name: "黑色", rgb: [30, 30, 30] },
+        { code: "S17", name: "灰色", rgb: [150, 150, 150] },
+        { code: "S18", name: "深灰", rgb: [80, 80, 80] },
+        { code: "C01", name: "亮白", rgb: [240, 240, 245] },
+        { code: "C02", name: "奶黄", rgb: [255, 240, 180] },
+        { code: "C03", name: "鹅黄", rgb: [255, 235, 100] },
+        { code: "C04", name: "金黄", rgb: [230, 180, 0] },
+        { code: "C05", name: "亮橙", rgb: [255, 170, 30] },
+        { code: "C06", name: "橘红", rgb: [240, 80, 30] },
+        { code: "C07", name: "玫红", rgb: [210, 40, 90] },
+        { code: "C08", name: "桃粉", rgb: [255, 180, 180] },
+        { code: "C09", name: "浅紫", rgb: [180, 130, 210] },
+        { code: "C10", name: "薰衣草", rgb: [200, 170, 230] },
+        { code: "C11", name: "天蓝", rgb: [100, 170, 230] },
+        { code: "C12", name: "湖蓝", rgb: [0, 140, 180] },
+        { code: "C13", name: "青色", rgb: [0, 180, 180] },
+        { code: "C14", name: "薄荷绿", rgb: [100, 200, 170] },
+        { code: "C15", name: "草绿", rgb: [100, 180, 60] },
+        { code: "C16", name: "橄榄绿", rgb: [100, 120, 50] },
+        { code: "C17", name: "卡其", rgb: [180, 160, 110] },
+        { code: "C18", name: "驼色", rgb: [180, 130, 70] },
+        { code: "C19", name: "深棕", rgb: [80, 50, 20] },
+        { code: "C20", name: "砖红", rgb: [160, 60, 40] },
+        { code: "C21", name: "酒红", rgb: [120, 30, 50] },
+        { code: "C22", name: "靛蓝", rgb: [40, 40, 120] },
+        { code: "C23", name: "藏蓝", rgb: [30, 50, 80] },
+        { code: "C24", name: "墨绿", rgb: [20, 70, 50] },
+        { code: "C25", name: "珊瑚红", rgb: [240, 100, 80] },
+        { code: "C26", name: "蜜桃", rgb: [255, 200, 160] },
+        { code: "C27", name: "香芋", rgb: [160, 120, 160] },
+        { code: "C28", name: "丁香紫", rgb: [150, 100, 170] },
+        { code: "C29", name: "蔚蓝", rgb: [80, 150, 220] },
+        { code: "C30", name: "冰蓝", rgb: [180, 220, 240] },
+        { code: "C31", name: "翠绿", rgb: [0, 160, 100] },
+        { code: "C32", name: "荧光绿", rgb: [180, 230, 80] },
+        { code: "C33", name: "荧光粉", rgb: [255, 100, 150] },
+        { code: "C34", name: "荧光橙", rgb: [255, 120, 0] },
+        { code: "C35", name: "荧光黄", rgb: [255, 240, 0] },
+        { code: "C36", name: "银灰", rgb: [190, 195, 200] },
+        { code: "C37", name: "铁灰", rgb: [110, 115, 120] },
+        { code: "C38", name: "巧克力", rgb: [100, 60, 30] },
+        { code: "C39", name: "肉粉", rgb: [240, 190, 170] },
+        { code: "C40", name: "松石绿", rgb: [40, 160, 160] },
+        { code: "C41", name: "军绿", rgb: [70, 90, 50] },
+        { code: "C42", name: "土黄", rgb: [200, 170, 80] }
+    ];
+
+    const app = {
+        image: null,
+        patternData: null,
+        usedColors: null,
+        zoom: 1,
+        panX: 0,
+        panY: 0,
+        isPanning: false,
+        lastMouseX: 0,
+        lastMouseY: 0,
+        cellSize: 12,
+
+        init() {
+            this.bindElements();
+            this.bindEvents();
+        },
+
+        bindElements() {
+            this.uploadArea = document.getElementById("uploadArea");
+            this.fileInput = document.getElementById("fileInput");
+            this.uploadPreview = document.getElementById("uploadPreview");
+            this.gridHeight = document.getElementById("gridHeight");
+            this.gridWidth = document.getElementById("gridWidth");
+            this.keepRatio = document.getElementById("keepRatio");
+            this.colorCount = document.getElementById("colorCount");
+            this.showGrid = document.getElementById("showGrid");
+            this.showCode = document.getElementById("showCode");
+            this.generateBtn = document.getElementById("generateBtn");
+            this.exportBtn = document.getElementById("exportBtn");
+            this.canvasContainer = document.getElementById("canvasContainer");
+            this.canvas = document.getElementById("patternCanvas");
+            this.ctx = this.canvas.getContext("2d");
+            this.canvasPlaceholder = document.getElementById("canvasPlaceholder");
+            this.loadingOverlay = document.getElementById("loadingOverlay");
+            this.zoomInfo = document.getElementById("zoomInfo");
+            this.patternInfo = document.getElementById("patternInfo");
+            this.canvasControls = document.getElementById("canvasControls");
+            this.statsCard = document.getElementById("statsCard");
+            this.statsBody = document.getElementById("statsBody");
+            this.heightHint = document.getElementById("heightHint");
+            this.widthHint = document.getElementById("widthHint");
+        },
+
+        bindEvents() {
+            this.uploadArea.addEventListener("click", () => this.fileInput.click());
+            this.fileInput.addEventListener("change", (e) => this.handleFile(e.target.files[0]));
+
+            this.uploadArea.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                this.uploadArea.classList.add("drag-over");
+            });
+            this.uploadArea.addEventListener("dragleave", () => {
+                this.uploadArea.classList.remove("drag-over");
+            });
+            this.uploadArea.addEventListener("drop", (e) => {
+                e.preventDefault();
+                this.uploadArea.classList.remove("drag-over");
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith("image/")) {
+                    this.handleFile(file);
+                }
+            });
+
+            this.gridHeight.addEventListener("input", this.debounce(() => this.updateWidthPreview(), 200));
+            this.keepRatio.addEventListener("change", () => this.updateWidthPreview());
+            this.gridWidth.addEventListener("input", this.debounce(() => {
+                this.widthHint.textContent = "手动设置";
+            }, 200));
+
+            this.generateBtn.addEventListener("click", () => this.generate());
+            this.exportBtn.addEventListener("click", () => this.exportPNG());
+
+            this.showGrid.addEventListener("change", () => {
+                if (this.patternData) this.renderPattern();
+            });
+            this.showCode.addEventListener("change", () => {
+                if (this.patternData) this.renderPattern();
+            });
+
+            this.canvasContainer.addEventListener("wheel", (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                this.setZoom(this.zoom + delta, e.clientX, e.clientY);
+            }, { passive: false });
+
+            this.canvasContainer.addEventListener("mousedown", (e) => {
+                if (e.button !== 0) return;
+                this.isPanning = true;
+                this.lastMouseX = e.clientX;
+                this.lastMouseY = e.clientY;
+                this.canvasContainer.style.cursor = "grabbing";
+            });
+
+            window.addEventListener("mousemove", (e) => {
+                if (!this.isPanning) return;
+                const dx = e.clientX - this.lastMouseX;
+                const dy = e.clientY - this.lastMouseY;
+                this.panX += dx;
+                this.panY += dy;
+                this.lastMouseX = e.clientX;
+                this.lastMouseY = e.clientY;
+                this.applyTransform();
+            });
+
+            window.addEventListener("mouseup", () => {
+                this.isPanning = false;
+                this.canvasContainer.style.cursor = "grab";
+            });
+
+            document.getElementById("zoomInBtn").addEventListener("click", () => {
+                this.setZoom(this.zoom + 0.2);
+            });
+            document.getElementById("zoomOutBtn").addEventListener("click", () => {
+                this.setZoom(this.zoom - 0.2);
+            });
+            document.getElementById("resetViewBtn").addEventListener("click", () => {
+                this.resetView();
+            });
+        },
+
+        debounce(fn, delay) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        },
+
+        handleFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    this.image = img;
+                    this.uploadPreview.src = e.target.result;
+                    this.uploadArea.classList.add("has-image");
+                    this.generateBtn.disabled = false;
+                    this.updateWidthPreview();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
+        updateWidthPreview() {
+            if (!this.image || !this.keepRatio.checked) {
+                if (!this.keepRatio.checked) {
+                    this.widthHint.textContent = "手动输入";
+                    this.gridWidth.placeholder = "请输入宽度";
+                }
+                return;
+            }
+            const h = parseInt(this.gridHeight.value) || 32;
+            const ratio = this.image.width / this.image.height;
+            const w = Math.round(h * ratio);
+            this.gridWidth.value = "";
+            this.gridWidth.placeholder = w + "（自动）";
+            this.widthHint.textContent = "约 " + w + " 颗";
+        },
+
+        getGridDimensions() {
+            const h = parseInt(this.gridHeight.value) || 32;
+            let w;
+            if (this.keepRatio.checked && this.image) {
+                const ratio = this.image.width / this.image.height;
+                w = Math.round(h * ratio);
+            } else {
+                w = parseInt(this.gridWidth.value) || Math.round(h * 1.2);
+            }
+            return {
+                width: Math.max(10, Math.min(200, w)),
+                height: Math.max(10, Math.min(100, h))
+            };
+        },
+
+        async generate() {
+            if (!this.image) return;
+
+            this.loadingOverlay.classList.add("active");
+            this.generateBtn.disabled = true;
+
+            await new Promise((r) => setTimeout(r, 50));
+
+            try {
+                const { width, height } = this.getGridDimensions();
+                this.gridHeight.value = height;
+                this.gridWidth.value = width;
+                this.widthHint.textContent = width + " 颗";
+
+                const pixelData = this.pixelate(this.image, width, height);
+                const maxColors = parseInt(this.colorCount.value) || 16;
+                this.patternData = this.mapColors(pixelData, maxColors);
+                this.computeStats();
+                this.renderPattern();
+
+                this.canvasPlaceholder.style.display = "none";
+                this.canvas.style.display = "block";
+                this.zoomInfo.style.display = "block";
+                this.patternInfo.style.display = "block";
+                this.canvasControls.style.display = "flex";
+                this.exportBtn.style.display = "flex";
+                this.statsCard.style.display = "block";
+
+                this.patternInfo.textContent = width + " × " + height + " 颗";
+
+                this.resetView();
+                this.renderStats();
+
+                this.statsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+            } catch (err) {
+                console.error(err);
+                alert("处理图片时出错：" + err.message);
+            } finally {
+                this.loadingOverlay.classList.remove("active");
+                this.generateBtn.disabled = false;
+            }
+        },
+
+        pixelate(img, gridW, gridH) {
+            const tmpCanvas = document.createElement("canvas");
+            tmpCanvas.width = gridW;
+            tmpCanvas.height = gridH;
+            const tmpCtx = tmpCanvas.getContext("2d");
+            tmpCtx.drawImage(img, 0, 0, gridW, gridH);
+            const imageData = tmpCtx.getImageData(0, 0, gridW, gridH);
+            const pixels = [];
+            for (let y = 0; y < gridH; y++) {
+                const row = [];
+                for (let x = 0; x < gridW; x++) {
+                    const i = (y * gridW + x) * 4;
+                    row.push([imageData.data[i], imageData.data[i + 1], imageData.data[i + 2]]);
+                }
+                pixels.push(row);
+            }
+            return pixels;
+        },
+
+        mapColors(pixels, maxColors) {
+            const gridH = pixels.length;
+            const gridW = pixels[0].length;
+            const allColorsMap = new Map();
+
+            for (let y = 0; y < gridH; y++) {
+                for (let x = 0; x < gridW; x++) {
+                    const c = this.findClosestColor(pixels[y][x]);
+                    if (!allColorsMap.has(c.code)) {
+                        allColorsMap.set(c.code, c);
+                    }
+                }
+            }
+
+            let selectedColors;
+            if (allColorsMap.size <= maxColors) {
+                selectedColors = Array.from(allColorsMap.values());
+            } else {
+                selectedColors = this.selectTopColors(pixels, maxColors);
+            }
+
+            const result = [];
+            const usedSet = new Set();
+            for (let y = 0; y < gridH; y++) {
+                const row = [];
+                for (let x = 0; x < gridW; x++) {
+                    const c = this.findClosestColorFromSet(pixels[y][x], selectedColors);
+                    row.push(c);
+                    usedSet.add(c.code);
+                }
+                result.push(row);
+            }
+
+            return result;
+        },
+
+        selectTopColors(pixels, maxColors) {
+            const gridH = pixels.length;
+            const gridW = pixels[0].length;
+            const sampleSize = Math.min(gridH * gridW, 5000);
+            const step = Math.max(1, Math.floor((gridH * gridW) / sampleSize));
+            const colorCounts = new Map();
+
+            for (let i = 0; i < gridH * gridW; i += step) {
+                const y = Math.floor(i / gridW);
+                const x = i % gridW;
+                const c = this.findClosestColor(pixels[y][x]);
+                colorCounts.set(c.code, (colorCounts.get(c.code) || 0) + 1);
+            }
+
+            const sorted = Array.from(colorCounts.entries()).sort((a, b) => b[1] - a[1]);
+            const topCodes = new Set(sorted.slice(0, maxColors).map(([code]) => code));
+            return PERLER_COLORS.filter((c) => topCodes.has(c.code));
+        },
+
+        findClosestColor(rgb) {
+            let minDist = Infinity;
+            let closest = PERLER_COLORS[0];
+            for (const c of PERLER_COLORS) {
+                const dr = rgb[0] - c.rgb[0];
+                const dg = rgb[1] - c.rgb[1];
+                const db = rgb[2] - c.rgb[2];
+                const dist = dr * dr + dg * dg + db * db;
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = c;
+                }
+            }
+            return closest;
+        },
+
+        findClosestColorFromSet(rgb, colorSet) {
+            let minDist = Infinity;
+            let closest = colorSet[0];
+            for (const c of colorSet) {
+                const dr = rgb[0] - c.rgb[0];
+                const dg = rgb[1] - c.rgb[1];
+                const db = rgb[2] - c.rgb[2];
+                const dist = dr * dr + dg * dg + db * db;
+                if (dist < minDist) {
+                    minDist = dist;
+                    closest = c;
+                }
+            }
+            return closest;
+        },
+
+        computeStats() {
+            const counts = new Map();
+            const gridH = this.patternData.length;
+            const gridW = this.patternData[0].length;
+            let total = 0;
+
+            for (let y = 0; y < gridH; y++) {
+                for (let x = 0; x < gridW; x++) {
+                    const c = this.patternData[y][x];
+                    counts.set(c.code, (counts.get(c.code) || 0) + 1);
+                    total++;
+                }
+            }
+
+            this.usedColors = Array.from(counts.entries())
+                .map(([code, count]) => ({
+                    ...PERLER_COLORS.find((c) => c.code === code),
+                    count,
+                    percent: ((count / total) * 100).toFixed(1)
+                }))
+                .sort((a, b) => b.count - a.count);
+        },
+
+        renderPattern() {
+            const gridH = this.patternData.length;
+            const gridW = this.patternData[0].length;
+            const cs = this.cellSize;
+            const showGrid = this.showGrid.checked;
+            const showCode = this.showCode.checked;
+
+            const canvasW = gridW * cs;
+            const canvasH = gridH * cs;
+            this.canvas.width = canvasW;
+            this.canvas.height = canvasH;
+
+            const ctx = this.ctx;
+            ctx.clearRect(0, 0, canvasW, canvasH);
+
+            for (let y = 0; y < gridH; y++) {
+                for (let x = 0; x < gridW; x++) {
+                    const c = this.patternData[y][x];
+                    const px = x * cs;
+                    const py = y * cs;
+                    ctx.fillStyle = `rgb(${c.rgb[0]},${c.rgb[1]},${c.rgb[2]})`;
+                    ctx.fillRect(px, py, cs, cs);
+
+                    if (showGrid) {
+                        ctx.strokeStyle = "rgba(0,0,0,0.15)";
+                        ctx.lineWidth = 0.5;
+                        ctx.strokeRect(px, py, cs, cs);
+                    }
+
+                    if (showCode && cs >= 14) {
+                        const lum = 0.299 * c.rgb[0] + 0.587 * c.rgb[1] + 0.114 * c.rgb[2];
+                        ctx.fillStyle = lum > 140 ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.85)";
+                        ctx.font = `bold ${Math.max(7, cs * 0.42)}px monospace`;
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(c.code, px + cs / 2, py + cs / 2);
+                    }
+                }
+            }
+        },
+
+        renderStats() {
+            if (!this.usedColors) return;
+            let totalBeads = 0;
+            let html = "";
+
+            for (const c of this.usedColors) {
+                totalBeads += c.count;
+                html += `<tr>
+                    <td><span class="color-swatch" style="background:rgb(${c.rgb[0]},${c.rgb[1]},${c.rgb[2]})"></span></td>
+                    <td class="color-code">${c.code}</td>
+                    <td>${c.name}</td>
+                    <td style="text-align:right;" class="bead-count">${c.count}</td>
+                    <td style="text-align:right;">${c.percent}%</td>
+                </tr>`;
+            }
+
+            html += `<tr class="total-row">
+                <td colspan="3">合计</td>
+                <td style="text-align:right;" class="bead-count">${totalBeads}</td>
+                <td style="text-align:right;">100%</td>
+            </tr>`;
+
+            this.statsBody.innerHTML = html;
+        },
+
+        setZoom(newZoom, clientX, clientY) {
+            const oldZoom = this.zoom;
+            this.zoom = Math.max(0.2, Math.min(5, newZoom));
+
+            if (clientX !== undefined && clientY !== undefined) {
+                const rect = this.canvasContainer.getBoundingClientRect();
+                const cx = clientX - rect.left;
+                const cy = clientY - rect.top;
+                this.panX = cx - (cx - this.panX) * (this.zoom / oldZoom);
+                this.panY = cy - (cy - this.panY) * (this.zoom / oldZoom);
+            }
+
+            this.applyTransform();
+            this.zoomInfo.textContent = Math.round(this.zoom * 100) + "%";
+        },
+
+        resetView() {
+            const gridH = this.patternData.length;
+            const gridW = this.patternData[0].length;
+            const containerW = this.canvasContainer.clientWidth;
+            const containerH = this.canvasContainer.clientHeight;
+            const canvasW = gridW * this.cellSize;
+            const canvasH = gridH * this.cellSize;
+
+            const scaleX = (containerW - 40) / canvasW;
+            const scaleY = (containerH - 40) / canvasH;
+            this.zoom = Math.min(scaleX, scaleY, 2);
+
+            this.panX = (containerW - canvasW * this.zoom) / 2;
+            this.panY = (containerH - canvasH * this.zoom) / 2;
+
+            this.applyTransform();
+            this.zoomInfo.textContent = Math.round(this.zoom * 100) + "%";
+        },
+
+        applyTransform() {
+            this.canvas.style.transform = `translate(${this.panX}px, ${this.panY}px) scale(${this.zoom})`;
+        },
+
+        exportPNG() {
+            if (!this.patternData) return;
+
+            const gridH = this.patternData.length;
+            const gridW = this.patternData[0].length;
+            const exportCellSize = 20;
+            const padding = 30;
+            const headerH = 50;
+            const canvasW = gridW * exportCellSize + padding * 2;
+            const canvasH = gridH * exportCellSize + padding * 2 + headerH;
+
+            const exportCanvas = document.createElement("canvas");
+            exportCanvas.width = canvasW;
+            exportCanvas.height = canvasH;
+            const ctx = exportCanvas.getContext("2d");
+
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            ctx.fillStyle = "#1f2937";
+            ctx.font = "bold 18px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(`拼豆图纸 - ${gridW} × ${gridH} 颗`, canvasW / 2, 30);
+
+            const showGrid = this.showGrid.checked;
+            const showCode = this.showCode.checked;
+            const offsetX = padding;
+            const offsetY = padding + headerH;
+
+            for (let y = 0; y < gridH; y++) {
+                for (let x = 0; x < gridW; x++) {
+                    const c = this.patternData[y][x];
+                    const px = offsetX + x * exportCellSize;
+                    const py = offsetY + y * exportCellSize;
+                    ctx.fillStyle = `rgb(${c.rgb[0]},${c.rgb[1]},${c.rgb[2]})`;
+                    ctx.fillRect(px, py, exportCellSize, exportCellSize);
+
+                    if (showGrid) {
+                        ctx.strokeStyle = "rgba(0,0,0,0.12)";
+                        ctx.lineWidth = 0.5;
+                        ctx.strokeRect(px, py, exportCellSize, exportCellSize);
+                    }
+
+                    if (showCode) {
+                        const lum = 0.299 * c.rgb[0] + 0.587 * c.rgb[1] + 0.114 * c.rgb[2];
+                        ctx.fillStyle = lum > 140 ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.85)";
+                        ctx.font = `bold ${Math.round(exportCellSize * 0.4)}px monospace`;
+                        ctx.textAlign = "center";
+                        ctx.textBaseline = "middle";
+                        ctx.fillText(c.code, px + exportCellSize / 2, py + exportCellSize / 2);
+                    }
+                }
+            }
+
+            ctx.strokeStyle = "#e5e7eb";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(offsetX, offsetY, gridW * exportCellSize, gridH * exportCellSize);
+
+            const link = document.createElement("a");
+            link.download = `拼豆图纸_${gridW}x${gridH}.png`;
+            link.href = exportCanvas.toDataURL("image/png");
+            link.click();
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        app.init();
+    });
+</script>
+
+</body>
+</html>
