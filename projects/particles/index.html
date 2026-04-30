@@ -1418,6 +1418,9 @@
       touchStartTime: 0,
       touchIsTap: false,
       touchDeadzonePassed: false,
+      touchVelocityX: 0,
+      inertiaActive: false,
+      lastPointerUpTime: 0,
       manualMode: false,
       shuffling: false,
       gesture: "unknown",
@@ -1447,7 +1450,11 @@
       maxVelocityBonus: 1.5,
       fistDamping: 0.12,
       dampingAttack: 0.15,
-      dampingRelease: 0.07
+      dampingRelease: 0.07,
+      touchHandEase: 0.45,
+      touchCameraEase: 0.08,
+      inertiaDecay: 0.92,
+      inertiaMinSpeed: 0.001
     };
 
     const canvas = document.getElementById("threeCanvas");
@@ -4436,6 +4443,11 @@
       appState.touchStartTime = 0;
       appState.touchIsTap = false;
       appState.touchDeadzonePassed = false;
+      appState.touchVelocityX = 0;
+      appState.inertiaActive = false;
+      appState.lastPointerUpTime = 0;
+      appState._lastMoveTime = 0;
+      appState._prevMoveTargetX = 0;
       appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
       const focusRing = document.getElementById("fistFocusRing");
       if (focusRing) focusRing.classList.remove("visible");
@@ -4581,10 +4593,19 @@
       animateParticles(t);
       updateMagicCircle(t);
 
-      const handEase = appState.renderProfile === "gestureLite" ? 0.1 : (appState.manualMode ? 0.2 : 0.14);
+      if (appState.inertiaActive && appState.manualMode) {
+        appState.handTargetX += appState.touchVelocityX * dt;
+        appState.touchVelocityX *= gestureConfig.inertiaDecay;
+        if (Math.abs(appState.touchVelocityX) < gestureConfig.inertiaMinSpeed) {
+          appState.inertiaActive = false;
+          appState.touchVelocityX = 0;
+        }
+      }
+      const handEase = appState.renderProfile === "gestureLite" ? 0.1 : (appState.manualMode ? gestureConfig.touchHandEase : 0.14);
       appState.handX += (appState.handTargetX - appState.handX) * handEase;
       appState.targetDeckRotation = (0.5 - appState.handX) * Math.PI * 2.15;
-      camera.position.x += ((appState.handX - 0.5) * 0.55 - camera.position.x) * 0.035;
+      const cameraEase = appState.manualMode ? gestureConfig.touchCameraEase : 0.035;
+      camera.position.x += ((appState.handX - 0.5) * 0.55 - camera.position.x) * cameraEase;
       camera.position.y = 1.7 + Math.sin(t * 0.28) * 0.06;
       camera.lookAt(0, 0.35, 0);
 
@@ -4756,6 +4777,11 @@
       appState.touchStartTime = 0;
       appState.touchIsTap = false;
       appState.touchDeadzonePassed = false;
+      appState.touchVelocityX = 0;
+      appState.inertiaActive = false;
+      appState.lastPointerUpTime = 0;
+      appState._lastMoveTime = 0;
+      appState._prevMoveTargetX = 0;
       appState.magicCircle = { active: false, history: [], circleCount: 0, lastCircleTime: 0, rotation: 0, targetRotation: 0 };
       const focusRingEl = document.getElementById("fistFocusRing");
       if (focusRingEl) focusRingEl.classList.remove("visible");
@@ -4808,8 +4834,10 @@
       const x = Math.min(Math.max(clientX / window.innerWidth, 0), 1);
       appState.handTargetX += (x - appState.handTargetX) * 0.7;
       const y = Math.min(Math.max(clientY / window.innerHeight, 0), 1);
-      appState.handTargetY += (y - appState.handTargetY) * 0.4;
-      appState.targetDeckTilt = (0.5 - appState.handTargetY) * 0.5;
+      const yEase = appState.manualMode ? 0.6 : 0.4;
+      appState.handTargetY += (y - appState.handTargetY) * yEase;
+      const tiltGain = appState.manualMode ? 0.65 : 0.5;
+      appState.targetDeckTilt = (0.5 - appState.handTargetY) * tiltGain;
       if (appState.manualMode) intensifyParticles();
     }
 
@@ -4820,6 +4848,7 @@
       appState.touchIsTap = true;
       appState.touchDeadzonePassed = false;
       canvas.setPointerCapture(e.pointerId);
+      appState.inertiaActive = false;
     });
     canvas.addEventListener("pointermove", e => {
       const dx = e.clientX - appState.touchStartX;
@@ -4836,12 +4865,24 @@
         }
       }
       updatePointerSelection(e.clientX, e.clientY);
+      const moveNow = performance.now();
+      const moveDelta = appState.handTargetX - (appState._prevMoveTargetX || appState.handTargetX);
+      const moveDt = appState._lastMoveTime ? Math.min((moveNow - appState._lastMoveTime) / 1000, 0.1) : 0.016;
+      if (moveDt > 0) {
+        appState.touchVelocityX = moveDelta / moveDt;
+      }
+      appState._lastMoveTime = moveNow;
+      appState._prevMoveTargetX = appState.handTargetX;
     });
     canvas.addEventListener("pointerup", () => {
       if (appState.touchIsTap && (performance.now() - appState.touchStartTime) < 500 && appState.manualMode && appState.started && !appState.drawn && !appState.shuffling) {
         pulseDeck();
         drawSelectedCard();
       }
+      if (Math.abs(appState.touchVelocityX) > 0.05 && appState.manualMode) {
+        appState.inertiaActive = true;
+      }
+      appState.lastPointerUpTime = performance.now();
       appState.touchIsTap = false;
       appState.touchDeadzonePassed = false;
     });
@@ -5429,7 +5470,9 @@
       handVelocityX: appState.handVelocityX,
       smoothedSensitivity: appState.smoothedSensitivity,
       gesturePhase: appState.gesturePhase,
-      gesture: appState.gesture
+      gesture: appState.gesture,
+      touchVelocityX: appState.touchVelocityX,
+      inertiaActive: appState.inertiaActive
     });
   </script>
 </body>
