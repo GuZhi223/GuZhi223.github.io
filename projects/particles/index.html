@@ -1400,9 +1400,11 @@
       deckRotation: 0,
       targetDeckRotation: 0,
       highlightedIndex: 0,
+      touchStartRotation: 0,
+      touchStartClientX: 0,
+      rotationVelocity: 0,
       handX: 0.5,
       handTargetX: 0.5,
-      rawTouchX: 0.5,
       handY: 0,
       handTargetY: 0.5,
       targetDeckTilt: 0,
@@ -1419,7 +1421,6 @@
       touchStartTime: 0,
       touchIsTap: false,
       touchDeadzonePassed: false,
-      touchVelocityX: 0,
       inertiaActive: false,
       lastPointerUpTime: 0,
       manualMode: false,
@@ -1452,10 +1453,10 @@
       fistDamping: 0.12,
       dampingAttack: 0.15,
       dampingRelease: 0.07,
-      touchHandEase: 0.65,
+      rotationGain: 0.005,
       touchCameraEase: 0.15,
-      inertiaDecay: 0.92,
-      inertiaMinSpeed: 0.001
+      inertiaFriction: 0.95,
+      inertiaMinSpeed: 0.05
     };
 
     const canvas = document.getElementById("threeCanvas");
@@ -4444,7 +4445,7 @@
       appState.touchStartTime = 0;
       appState.touchIsTap = false;
       appState.touchDeadzonePassed = false;
-      appState.touchVelocityX = 0;
+      appState.rotationVelocity = 0;
       appState.inertiaActive = false;
       appState.lastPointerUpTime = 0;
       appState._lastMoveTime = 0;
@@ -4588,24 +4589,19 @@
       }
 
       if (appState.inertiaActive && appState.manualMode) {
-        appState.handTargetX += appState.touchVelocityX * dt;
-        appState.handTargetX = Math.min(Math.max(appState.handTargetX, 0), 1);
-        appState.touchVelocityX *= gestureConfig.inertiaDecay;
-        if (Math.abs(appState.touchVelocityX) < gestureConfig.inertiaMinSpeed) {
+        appState.deckRotation += appState.rotationVelocity * dt;
+        appState.targetDeckRotation = appState.deckRotation;
+        appState.rotationVelocity *= gestureConfig.inertiaFriction;
+        if (Math.abs(appState.rotationVelocity) < gestureConfig.inertiaMinSpeed) {
           appState.inertiaActive = false;
-          appState.touchVelocityX = 0;
+          appState.rotationVelocity = 0;
         }
       }
-      if (appState.manualMode && !appState.inertiaActive && appState.started && !appState.drawn) {
-        const directEase = 0.75;
-        appState.handX += (appState.rawTouchX - appState.handX) * directEase;
-      } else {
-        const handEase = appState.renderProfile === "gestureLite" ? 0.1 : (appState.manualMode ? gestureConfig.touchHandEase : 0.14);
-        appState.handX += (appState.handTargetX - appState.handX) * handEase;
-      }
-      appState.targetDeckRotation = (0.5 - appState.handX) * Math.PI * 2.15;
+      appState.handX = 0.5 - appState.deckRotation / (Math.PI * 2.15);
       if (appState.manualMode) {
         appState.deckRotation = appState.targetDeckRotation;
+      } else {
+        appState.targetDeckRotation = (0.5 - appState.handTargetX) * Math.PI * 2.15;
       }
 
       deckGroup.rotation.y = 0;
@@ -4788,7 +4784,7 @@
       appState.touchStartTime = 0;
       appState.touchIsTap = false;
       appState.touchDeadzonePassed = false;
-      appState.touchVelocityX = 0;
+      appState.rotationVelocity = 0;
       appState.inertiaActive = false;
       appState.lastPointerUpTime = 0;
       appState._lastMoveTime = 0;
@@ -4860,11 +4856,11 @@
       appState.touchDeadzonePassed = false;
       canvas.setPointerCapture(e.pointerId);
       appState.inertiaActive = false;
-      const xNorm = Math.min(Math.max(e.clientX / window.innerWidth, 0), 1);
-      appState.rawTouchX = xNorm;
-      appState.handTargetX = xNorm;
-      appState._rawPrevX = xNorm;
-      appState._lastMoveTime = performance.now();
+      appState.rotationVelocity = 0;
+      appState.touchStartRotation = appState.deckRotation;
+      appState.touchStartClientX = e.clientX;
+      appState._lastRotX = e.clientX;
+      appState._lastRotTime = performance.now();
     });
     canvas.addEventListener("pointermove", e => {
       const dx = e.clientX - appState.touchStartX;
@@ -4880,16 +4876,18 @@
           return;
         }
       }
-      const moveNow = performance.now();
-      const rawX = Math.min(Math.max(e.clientX / window.innerWidth, 0), 1);
-      appState.rawTouchX = rawX;
-      const rawPrevX = appState._rawPrevX != null ? appState._rawPrevX : rawX;
-      const moveDt = appState._lastMoveTime ? Math.min((moveNow - appState._lastMoveTime) / 1000, 0.1) : 0.016;
-      if (moveDt > 0) {
-        appState.touchVelocityX = (rawX - rawPrevX) / moveDt;
+      const now = performance.now();
+      const pixelDelta = e.clientX - appState.touchStartClientX;
+      appState.deckRotation = appState.touchStartRotation + pixelDelta * gestureConfig.rotationGain;
+      appState.targetDeckRotation = appState.deckRotation;
+      const frameDx = e.clientX - appState._lastRotX;
+      const frameDt = appState._lastRotTime ? Math.min((now - appState._lastRotTime) / 1000, 0.1) : 0.016;
+      if (frameDt > 0) {
+        const instantVel = (frameDx * gestureConfig.rotationGain) / frameDt;
+        appState.rotationVelocity = appState.rotationVelocity * 0.5 + instantVel * 0.5;
       }
-      appState._rawPrevX = rawX;
-      appState._lastMoveTime = moveNow;
+      appState._lastRotX = e.clientX;
+      appState._lastRotTime = now;
       updatePointerSelection(e.clientX, e.clientY);
     });
     canvas.addEventListener("pointerup", () => {
@@ -4897,8 +4895,10 @@
         pulseDeck();
         drawSelectedCard();
       }
-      if (Math.abs(appState.touchVelocityX) > 0.05 && appState.manualMode) {
+      if (Math.abs(appState.rotationVelocity) > gestureConfig.inertiaMinSpeed && appState.manualMode) {
         appState.inertiaActive = true;
+      } else {
+        appState.rotationVelocity = 0;
       }
       appState.lastPointerUpTime = performance.now();
       appState.touchIsTap = false;
@@ -5489,7 +5489,7 @@
       smoothedSensitivity: appState.smoothedSensitivity,
       gesturePhase: appState.gesturePhase,
       gesture: appState.gesture,
-      touchVelocityX: appState.touchVelocityX,
+      rotationVelocity: appState.rotationVelocity,
       inertiaActive: appState.inertiaActive
     });
   </script>
