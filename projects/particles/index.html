@@ -44,6 +44,7 @@
       width: 100%;
       height: 100%;
       display: block;
+      touch-action: none;
     }
 
     .grain {
@@ -1453,9 +1454,9 @@
       fistDamping: 0.12,
       dampingAttack: 0.15,
       dampingRelease: 0.07,
-      rotationGain: 0.015,
+      rotationGain: 0.018,
       touchCameraEase: 0.15,
-      inertiaFriction: 0.95,
+      inertiaFriction: 0.96,
       inertiaMinSpeed: 0.05
     };
 
@@ -3226,6 +3227,202 @@
     const starfield = new THREE.Points(starfieldGeo, starfieldMat);
     scene.add(starfield);
 
+    const speedLineCount = 128;
+    const speedLinesPositions = new Float32Array(speedLineCount * 2 * 3);
+    const speedLinesGeo = new THREE.BufferGeometry();
+    speedLinesGeo.setAttribute("position", new THREE.BufferAttribute(speedLinesPositions, 3));
+    speedLinesGeo.setDrawRange(0, 0);
+    const speedLinesMat = new THREE.LineBasicMaterial({
+      color: 0xf1d68a,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+    const speedLines = new THREE.LineSegments(speedLinesGeo, speedLinesMat);
+    speedLines.frustumCulled = false;
+    scene.add(speedLines);
+
+    let speedLinesCurrentOpacity = 0;
+
+    let shockwaveMesh = null;
+    let shockwaveSpawnTime = 0;
+    const SHOCKWAVE_DURATION = 0.6;
+
+    function triggerEnergyBurst(worldPos) {
+      if (shockwaveMesh) { scene.remove(shockwaveMesh); shockwaveMesh.geometry.dispose(); shockwaveMesh.material.dispose(); }
+      const geo = new THREE.RingGeometry(0.1, 0.15, 64);
+      const mat = new THREE.MeshBasicMaterial({ color: 0xf1d68a, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
+      shockwaveMesh = new THREE.Mesh(geo, mat);
+      shockwaveMesh.position.copy(worldPos);
+      shockwaveMesh.rotation.x = -Math.PI / 2;
+      shockwaveMesh.scale.set(0.01, 0.01, 0.01);
+      scene.add(shockwaveMesh);
+      shockwaveSpawnTime = performance.now() / 1000;
+
+      for (let i = 0; i < 30; i++) {
+        const bi = energyBurstNextIdx;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 1.5 + Math.random() * 3;
+        energyBurstPositions[bi * 3] = worldPos.x;
+        energyBurstPositions[bi * 3 + 1] = worldPos.y;
+        energyBurstPositions[bi * 3 + 2] = worldPos.z;
+        energyBurstVelocities[bi * 3] = Math.cos(angle) * speed * 0.3;
+        energyBurstVelocities[bi * 3 + 1] = 3 + Math.random() * 4;
+        energyBurstVelocities[bi * 3 + 2] = Math.sin(angle) * speed * 0.3;
+        energyBurstColors[bi * 3] = 0.945;
+        energyBurstColors[bi * 3 + 1] = 0.839;
+        energyBurstColors[bi * 3 + 2] = 0.541;
+        energyBurstAlphas[bi] = 1.0;
+        energyBurstSpawnTimes[bi] = performance.now() / 1000;
+        energyBurstNextIdx = (bi + 1) % energyBurstCount;
+      }
+
+      const canvas3d = document.getElementById("threeCanvas");
+      if (canvas3d) {
+        const rect = canvas3d.getBoundingClientRect();
+        const vignetteGold = document.createElement("div");
+        vignetteGold.style.cssText = "position:fixed;inset:0;pointer-events:none;z-index:9998;background:radial-gradient(ellipse at center, transparent 30%, rgba(241,214,138,0.15) 60%, rgba(241,214,138,0.35) 100%);opacity:0;";
+        document.body.appendChild(vignetteGold);
+        gsap.fromTo(vignetteGold, { opacity: 0 }, { opacity: 1, duration: 0.2, yoyo: true, repeat: 1, ease: "power2.inOut", onComplete: () => vignetteGold.remove() });
+      }
+    }
+
+    const energyBurstCount = 60;
+    const energyBurstPositions = new Float32Array(energyBurstCount * 3);
+    const energyBurstVelocities = new Float32Array(energyBurstCount * 3);
+    const energyBurstColors = new Float32Array(energyBurstCount * 3);
+    const energyBurstAlphas = new Float32Array(energyBurstCount);
+    const energyBurstSpawnTimes = new Float32Array(energyBurstCount);
+    let energyBurstNextIdx = 0;
+    for (let i = 0; i < energyBurstCount; i++) { energyBurstAlphas[i] = -1; energyBurstSpawnTimes[i] = -1; }
+    const energyBurstGeo = new THREE.BufferGeometry();
+    energyBurstGeo.setAttribute("position", new THREE.BufferAttribute(energyBurstPositions, 3));
+    energyBurstGeo.setAttribute("color", new THREE.BufferAttribute(energyBurstColors, 3));
+    energyBurstGeo.setAttribute("alpha", new THREE.BufferAttribute(energyBurstAlphas, 1));
+    const energyBurstMat = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      uniforms: {},
+      vertexShader: `
+        attribute float alpha;
+        attribute vec3 color;
+        varying float vAlpha;
+        varying vec3 vColor;
+        void main() {
+          vAlpha = alpha;
+          vColor = color;
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = 10.0 * (300.0 / -mvPos.z);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        varying float vAlpha;
+        varying vec3 vColor;
+        void main() {
+          if (vAlpha <= 0.0) discard;
+          float d = length(gl_PointCoord - 0.5) * 2.0;
+          float glow = exp(-d * d * 2.5);
+          gl_FragColor = vec4(vColor * glow, vAlpha * glow);
+        }
+      `
+    });
+    const energyBurst = new THREE.Points(energyBurstGeo, energyBurstMat);
+    energyBurst.frustumCulled = false;
+    scene.add(energyBurst);
+
+    const ripplePoolSize = 5;
+    const ripplePool = [];
+    const rippleSpawnTimes = [];
+    for (let i = 0; i < ripplePoolSize; i++) {
+      const geo = new THREE.RingGeometry(0.1, 0.13, 64);
+      const mat = new THREE.MeshBasicMaterial({ color: 0xf1d68a, transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.rotation.x = -Math.PI / 2;
+      mesh.position.set(0, 0.35, 0);
+      mesh.visible = false;
+      scene.add(mesh);
+      ripplePool.push({ mesh, mat, active: false });
+      rippleSpawnTimes.push(0);
+    }
+    let lastRippleTime = 0;
+
+    const fingerTrailCount = 200;
+    const fingerTrailPositions = new Float32Array(fingerTrailCount * 3);
+    const fingerTrailColors = new Float32Array(fingerTrailCount * 3);
+    const fingerTrailAlphas = new Float32Array(fingerTrailCount);
+    const fingerTrailSpawnTimes = new Float32Array(fingerTrailCount);
+    let fingerTrailNextIdx = 0;
+    for (let i = 0; i < fingerTrailCount; i++) {
+      fingerTrailAlphas[i] = -1;
+      fingerTrailSpawnTimes[i] = -1;
+    }
+    const fingerTrailGeo = new THREE.BufferGeometry();
+    fingerTrailGeo.setAttribute("position", new THREE.BufferAttribute(fingerTrailPositions, 3));
+    fingerTrailGeo.setAttribute("color", new THREE.BufferAttribute(fingerTrailColors, 3));
+    fingerTrailGeo.setAttribute("alpha", new THREE.BufferAttribute(fingerTrailAlphas, 1));
+    const fingerTrailMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {},
+      vertexShader: `
+        attribute float alpha;
+        attribute vec3 color;
+        varying float vAlpha;
+        varying vec3 vColor;
+        void main() {
+          vAlpha = alpha;
+          vColor = color;
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = 8.0 * (300.0 / -mvPos.z);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        varying float vAlpha;
+        varying vec3 vColor;
+        void main() {
+          if (vAlpha <= 0.0) discard;
+          float d = length(gl_PointCoord - 0.5) * 2.0;
+          float glow = exp(-d * d * 3.0);
+          gl_FragColor = vec4(vColor * glow, vAlpha * glow);
+        }
+      `
+    });
+    const fingerTrail = new THREE.Points(fingerTrailGeo, fingerTrailMat);
+    fingerTrail.frustumCulled = false;
+    scene.add(fingerTrail);
+    const _trailRaycaster = new THREE.Raycaster();
+    const _trailVec2 = new THREE.Vector2();
+    const _trailPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.35);
+    const _trailWorldPt = new THREE.Vector3();
+    let _cachedColorKeys = null;
+    let _cachedColorKeysTime = 0;
+
+    function emitFingerTrailParticle(worldX, worldY, worldZ) {
+      const i = fingerTrailNextIdx;
+      fingerTrailPositions[i * 3] = worldX;
+      fingerTrailPositions[i * 3 + 1] = worldY;
+      fingerTrailPositions[i * 3 + 2] = worldZ;
+      const hi = appState.highlightedIndex;
+      const ci = hi % 22;
+      const now = performance.now();
+      if (!_cachedColorKeys || now - _cachedColorKeysTime > 5000) {
+        _cachedColorKeys = Object.keys(arcanaAccentColors);
+        _cachedColorKeysTime = now;
+      }
+      const colorKeys = _cachedColorKeys;
+      const accent = arcanaAccentColors[colorKeys[ci]] || { main: "rgba(241,214,138,1)" };
+      const m = accent.main.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      fingerTrailColors[i * 3] = m ? parseInt(m[1]) / 255 : 0.945;
+      fingerTrailColors[i * 3 + 1] = m ? parseInt(m[2]) / 255 : 0.839;
+      fingerTrailColors[i * 3 + 2] = m ? parseInt(m[3]) / 255 : 0.541;
+      fingerTrailAlphas[i] = 1.0;
+      fingerTrailSpawnTimes[i] = performance.now() / 1000;
+      fingerTrailNextIdx = (i + 1) % fingerTrailCount;
+    }
+
     function applyRenderProfile(name) {
       const next = profiles[name] || profiles.visual;
       appState.renderProfile = name;
@@ -3413,9 +3610,7 @@
 
     function layoutCards(dt) {
       if (appState.shuffling) return;
-      if (appState.manualMode) {
-        appState.deckRotation = appState.targetDeckRotation;
-      } else {
+      if (!appState.manualMode) {
         const lerp = 1 - Math.pow(0.0001, dt);
         appState.deckRotation += (appState.targetDeckRotation - appState.deckRotation) * lerp;
       }
@@ -3608,6 +3803,10 @@
           document.getElementById("mysticFrame").classList.add("visible");
           showResult(tarot);
         }, null, 2.3);
+
+      const burstWorld = new THREE.Vector3();
+      selected.getWorldPosition(burstWorld);
+      triggerEnergyBurst(burstWorld);
 
       burstParticlesAtCard(selected);
     }
@@ -4597,10 +4796,8 @@
           appState.rotationVelocity = 0;
         }
       }
-      appState.handX = 0.5 - appState.deckRotation / (Math.PI * 2.15);
-      if (appState.manualMode) {
-        appState.deckRotation = appState.targetDeckRotation;
-      } else {
+      appState.handX = Math.min(Math.max(0.5 - appState.deckRotation / (Math.PI * 2.15), 0), 1);
+      if (!appState.manualMode) {
         appState.targetDeckRotation = (0.5 - appState.handTargetX) * Math.PI * 2.15;
       }
 
@@ -4619,6 +4816,132 @@
       rimLight.position.x = 3 + Math.sin(t * 0.6) * 1.5;
       rimLight.position.z = 4 + Math.cos(t * 0.4) * 1;
       fillLight.intensity = 0.4 + Math.sin(t * 0.8) * 0.15;
+
+      {
+        const absVel = Math.abs(appState.rotationVelocity);
+        const speedFactor = Math.min(Math.max((absVel - 0.1) / 0.2, 0), 1);
+        const targetOpacity = speedFactor * 0.6;
+        speedLinesCurrentOpacity += (targetOpacity - speedLinesCurrentOpacity) * Math.min(dt * 8, 1);
+        speedLinesMat.opacity = speedLinesCurrentOpacity;
+
+        const activeCount = Math.floor(8 + speedFactor * 24);
+        const halfCount = activeCount;
+        speedLinesGeo.setDrawRange(0, halfCount * 2);
+
+        const slPos = speedLinesPositions;
+        const direction = appState.rotationVelocity >= 0 ? 1 : -1;
+        for (let i = 0; i < halfCount; i++) {
+          const angle = (i / halfCount) * Math.PI * 2;
+          const cosA = Math.cos(angle);
+          const sinA = Math.sin(angle);
+          const innerR = 1.0;
+          const outerR = 1.0 + 0.8 + speedFactor * 2.5;
+          const idx = i * 6;
+          slPos[idx] = cosA * innerR;
+          slPos[idx + 1] = 0.35;
+          slPos[idx + 2] = sinA * innerR;
+          slPos[idx + 3] = cosA * outerR * direction;
+          slPos[idx + 4] = 0.35;
+          slPos[idx + 5] = sinA * outerR * direction;
+        }
+        speedLinesGeo.attributes.position.needsUpdate = true;
+      }
+
+      {
+        const nowSec = now / 1000;
+        const trailLife = 0.6;
+        const ftPos = fingerTrailPositions;
+        const ftCol = fingerTrailColors;
+        const ftAlpha = fingerTrailAlphas;
+        let needsUpdate = false;
+        for (let i = 0; i < fingerTrailCount; i++) {
+          if (fingerTrailSpawnTimes[i] < 0) continue;
+          const age = nowSec - fingerTrailSpawnTimes[i];
+          if (age > trailLife) {
+            ftAlpha[i] = -1;
+            fingerTrailSpawnTimes[i] = -1;
+            needsUpdate = true;
+          } else {
+            const a = 1 - age / trailLife;
+            ftAlpha[i] = a * a;
+            needsUpdate = true;
+          }
+        }
+        if (needsUpdate) {
+          fingerTrailGeo.attributes.position.needsUpdate = true;
+          fingerTrailGeo.attributes.color.needsUpdate = true;
+          fingerTrailGeo.attributes.alpha.needsUpdate = true;
+        }
+      }
+
+      {
+        const nowSec = now / 1000;
+        if (shockwaveMesh) {
+          const age = nowSec - shockwaveSpawnTime;
+          if (age > SHOCKWAVE_DURATION) {
+            scene.remove(shockwaveMesh);
+            shockwaveMesh.geometry.dispose();
+            shockwaveMesh.material.dispose();
+            shockwaveMesh = null;
+          } else {
+            const t0 = age / SHOCKWAVE_DURATION;
+            const scale = t0 * 4;
+            shockwaveMesh.scale.set(scale, scale, scale);
+            shockwaveMesh.material.opacity = 0.8 * (1 - t0) * (1 - t0);
+          }
+        }
+        for (let i = 0; i < energyBurstCount; i++) {
+          if (energyBurstSpawnTimes[i] < 0) continue;
+          const age = nowSec - energyBurstSpawnTimes[i];
+          if (age > 1.0) {
+            energyBurstAlphas[i] = -1;
+            energyBurstSpawnTimes[i] = -1;
+          } else {
+            energyBurstPositions[i * 3] += energyBurstVelocities[i * 3] * dt;
+            energyBurstPositions[i * 3 + 1] += energyBurstVelocities[i * 3 + 1] * dt;
+            energyBurstPositions[i * 3 + 2] += energyBurstVelocities[i * 3 + 2] * dt;
+            energyBurstVelocities[i * 3 + 1] -= 5.0 * dt;
+            energyBurstAlphas[i] = Math.max(0, 1 - age / 1.0);
+          }
+        }
+        if (shockwaveMesh || energyBurstSpawnTimes.some(t => t >= 0)) {
+          energyBurstGeo.attributes.position.needsUpdate = true;
+          energyBurstGeo.attributes.alpha.needsUpdate = true;
+        }
+      }
+
+      {
+        const nowSec = now / 1000;
+        const absVel = Math.abs(appState.rotationVelocity);
+        const isInertia = appState.inertiaActive;
+        const isRotating = absVel > 0.1 || (!appState.manualMode && Math.abs(appState.deckRotation - appState.targetDeckRotation) > 0.01);
+        if (isRotating && !appState.drawn && nowSec - lastRippleTime > 0.6) {
+          for (let i = 0; i < ripplePoolSize; i++) {
+            if (!ripplePool[i].active) {
+              ripplePool[i].active = true;
+              ripplePool[i].mesh.visible = true;
+              ripplePool[i].mesh.scale.set(0.01, 0.01, 0.01);
+              ripplePool[i].mat.opacity = 0.3;
+              rippleSpawnTimes[i] = nowSec;
+              lastRippleTime = nowSec;
+              break;
+            }
+          }
+        }
+        for (let i = 0; i < ripplePoolSize; i++) {
+          if (!ripplePool[i].active) continue;
+          const age = nowSec - rippleSpawnTimes[i];
+          if (age > 1.5) {
+            ripplePool[i].active = false;
+            ripplePool[i].mesh.visible = false;
+            continue;
+          }
+          const t0 = age / 1.5;
+          const scale = t0 * 5;
+          ripplePool[i].mesh.scale.set(scale, scale, scale);
+          ripplePool[i].mat.opacity = 0.3 * (1 - t0);
+        }
+      }
 
       renderer.render(scene, camera);
       requestAnimationFrame(renderLoop);
@@ -4861,6 +5184,7 @@
       appState.touchStartClientX = e.clientX;
       appState._lastRotX = e.clientX;
       appState._lastRotTime = performance.now();
+      appState._touchStartTilt = appState.targetDeckTilt;
     });
     canvas.addEventListener("pointermove", e => {
       const dx = e.clientX - appState.touchStartX;
@@ -4886,9 +5210,22 @@
         const instantVel = (frameDx * gestureConfig.rotationGain) / frameDt;
         appState.rotationVelocity = appState.rotationVelocity * 0.5 + instantVel * 0.5;
       }
+      if (appState.started && !appState.drawn) {
+        _trailVec2.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+        _trailRaycaster.setFromCamera(_trailVec2, camera);
+        _trailRaycaster.ray.intersectPlane(_trailPlane, _trailWorldPt);
+        emitFingerTrailParticle(_trailWorldPt.x, _trailWorldPt.y + 0.1, _trailWorldPt.z);
+      }
       appState._lastRotX = e.clientX;
       appState._lastRotTime = now;
-      updatePointerSelection(e.clientX, e.clientY);
+      if (appState.manualMode) {
+        const yDelta = e.clientY - appState.touchStartY;
+        const tiltGain = 0.002;
+        appState.targetDeckTilt = (appState._touchStartTilt || 0) - yDelta * tiltGain;
+        intensifyParticles();
+      } else {
+        updatePointerSelection(e.clientX, e.clientY);
+      }
     });
     canvas.addEventListener("pointerup", () => {
       if (appState.touchIsTap && (performance.now() - appState.touchStartTime) < 500 && appState.manualMode && appState.started && !appState.drawn && !appState.shuffling) {
@@ -4901,6 +5238,12 @@
         appState.rotationVelocity = 0;
       }
       appState.lastPointerUpTime = performance.now();
+      appState.touchIsTap = false;
+      appState.touchDeadzonePassed = false;
+    });
+    canvas.addEventListener("pointercancel", () => {
+      appState.inertiaActive = false;
+      appState.rotationVelocity = 0;
       appState.touchIsTap = false;
       appState.touchDeadzonePassed = false;
     });
