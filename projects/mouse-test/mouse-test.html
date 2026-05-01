@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鼠标灵敏度测试</title>
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --green: #34d399;
+  --cyan: #22d3ee;
+  --red: #f87171;
+  --blue: #5e9eff;
+  --orange: #fb923c;
+  --yellow: #facc15;
+  --bg: #0a0a1a;
+  --panel-bg: rgba(15, 15, 35, 0.75);
+  --panel-border: rgba(255, 255, 255, 0.08);
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", "Courier New", monospace;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+.top-bar {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  background: rgba(10, 10, 26, 0.9);
+  border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 10;
+}
+
+.top-bar h1 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--cyan);
+  white-space: nowrap;
+}
+
+.top-bar .instr {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: right;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.main-area {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.canvas-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+#mainCanvas {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  display: block;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.canvas-label {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.side-panel {
+  width: 260px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 1px solid var(--panel-border);
+  background: rgba(10, 10, 26, 0.6);
+  -webkit-overflow-scrolling: touch;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 12px;
+}
+
+.panel-grid.single-col {
+  grid-template-columns: 1fr;
+}
+
+.panel-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.label {
+  color: var(--text-dim);
+  font-size: 11px;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.value.hit { color: var(--green); }
+.value.miss { color: var(--red); }
+.value.warn { color: var(--orange); }
+.value.info { color: var(--cyan); }
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0 2px;
+}
+
+.btn {
+  flex: 1;
+  padding: 7px 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn:active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn.primary {
+  color: var(--green);
+  border-color: rgba(52, 211, 153, 0.2);
+}
+
+.btn.primary:hover {
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.btn.clear {
+  color: var(--red);
+}
+
+.btn.export {
+  color: var(--cyan);
+}
+
+.advice-box {
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  border-left: 3px solid;
+}
+
+.advice-box.good {
+  background: rgba(52, 211, 153, 0.08);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.advice-box.too-fast {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.advice-box.too-slow {
+  background: rgba(251, 146, 60, 0.08);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.advice-box.neutral {
+  background: rgba(94, 158, 255, 0.08);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.summary-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 26, 0.85);
+  backdrop-filter: blur(6px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.summary-overlay.show {
+  display: flex;
+}
+
+.summary-card {
+  background: var(--panel-bg);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  border-radius: 16px;
+  padding: 28px 36px;
+  text-align: center;
+  min-width: 300px;
+  backdrop-filter: blur(16px);
+}
+
+.summary-card h2 {
+  font-size: 18px;
+  color: var(--cyan);
+  margin-bottom: 16px;
+}
+
+.summary-card .stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+.summary-card .stat-item {
+  text-align: center;
+}
+
+.summary-card .stat-val {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.summary-card .stat-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.summary-card .btn {
+  margin-top: 8px;
+  display: inline-block;
+  padding: 8px 24px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.progress-bar .fill {
+  height: 100%;
+  background: var(--cyan);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+@media (max-width: 700px) {
+  .main-area {
+    flex-direction: column;
+  }
+  .side-panel {
+    width: 100%;
+    max-height: 40vh;
+    border-left: none;
+    border-top: 1px solid var(--panel-border);
+  }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-bar">
+    <h1>鼠标灵敏度测试</h1>
+    <span class="instr">移动鼠标追踪轨迹，点击圆环测试精度</span>
+  </div>
+  <div class="main-area">
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="mainCanvas"></canvas>
+      <div class="canvas-label">测试区域 — 移动鼠标并点击目标</div>
+      <div class="summary-overlay" id="summaryOverlay">
+        <div class="summary-card">
+          <h2>测试完成</h2>
+          <div class="stat-grid" id="summaryGrid"></div>
+          <button class="btn primary" id="btnSummaryRestart">再来一次</button>
+        </div>
+      </div>
+    </div>
+    <div class="side-panel">
+      <div class="panel" id="panelRealtime">
+        <div class="panel-title">实时数据</div>
+        <div class="panel-grid">
+          <div class="panel-row"><span class="label">坐标 X</span><span class="value" id="v-curX">0</span></div>
+          <div class="panel-row"><span class="label">坐标 Y</span><span class="value" id="v-curY">0</span></div>
+          <div class="panel-row"><span class="label">速度</span><span class="value" id="v-vel">0 px/s</span></div>
+          <div class="panel-row"><span class="label">方向</span><span class="value" id="v-dir">静止</span></div>
+        </div>
+      </div>
+      <div class="panel" id="panelStats">
+        <div class="panel-title">移动统计</div>
+        <div class="panel-grid">
+          <div class="panel-row"><span class="label">采样频率</span><span class="value" id="s-rate">0 Hz</span></div>
+          <div class="panel-row"><span class="label">平均速度</span><span class="value" id="s-avgVel">0 px/s</span></div>
+          <div class="panel-row"><span class="label">最大速度</span><span class="value" id="s-maxVel">0 px/s</span></div>
+          <div class="panel-row"><span class="label">移动距离</span><span class="value" id="s-dist">0 px</span></div>
+          <div class="panel-row"><span class="label">方向修正</span><span class="value" id="s-rev">0 次</span></div>
+        </div>
+      </div>
+      <div class="panel" id="panelClick">
+        <div class="panel-title">点击测试</div>
+        <div class="panel-grid single-col">
+          <div class="panel-row"><span class="label">进度</span><span class="value" id="c-progress">0 / 20</span></div>
+          <div class="progress-bar"><div class="fill" id="c-progBar" style="width:0%"></div></div>
+          <div class="panel-row"><span class="label">命中率</span><span class="value" id="c-accuracy">--</span></div>
+          <div class="panel-row"><span class="label">平均偏差</span><span class="value" id="c-avgDev">-- px</span></div>
+          <div class="panel-row"><span class="label">平均反应</span><span class="value" id="c-avgReact">-- ms</span></div>
+        </div>
+      </div>
+      <div class="panel" id="panelAdvice">
+        <div class="panel-title">灵敏度建议</div>
+        <div id="adviceContent">
+          <div class="advice-box neutral">开始测试后将根据你的操作给出灵敏度建议</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="btnStart">开始测试</button>
+        <button class="btn clear" id="btnReset">重置</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="btnClearCanvas">清空画布</button>
+        <button class="btn export" id="btnExport">导出 CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  var BUFFER_SIZE = 500;
+  var TOTAL_CLICKS = 20;
+  var HIT_THRESHOLD_RATIO = 1.0;
+  var TARGET_SIZES = [60, 40, 24];
+  var TARGET_SIZE_LABELS = ["大", "中", "小"];
+  var SPEED_SLOW = 500;
+  var SPEED_FAST = 2000;
+
+  var canvas = document.getElementById("mainCanvas");
+  var ctx = canvas.getContext("2d");
+  var canvasWrap = document.getElementById("canvasWrap");
+  var dpr = window.devicePixelRatio || 1;
+  var canvasW = 0, canvasH = 0;
+
+  function resizeCanvas() {
+    var rect = canvasWrap.getBoundingClientRect();
+    canvasW = rect.width;
+    canvasH = rect.height;
+    canvas.width = canvasW * dpr;
+    canvas.height = canvasH * dpr;
+    canvas.style.width = canvasW + "px";
+    canvas.style.height = canvasH + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  var buffer = new Array(BUFFER_SIZE);
+  var bufIdx = 0;
+  var bufCount = 0;
+  for (var i = 0; i < BUFFER_SIZE; i++) buffer[i] = null;
+
+  var totalDistance = 0;
+  var maxVelocity = 0;
+  var velocitySum = 0;
+  var velocityCount = 0;
+  var deltaTimeSum = 0;
+  var deltaTimeCount = 0;
+  var directionReversals = 0;
+  var lastDxSign = 0;
+
+  var trailPoints = [];
+  var trailMaxLen = 60;
+
+  var lastX = 0, lastY = 0, lastTime = 0;
+  var isTracking = false;
+
+  var testActive = false;
+  var testStartTime = 0;
+  var clickResults = [];
+  var currentTarget = null;
+  var targetAppearTime = 0;
+
+  var feedbackEffects = [];
+
+  function pushPoint(data) {
+    buffer[bufIdx] = data;
+    bufIdx = (bufIdx + 1) % BUFFER_SIZE;
+    if (bufCount < BUFFER_SIZE) bufCount++;
+  }
+
+  function getPoint(offset) {
+    if (offset >= bufCount) return null;
+    var idx = (bufIdx - 1 - offset + BUFFER_SIZE * 2) % BUFFER_SIZE;
+    return buffer[idx];
+  }
+
+  function getAllPoints() {
+    var pts = [];
+    for (var i = bufCount - 1; i >= 0; i--) {
+      var p = getPoint(i);
+      if (p) pts.push(p);
+    }
+    return pts;
+  }
+
+  function computeSmoothVel(idx) {
+    var sum = 0, cnt = 0;
+    for (var k = idx; k <= idx + 2 && k < bufCount; k++) {
+      var p = getPoint(k);
+      if (p) { sum += p.velocity; cnt++; }
+    }
+    return cnt > 0 ? sum / cnt : 0;
+  }
+
+  function velToColor(vel) {
+    var absVel = Math.abs(vel);
+    if (absVel <= SPEED_SLOW) {
+      var t = absVel / SPEED_SLOW;
+      return "rgba(94, 158, 255, " + (0.3 + 0.7 * t) + ")";
+    } else if (absVel <= SPEED_FAST) {
+      var t2 = (absVel - SPEED_SLOW) / (SPEED_FAST - SPEED_SLOW);
+      var r = Math.round(94 + (52 - 94) * t2);
+      var g = Math.round(158 + (211 - 158) * t2);
+      var b = Math.round(255 + (153 - 255) * t2);
+      return "rgb(" + r + "," + g + "," + b + ")";
+    } else {
+      var t3 = Math.min(1, (absVel - SPEED_FAST) / SPEED_FAST);
+      var r2 = Math.round(52 + (248 - 52) * t3);
+      var g2 = Math.round(211 + (113 - 211) * t3);
+      var b2 = Math.round(153 + (113 - 153) * t3);
+      return "rgb(" + r2 + "," + g2 + "," + b2 + ")";
+    }
+  }
+
+  function getRect() {
+    return canvasWrap.getBoundingClientRect();
+  }
+
+  canvas.addEventListener("mousemove", function(e) {
+    var rect = getRect();
+    var cx = e.clientX - rect.left;
+    var cy = e.clientY - rect.top;
+    var t = performance.now();
+
+    if (!isTracking) {
+      isTracking = true;
+      lastX = cx;
+      lastY = cy;
+      lastTime = t;
+      trailPoints = [{ x: cx, y: cy, t: t }];
+      pushPoint({
+        time: t, x: cx, y: cy,
+        deltaX: 0, deltaY: 0, deltaMs: 0,
+        velocity: 0, velSmooth: 0
+      });
+      return;
+    }
+
+    var dx = cx - lastX;
+    var dy = cy - lastY;
+    var dt = t - lastTime;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var vel = dt > 0 ? (dist / dt) * 1000 : 0;
+
+    totalDistance += dist;
+    if (vel > maxVelocity) maxVelocity = vel;
+    velocitySum += vel;
+    velocityCount++;
+    deltaTimeSum += dt;
+    deltaTimeCount++;
+
+    var dxSign = dx > 0.5 ? 1 : (dx < -0.5 ? -1 : 0);
+    if (dxSign !== 0 && lastDxSign !== 0 && dxSign !== lastDxSign) {
+      directionReversals++;
+    }
+    if (dxSign !== 0) lastDxSign = dxSign;
+
+    var pt = {
+      time: t, x: cx, y: cy,
+      deltaX: dx, deltaY: dy, deltaMs: dt,
+      velocity: vel, velSmooth: 0
+    };
+    pushPoint(pt);
+
+    var newSmooth = computeSmoothVel(0);
+    buffer[(bufIdx - 1 + BUFFER_SIZE) % BUFFER_SIZE].velSmooth = newSmooth;
+
+    trailPoints.push({ x: cx, y: cy, t: t });
+    if (trailPoints.length > trailMaxLen) trailPoints.shift();
+
+    lastX = cx;
+    lastY = cy;
+    lastTime = t;
+  });
+
+  canvas.addEventListener("mouseleave", function() {
+    isTracking = false;
+  });
+
+  canvas.addEventListener("click", function(e) {
+    if (!testActive || !currentTarget) return;
+
+    var rect = getRect();
+    var cx = e.clientX - rect.left;
+    var cy = e.clientY - rect.top;
+    var t = performance.now();
+    var dx = cx - currentTarget.x;
+    var dy = cy - currentTarget.y;
+    var deviation = Math.sqrt(dx * dx + dy * dy);
+    var reactionTime = t - targetAppearTime;
+    var hit = deviation <= currentTarget.radius * HIT_THRESHOLD_RATIO;
+
+    clickResults.push({
+      deviation: deviation,
+      reactionTime: reactionTime,
+      hit: hit,
+      targetRadius: currentTarget.radius,
+      x: cx, y: cy
+    });
+
+    feedbackEffects.push({
+      x: cx, y: cy,
+      hit: hit,
+      startTime: t,
+      duration: 600
+    });
+
+    updateClickUI();
+
+    if (clickResults.length >= TOTAL_CLICKS) {
+      finishTest();
+    } else {
+      spawnTarget();
+    }
+  });
+
+  function spawnTarget() {
+    var sizeIdx = Math.floor(Math.random() * TARGET_SIZES.length);
+    var radius = TARGET_SIZES[sizeIdx];
+    var padding = radius + 10;
+    var x = padding + Math.random() * (canvasW - 2 * padding);
+    var y = padding + Math.random() * (canvasH - 2 * padding);
+    currentTarget = {
+      x: x, y: y,
+      radius: radius,
+      sizeLabel: TARGET_SIZE_LABELS[sizeIdx]
+    };
+    targetAppearTime = performance.now();
+  }
+
+  function startTest() {
+    testActive = true;
+    clickResults = [];
+    testStartTime = performance.now();
+    document.getElementById("btnStart").textContent = "测试中...";
+    document.getElementById("btnStart").disabled = true;
+    document.getElementById("summaryOverlay").classList.remove("show");
+    updateClickUI();
+    spawnTarget();
+  }
+
+  function finishTest() {
+    testActive = false;
+    currentTarget = null;
+    document.getElementById("btnStart").textContent = "开始测试";
+    document.getElementById("btnStart").disabled = false;
+    showSummary();
+    updateAdvice();
+  }
+
+  function resetAll() {
+    testActive = false;
+    currentTarget = null;
+    clickResults = [];
+    feedbackEffects = [];
+    document.getElementById("btnStart").textContent = "开始测试";
+    document.getElementById("btnStart").disabled = false;
+    document.getElementById("summaryOverlay").classList.remove("show");
+
+    for (var i = 0; i < BUFFER_SIZE; i++) buffer[i] = null;
+    bufIdx = 0;
+    bufCount = 0;
+    totalDistance = 0;
+    maxVelocity = 0;
+    velocitySum = 0;
+    velocityCount = 0;
+    deltaTimeSum = 0;
+    deltaTimeCount = 0;
+    directionReversals = 0;
+    lastDxSign = 0;
+    trailPoints = [];
+    isTracking = false;
+
+    document.getElementById("v-curX").textContent = "0";
+    document.getElementById("v-curY").textContent = "0";
+    document.getElementById("v-vel").textContent = "0 px/s";
+    document.getElementById("v-dir").textContent = "静止";
+    document.getElementById("s-rate").textContent = "0 Hz";
+    document.getElementById("s-avgVel").textContent = "0 px/s";
+    document.getElementById("s-maxVel").textContent = "0 px/s";
+    document.getElementById("s-dist").textContent = "0 px";
+    document.getElementById("s-rev").textContent = "0 次";
+    document.getElementById("c-progress").textContent = "0 / " + TOTAL_CLICKS;
+    document.getElementById("c-progBar").style.width = "0%";
+    document.getElementById("c-accuracy").textContent = "--";
+    document.getElementById("c-avgDev").textContent = "-- px";
+    document.getElementById("c-avgReact").textContent = "-- ms";
+    document.getElementById("adviceContent").innerHTML =
+      '<div class="advice-box neutral">开始测试后将根据你的操作给出灵敏度建议</div>';
+  }
+
+  function clearCanvasOnly() {
+    trailPoints = [];
+    feedbackEffects = [];
+    for (var i = 0; i < BUFFER_SIZE; i++) buffer[i] = null;
+    bufIdx = 0;
+    bufCount = 0;
+    totalDistance = 0;
+    maxVelocity = 0;
+    velocitySum = 0;
+    velocityCount = 0;
+    deltaTimeSum = 0;
+    deltaTimeCount = 0;
+    directionReversals = 0;
+    lastDxSign = 0;
+  }
+
+  function showSummary() {
+    var hits = clickResults.filter(function(r) { return r.hit; });
+    var totalDev = 0, totalReact = 0;
+    for (var i = 0; i < clickResults.length; i++) {
+      totalDev += clickResults[i].deviation;
+      totalReact += clickResults[i].reactionTime;
+    }
+    var avgDev = totalDev / clickResults.length;
+    var avgReact = totalReact / clickResults.length;
+    var hitRate = (hits.length / clickResults.length * 100).toFixed(0);
+
+    var grid = document.getElementById("summaryGrid");
+    grid.innerHTML =
+      '<div class="stat-item"><div class="stat-val" style="color:var(--green)">' + hitRate + '%</div><div class="stat-label">命中率</div></div>' +
+      '<div class="stat-item"><div class="stat-val">' + avgDev.toFixed(1) + ' px</div><div class="stat-label">平均偏差</div></div>' +
+      '<div class="stat-item"><div class="stat-val">' + avgReact.toFixed(0) + ' ms</div><div class="stat-label">平均反应</div></div>' +
+      '<div class="stat-item"><div class="stat-val">' + directionReversals + ' 次</div><div class="stat-label">方向修正</div></div>';
+
+    document.getElementById("summaryOverlay").classList.add("show");
+  }
+
+  function updateClickUI() {
+    var n = clickResults.length;
+    document.getElementById("c-progress").textContent = n + " / " + TOTAL_CLICKS;
+    document.getElementById("c-progBar").style.width = (n / TOTAL_CLICKS * 100) + "%";
+
+    if (n > 0) {
+      var hits = clickResults.filter(function(r) { return r.hit; });
+      var hitRate = (hits.length / n * 100).toFixed(0) + "%";
+      var totalDev = 0, totalReact = 0;
+      for (var i = 0; i < n; i++) {
+        totalDev += clickResults[i].deviation;
+        totalReact += clickResults[i].reactionTime;
+      }
+      document.getElementById("c-accuracy").textContent = hitRate;
+      document.getElementById("c-avgDev").textContent = (totalDev / n).toFixed(1) + " px";
+      document.getElementById("c-avgReact").textContent = (totalReact / n).toFixed(0) + " ms";
+    }
+  }
+
+  function updateAdvice() {
+    if (clickResults.length === 0) return;
+
+    var totalDev = 0;
+    for (var i = 0; i < clickResults.length; i++) totalDev += clickResults[i].deviation;
+    var avgDev = totalDev / clickResults.length;
+
+    var avgDt = deltaTimeCount > 0 ? deltaTimeSum / deltaTimeCount : 16;
+    var moveReversalRate = avgDt > 0 ? directionReversals / (deltaTimeCount * avgDt / 1000) : 0;
+
+    var hits = clickResults.filter(function(r) { return r.hit; });
+    var hitRate = hits.length / clickResults.length;
+    var html = "";
+
+    if (avgDev > 30 && hitRate < 0.5) {
+      html = '<div class="advice-box too-fast">灵敏度偏高 — 鼠标移动过快导致难以精确定位。建议：降低系统指针速度或降低鼠标 DPI。</div>';
+    } else if (avgDev > 30 && hitRate >= 0.5) {
+      html = '<div class="advice-box too-slow">可适当降低灵敏度 — 点击偏差较大，稍低的灵敏度有助于提高精度。</div>';
+    } else if (moveReversalRate > 3 && hitRate >= 0.7) {
+      html = '<div class="advice-box too-slow">灵敏度偏低 — 移动中频繁回退修正，说明需要大幅移动鼠标才能到达目标。建议：适当提高 DPI 或增大鼠标垫空间。</div>';
+    } else if (hitRate >= 0.8 && avgDev < 15) {
+      html = '<div class="advice-box good">灵敏度合适 — 命中率高且偏差小，当前设置非常适合你的操作习惯。</div>';
+    } else {
+      html = '<div class="advice-box neutral">灵敏度尚可 — 表现一般，可以微调 DPI 或系统指针速度来找到更舒适的手感。</div>';
+    }
+
+    document.getElementById("adviceContent").innerHTML = html;
+  }
+
+  function updateRealtimeUI() {
+    var lastPt = bufCount > 0 ? getPoint(0) : null;
+    document.getElementById("v-curX").textContent = lastPt ? Math.round(lastPt.x) : "0";
+    document.getElementById("v-curY").textContent = lastPt ? Math.round(lastPt.y) : "0";
+
+    var currentVel = lastPt ? lastPt.velSmooth : 0;
+    document.getElementById("v-vel").textContent = Math.round(currentVel) + " px/s";
+
+    var dirText = "静止";
+    if (lastPt && Math.abs(lastPt.velSmooth) > 20) {
+      var angle = Math.atan2(lastPt.deltaY, lastPt.deltaX) * 180 / Math.PI;
+      if (angle > -22.5 && angle <= 22.5) dirText = "→ 右";
+      else if (angle > 22.5 && angle <= 67.5) dirText = "↘ 右下";
+      else if (angle > 67.5 && angle <= 112.5) dirText = "↓ 下";
+      else if (angle > 112.5 && angle <= 157.5) dirText = "↙ 左下";
+      else if (angle > 157.5 || angle <= -157.5) dirText = "← 左";
+      else if (angle > -157.5 && angle <= -112.5) dirText = "↖ 左上";
+      else if (angle > -112.5 && angle <= -67.5) dirText = "↑ 上";
+      else if (angle > -67.5 && angle <= -22.5) dirText = "↗ 右上";
+    }
+    document.getElementById("v-dir").textContent = dirText;
+
+    var avgDt = deltaTimeCount > 0 ? deltaTimeSum / deltaTimeCount : 16;
+    var hz = avgDt > 0 ? Math.round(1000 / avgDt) : 0;
+    document.getElementById("s-rate").textContent = hz + " Hz";
+    var avgVel = velocityCount > 0 ? velocitySum / velocityCount : 0;
+    document.getElementById("s-avgVel").textContent = Math.round(avgVel) + " px/s";
+    document.getElementById("s-maxVel").textContent = Math.round(maxVelocity) + " px/s";
+    document.getElementById("s-dist").textContent = Math.round(totalDistance) + " px";
+    document.getElementById("s-rev").textContent = directionReversals + " 次";
+  }
+
+  function drawFrame() {
+    var now = performance.now();
+    ctx.clearRect(0, 0, canvasW, canvasH);
+
+    if (trailPoints.length >= 2) {
+      for (var i = 1; i < trailPoints.length; i++) {
+        var p0 = trailPoints[i - 1];
+        var p1 = trailPoints[i];
+        var age = now - p1.t;
+        var alpha = Math.max(0, 1 - age / 2000) * 0.8;
+        if (alpha <= 0) continue;
+
+        var pt0Idx = Math.max(0, bufCount - (trailPoints.length - i));
+        var pt1Idx = Math.max(0, bufCount - (trailPoints.length - i - 1));
+        var velForColor = 0;
+        var p = getPoint(Math.max(0, bufCount - i - 1));
+        if (p) velForColor = p.velSmooth;
+
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.strokeStyle = velToColor(velForColor);
+        ctx.globalAlpha = alpha;
+        ctx.lineWidth = 2;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round";
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (isTracking && trailPoints.length > 0) {
+      var lp = trailPoints[trailPoints.length - 1];
+      var glowR = 20;
+      var grad = ctx.createRadialGradient(lp.x, lp.y, 0, lp.x, lp.y, glowR);
+      grad.addColorStop(0, "rgba(34, 211, 238, 0.6)");
+      grad.addColorStop(0.5, "rgba(34, 211, 238, 0.2)");
+      grad.addColorStop(1, "rgba(34, 211, 238, 0)");
+      ctx.beginPath();
+      ctx.arc(lp.x, lp.y, glowR, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(lp.x, lp.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(34, 211, 238, 0.9)";
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(lp.x, lp.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+    }
+
+    if (currentTarget) {
+      var tgt = currentTarget;
+      var pulse = Math.sin(now / 300) * 0.15 + 0.85;
+
+      var tgtGlow = ctx.createRadialGradient(tgt.x, tgt.y, tgt.radius * 0.5, tgt.x, tgt.y, tgt.radius * 1.5);
+      tgtGlow.addColorStop(0, "rgba(34, 211, 238, 0.15)");
+      tgtGlow.addColorStop(1, "rgba(34, 211, 238, 0)");
+      ctx.beginPath();
+      ctx.arc(tgt.x, tgt.y, tgt.radius * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = tgtGlow;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(tgt.x, tgt.y, tgt.radius * pulse, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(34, 211, 238, 0.8)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(tgt.x, tgt.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(34, 211, 238, 0.9)";
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      ctx.font = "11px " + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = "center";
+      ctx.fillText(tgt.sizeLabel + " (" + tgt.radius * 2 + "px)", tgt.x, tgt.y + tgt.radius + 16);
+    }
+
+    for (var fi = feedbackEffects.length - 1; fi >= 0; fi--) {
+      var fe = feedbackEffects[fi];
+      var fAge = now - fe.startTime;
+      var fProg = fAge / fe.duration;
+      if (fProg >= 1) {
+        feedbackEffects.splice(fi, 1);
+        continue;
+      }
+      var fAlpha = 1 - fProg;
+      var fRadius = fe.hit ? 20 + fProg * 30 : 15 + fProg * 15;
+      var fColor = fe.hit ? "52, 211, 153" : "248, 113, 113";
+
+      ctx.beginPath();
+      ctx.arc(fe.x, fe.y, fRadius, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(" + fColor + "," + (fAlpha * 0.7) + ")";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      if (fe.hit) {
+        ctx.font = "bold 14px " + getComputedStyle(document.body).fontFamily;
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(" + fColor + "," + fAlpha + ")";
+        ctx.fillText("✓", fe.x, fe.y + 5);
+      }
+    }
+
+    requestAnimationFrame(drawFrame);
+  }
+
+  function exportCSV() {
+    var pts = getAllPoints();
+    if (pts.length === 0 && clickResults.length === 0) {
+      alert("没有数据可导出");
+      return;
+    }
+
+    var csv = "type,timestamp,x,y,deltaX,deltaY,velocity,velSmooth,deviation,reactionTime,hit\n";
+
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      csv += "move," + p.time.toFixed(2) + "," + p.x.toFixed(1) + "," + p.y.toFixed(1) + "," +
+        p.deltaX.toFixed(1) + "," + p.deltaY.toFixed(1) + "," +
+        p.velocity.toFixed(2) + "," + p.velSmooth.toFixed(2) + ",,,\n";
+    }
+
+    for (var j = 0; j < clickResults.length; j++) {
+      var c = clickResults[j];
+      csv += "click,,," + c.x.toFixed(1) + ",,,,," + c.deviation.toFixed(1) + "," +
+        c.reactionTime.toFixed(1) + "," + (c.hit ? "1" : "0") + "\n";
+    }
+
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "mouse-data-" + Date.now() + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("btnStart").addEventListener("click", startTest);
+  document.getElementById("btnReset").addEventListener("click", resetAll);
+  document.getElementById("btnClearCanvas").addEventListener("click", clearCanvasOnly);
+  document.getElementById("btnExport").addEventListener("click", exportCSV);
+  document.getElementById("btnSummaryRestart").addEventListener("click", function() {
+    document.getElementById("summaryOverlay").classList.remove("show");
+    startTest();
+  });
+
+  requestAnimationFrame(drawFrame);
+  setInterval(updateRealtimeUI, 50);
+
+})();
+</script>
+</body>
+</html>
