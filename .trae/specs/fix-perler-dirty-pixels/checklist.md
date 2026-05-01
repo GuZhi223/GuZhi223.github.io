@@ -1,5 +1,0 @@
-- [x] `pixelate()` 中 `imageSmoothingEnabled` 已设为 `false`
-- [x] `mapColors()` 返回前调用了 `cleanNoise()` 后处理
-- [x] `cleanNoise()` 方法实现正确——检测孤立像素并替换为邻居多数色
-- [x] 纯色区域不再出现零星杂色像素
-- [x] 正常图案的颜色细节（如边界线、渐变）未被过度平滑抹除

@@ -1,7 +1,0 @@
-- [x] appState 中新增 touchStartX、touchStartY、touchStartTime、touchIsTap 字段
-- [x] resetReading() 和 continueSpread() 中重置触控追踪字段
-- [x] pointerdown 仅记录起始状态，不直接抽卡
-- [x] pointermove 中移动距离超过 15px 时 touchIsTap 设为 false
-- [x] pointerup 中判定点击手势（touchIsTap && 时长 < 500ms && 条件守卫）才触发抽卡
-- [x] 滑动选牌功能不受影响（pointermove 仍正常调用 updatePointerSelection）
-- [x] 桌面端鼠标点击仍可正常抽卡

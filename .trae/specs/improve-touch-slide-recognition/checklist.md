@@ -1,7 +1,0 @@
-- [x] appState 中新增 touchDeadzonePassed 字段
-- [x] resetReading() 和 continueSpread() 中重置新字段
-- [x] 死区内（< 8px）不调用 updatePointerSelection
-- [x] 超过 8px 后开始正常追踪手指位置
-- [x] pointerdown 中调用 setPointerCapture
-- [x] pointerup 中重置 touchDeadzonePassed 和 touchIsTap
-- [x] 手动模式下 layoutCards() 跳过 deckRotation 二次插值
