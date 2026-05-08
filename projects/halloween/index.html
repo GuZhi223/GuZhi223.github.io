@@ -111,37 +111,63 @@
             z-index: 3;
         }
 
+        #effectCanvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 4;
+        }
+
         .message {
             position: absolute;
             width: var(--bubble-width);
-            min-height: var(--bubble-height);
-            display: grid;
-            place-items: center;
-            padding: 7px 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.95);
-            color: #37214a;
-            text-align: center;
-            font-size: var(--bubble-font);
-            font-weight: 800;
-            line-height: 1.24;
-            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(200, 180, 220, 0.45);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.96);
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
             transform: translate(-50%, -50%) scale(0.58) rotate(-5deg);
             animation: pop 0.34s ease-out forwards;
             will-change: transform, opacity;
         }
 
-        .message:nth-child(3n) {
-            background: rgba(255, 241, 214, 0.96);
+        .message:nth-child(3n) .dialog-header {
+            background: linear-gradient(135deg, #ffb347, #ff8c00);
         }
 
-        .message:nth-child(3n + 1) {
-            background: rgba(255, 232, 242, 0.96);
+        .message:nth-child(3n + 1) .dialog-header {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
         }
 
-        .message:nth-child(3n + 2) {
-            background: rgba(237, 232, 255, 0.96);
+        .message:nth-child(3n + 2) .dialog-header {
+            background: linear-gradient(135deg, #9370db, #7b68ee);
+        }
+
+        .dialog-header {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            font-size: calc(var(--bubble-font) * 0.75);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.02em;
+        }
+
+        .dialog-header .icon {
+            font-size: calc(var(--bubble-font) * 0.85);
+            line-height: 1;
+        }
+
+        .dialog-body {
+            padding: 5px 8px 6px;
+            font-size: var(--bubble-font);
+            font-weight: 800;
+            color: #37214a;
+            text-align: center;
+            line-height: 1.3;
         }
 
         @keyframes float {
@@ -180,6 +206,7 @@
     </main>
 
     <div class="popup-layer" id="popupLayer"></div>
+    <canvas id="effectCanvas"></canvas>
     <audio id="bgMusic" preload="none" loop>
         <source src="https://sf5-hl-cdn-tos.douyinstatic.com/obj/ies-music/7499771397531503370.mp3" type="audio/mpeg">
     </audio>
@@ -202,20 +229,286 @@
         const layer = document.getElementById("popupLayer");
         const button = document.getElementById("openGift");
         const music = document.getElementById("bgMusic");
+        const canvas = document.getElementById("effectCanvas");
+        const ctx = canvas.getContext("2d");
+
         let opened = false;
         let timers = [];
+        let heartComplete = false;
+
+        const PETAL_COLORS = ['#FFB6C1', '#FF69B4', '#FFC0CB', '#FF8C00', '#FF6347', '#9370DB', '#8A2BE2'];
+        const FW_COLORS = ['#FF4500', '#FF6347', '#FF8C00', '#FFD700', '#FF1493', '#9370DB', '#FF69B4'];
+        const ALL_COLORS = [...new Set([...PETAL_COLORS, ...FW_COLORS])];
+
+        const SIZES = [4, 6, 8, 10, 12, 14, 16];
+        const petalCache = new Map();
+
+        function buildPetalCache() {
+            SIZES.forEach(size => {
+                ALL_COLORS.forEach(color => {
+                    const key = `${size}_${color}`;
+                    const offscreen = document.createElement('canvas');
+                    const s = size * 2 + 4;
+                    offscreen.width = s;
+                    offscreen.height = s;
+                    const oCtx = offscreen.getContext('2d');
+                    const cx = s / 2;
+                    const cy = s / 2;
+                    oCtx.translate(cx, cy);
+                    oCtx.beginPath();
+                    oCtx.moveTo(0, -size);
+                    oCtx.bezierCurveTo(size * 0.8, -size * 0.8, size * 0.8, size * 0.3, 0, size);
+                    oCtx.bezierCurveTo(-size * 0.8, size * 0.3, -size * 0.8, -size * 0.8, 0, -size);
+                    oCtx.fillStyle = color;
+                    oCtx.fill();
+                    oCtx.beginPath();
+                    oCtx.moveTo(0, -size * 0.6);
+                    oCtx.bezierCurveTo(size * 0.3, -size * 0.4, size * 0.3, size * 0.1, 0, size * 0.6);
+                    oCtx.bezierCurveTo(-size * 0.3, size * 0.1, -size * 0.3, -size * 0.4, 0, -size * 0.6);
+                    oCtx.fillStyle = 'rgba(255,255,255,0.25)';
+                    oCtx.fill();
+                    petalCache.set(key, offscreen);
+                });
+            });
+        }
+        buildPetalCache();
+
+        function getCachedPetal(size, color) {
+            const clampedSize = Math.round(size / 2) * 2;
+            const s = Math.max(SIZES[0], Math.min(SIZES[SIZES.length - 1], clampedSize));
+            return petalCache.get(`${s}_${color}`);
+        }
+
+        function rand(a, b) { return Math.random() * (b - a) + a; }
+        function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener("resize", resizeCanvas);
+
+        const PHASE = { FIREWORK: 0, FALLING: 1 };
+        const FIREWORK_DURATION = 1400;
+        const FIREWORK_DECAY_MIN = 0.006;
+        const FIREWORK_DECAY_MAX = 0.013;
+        const TRANSITION_DECAY = 0.003;
+
+        const POOL_MAX = 400;
+        const pool = [];
+
+        function acquire() {
+            if (pool.length > 0) return pool.pop();
+            return {};
+        }
+
+        function release(p) {
+            if (pool.length < POOL_MAX) pool.push(p);
+        }
+
+        const particles = [];
+        let phaseStartTime = 0;
+        let phase = null;
+        let animFrameId = null;
+        let frameTick = 0;
+
+        function initFireworkParticle(p, x, y) {
+            const angle = rand(0, Math.PI * 2);
+            const speed = rand(2, 8);
+            p.x = x;
+            p.y = y;
+            p.vx = Math.cos(angle) * speed;
+            p.vy = Math.sin(angle) * speed - rand(0.5, 2);
+            p.size = rand(4, 12);
+            p.color = pick(ALL_COLORS);
+            p.life = 1;
+            p.decay = rand(FIREWORK_DECAY_MIN, FIREWORK_DECAY_MAX);
+            p.gravity = 0.06;
+            p.rotation = rand(0, Math.PI * 2);
+            p.rotSpeed = rand(-0.08, 0.08);
+            p.phase = PHASE.FIREWORK;
+            p.sway = 0;
+            p.swayFreq = 0;
+            p.swayAmp = 0;
+            p.fadeIn = 0;
+            return p;
+        }
+
+        function transitionToFalling(p) {
+            p.phase = PHASE.FALLING;
+            p.decay = TRANSITION_DECAY;
+            p.gravity = 0.012;
+            p.vx *= 0.15;
+            p.vy = Math.abs(p.vy) * 0.2 + rand(0.3, 1.0);
+            p.size = rand(6, 14);
+            p.color = pick(PETAL_COLORS);
+            p.rotSpeed = rand(-0.025, 0.025);
+            p.sway = rand(0, Math.PI * 2);
+            p.swayFreq = rand(0.008, 0.025);
+            p.swayAmp = rand(0.4, 1.2);
+            p.life = rand(0.7, 1);
+            return p;
+        }
+
+        function spawnFallingPetal(fromTop) {
+            const p = acquire();
+            p.x = rand(0, canvas.width);
+            p.y = fromTop ? rand(-canvas.height, 0) : rand(-100, -10);
+            p.vx = rand(-0.2, 0.2);
+            p.vy = rand(0.5, 1.6);
+            p.size = rand(6, 14);
+            p.color = pick(PETAL_COLORS);
+            p.life = 1;
+            p.decay = 0;
+            p.gravity = 0;
+            p.rotation = rand(0, Math.PI * 2);
+            p.rotSpeed = rand(-0.025, 0.025);
+            p.phase = PHASE.FALLING;
+            p.sway = rand(0, Math.PI * 2);
+            p.swayFreq = rand(0.008, 0.025);
+            p.swayAmp = rand(0.4, 1.2);
+            p.fadeIn = fromTop ? 1 : 0;
+            particles.push(p);
+        }
+
+        function spawnFireworkBurst(x, y) {
+            const count = rand(24, 36) | 0;
+            for (let i = 0; i < count; i++) {
+                const p = acquire();
+                initFireworkParticle(p, x, y);
+                particles.push(p);
+            }
+        }
+
+        function updateParticle(p, dt) {
+            if (p.phase === PHASE.FIREWORK) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.vx *= 0.985;
+                p.rotation += p.rotSpeed;
+                p.life -= p.decay;
+
+                if (p.life <= 0.35) {
+                    transitionToFalling(p);
+                }
+            } else {
+                p.sway += p.swayFreq;
+                p.x += p.vx + Math.sin(p.sway) * p.swayAmp;
+                p.y += p.vy;
+                p.vy += p.gravity;
+                p.vy = Math.min(p.vy, 2.5);
+                p.vx *= 0.995;
+                p.rotation += p.rotSpeed;
+                if (p.fadeIn > 0) p.fadeIn = Math.max(0, p.fadeIn - 0.015);
+
+                if (p.decay > 0) {
+                    p.life -= p.decay;
+                }
+
+                if (p.y > canvas.height + 30) {
+                    p.x = rand(0, canvas.width);
+                    p.y = rand(-80, -10);
+                    p.vy = rand(0.5, 1.6);
+                    p.vx = rand(-0.2, 0.2);
+                    p.life = 1;
+                    p.fadeIn = 1;
+                    p.sway = rand(0, Math.PI * 2);
+                }
+            }
+        }
+
+        function drawParticle(p) {
+            if (p.life <= 0 && p.decay > 0) return;
+            const alpha = Math.max(0, Math.min(1, p.life - p.fadeIn));
+            if (alpha <= 0) return;
+
+            const cached = getCachedPetal(p.size, p.color);
+            if (!cached) return;
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+
+            if (p.phase === PHASE.FIREWORK && p.life > 0.6) {
+                ctx.shadowColor = p.color;
+                ctx.shadowBlur = 12 * p.life;
+            }
+
+            ctx.drawImage(cached, -cached.width / 2, -cached.height / 2);
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        }
+
+        function cleanup() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                if (particles[i].life <= 0 && particles[i].decay > 0) {
+                    release(particles[i]);
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function startFireworkAnimation() {
+            phase = PHASE.FIREWORK;
+            phaseStartTime = performance.now();
+            frameTick = 0;
+            runLoop();
+        }
+
+        function runLoop() {
+            frameTick++;
+            const now = performance.now();
+            const elapsed = now - phaseStartTime;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (phase === PHASE.FIREWORK && elapsed < FIREWORK_DURATION) {
+                if (Math.random() > 0.55) {
+                    const x = rand(canvas.width * 0.15, canvas.width * 0.85);
+                    const y = rand(canvas.height * 0.15, canvas.height * 0.5);
+                    spawnFireworkBurst(x, y);
+                }
+            }
+
+            if (phase === PHASE.FIREWORK && elapsed >= FIREWORK_DURATION) {
+                const hasFwParticles = particles.some(p => p.phase === PHASE.FIREWORK);
+                if (!hasFwParticles) {
+                    phase = PHASE.FALLING;
+                    phaseStartTime = now;
+                    const count = Math.min(60, Math.floor(canvas.width / 18));
+                    for (let i = 0; i < count; i++) {
+                        spawnFallingPetal(true);
+                    }
+                }
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                updateParticle(particles[i], 1);
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                drawParticle(particles[i]);
+            }
+
+            if (frameTick % 30 === 0) cleanup();
+
+            animFrameId = requestAnimationFrame(runLoop);
+        }
 
         function getLayout() {
             const width = window.innerWidth;
             const height = window.innerHeight;
             const mobile = width < 640;
-            const bubbleWidth = mobile ? Math.max(54, Math.min(72, width / 6.4)) : Math.max(72, Math.min(104, width / 11));
-            const bubbleHeight = mobile ? 36 : 42;
+            const bubbleWidth = mobile ? Math.max(62, Math.min(80, width / 5.8)) : Math.max(82, Math.min(116, width / 9.5));
+            const bubbleHeight = mobile ? 50 : 58;
             const centerX = width / 2;
             const centerY = mobile ? height * 0.5 : height * 0.5;
             const scale = Math.min(
                 (width - bubbleWidth * 1.8) / 34,
-                (height - bubbleHeight * 3.2) / 30,
+                (height - bubbleHeight * 3.0) / 30,
                 mobile ? 10 : 18
             );
 
@@ -248,23 +541,49 @@
         function renderHeart() {
             clearTimers();
             layer.innerHTML = "";
+            heartComplete = false;
 
             const layout = getLayout();
             layer.style.setProperty("--bubble-width", `${layout.bubbleWidth}px`);
             layer.style.setProperty("--bubble-height", `${layout.bubbleHeight}px`);
             layer.style.setProperty("--bubble-font", `${layout.fontSize}px`);
 
+            const dialogIcons = ["\ud83c\udf83", "\u2728", "\ud83c\udf1f", "\ud83d\udc9c", "\ud83c\udf42"];
+            const dialogTitles = ["\u795d\u798f", "\u5173\u6000", "\u5bc6\u8bed", "\u5fc3\u610f", "\u6e29\u6696"];
+
             for (let i = 0; i < layout.count; i += 1) {
                 const timer = setTimeout(() => {
                     const point = heartPoint(i, layout.count, layout);
+
                     const message = document.createElement("div");
                     message.className = "message";
                     message.style.left = `${point.x}px`;
                     message.style.top = `${point.y}px`;
                     message.style.setProperty("--rotate", `${(i % 7) - 3}deg`);
-                    message.textContent = messages[i % messages.length];
+
+                    const header = document.createElement("div");
+                    header.className = "dialog-header";
+                    const icon = document.createElement("span");
+                    icon.className = "icon";
+                    icon.textContent = dialogIcons[i % dialogIcons.length];
+                    const title = document.createElement("span");
+                    title.textContent = dialogTitles[i % dialogTitles.length];
+                    header.appendChild(icon);
+                    header.appendChild(title);
+
+                    const body = document.createElement("div");
+                    body.className = "dialog-body";
+                    body.textContent = messages[i % messages.length];
+
+                    message.appendChild(header);
+                    message.appendChild(body);
                     layer.appendChild(message);
-                }, i * 150);
+
+                    if (i === layout.count - 1) {
+                        heartComplete = true;
+                        startFireworkAnimation();
+                    }
+                }, i * 120);
                 timers.push(timer);
             }
         }
