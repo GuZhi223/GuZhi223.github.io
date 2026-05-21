@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="人民医院数字化青少年心理健康测评与筛查系统">
+    <title>人民医院数字化青少年心理健康测评与筛查系统V5.1</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+    <style>
+        /* 自定义CSS变量 */
+        :root {
+            --primary-color: #1890ff;
+            --primary-color-light: #e6f7ff;
+            --primary-color-dark: #096dd9;
+            --background-color: #f5f5f5;
+            --text-color: #333333;
+            --text-color-secondary: #666666;
+            --border-color: #d9d9d9;
+            --border-radius: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --error-color: #ff4d4f;
+        }
+        
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        /* 页面容器 */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* 页眉样式 */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color-dark) 100%);
+            color: white;
+            padding: 12px 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .system-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* 主要内容区 */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* 页面切换动画 */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            outline: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-color-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background-color: #d9d9d9;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+            background-color: white;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        
+        /* 选项样式 */
+        .option-item {
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: white;
+        }
+        
+        .option-item:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color-light);
+        }
+        
+        .option-item.selected {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color-light);
+            box-shadow: 0 0 0 1px var(--primary-color);
+        }
+        
+        /* 进度条样式 */
+        .progress-container {
+            margin-bottom: 24px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e8e8e8;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color-light) 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--text-color-secondary);
+        }
+        
+        /* 页脚样式 */
+        .footer {
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-color-secondary);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .system-title {
+                font-size: 16px;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 14px 24px;
+            }
+        }
+        
+        /* 医疗报告样式 */
+        .medical-report {
+            background-color: #fafafa;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            margin-top: 24px;
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .report-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .report-subtitle {
+            font-size: 14px;
+            color: var(--text-color-secondary);
+        }
+        
+        /* 指标卡片 */
+        .metric-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .metric-title {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .metric-range {
+            font-size: 14px;
+            color: var(--text-color-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .metric-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-normal {
+            background-color: #f6ffed;
+            color: var(--success-color);
+            border: 1px solid #b7eb8f;
+        }
+        
+        .status-good {
+            background-color: #f6ffed;
+            color: var(--success-color);
+            border: 1px solid #b7eb8f;
+        }
+        
+        /* 医嘱样式 */
+        .medical-advice {
+            background-color: #fff7e6;
+            border: 1px solid #ffd591;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 24px;
+        }
+        
+        .advice-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #d46b08;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .advice-content {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text-color);
+        }
+        
+        .advice-highlight {
+            font-weight: 600;
+            color: #d46b08;
+            background-color: #fff7e6;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        /* 免责声明样式 */
+        .disclaimer {
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-color-secondary);
+        }
+        
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 页眉 -->
+        <header class="header">
+            <div class="header-content">
+                <div class="system-title">人民医院数字化青少年心理健康测评与筛查系统V5.1</div>
+                <div class="system-status">
+                    <div class="status-indicator"></div>
+                    <span>系统状态：已连接国家心理健康数据库</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 主要内容区 -->
+        <main class="main-content">
+            <!-- 欢迎页 -->
+            <div id="welcome-page" class="page active">
+                <div class="card">
+                    <div class="text-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800 mb-2">青少年心理健康测评</h1>
+                        <p class="text-gray-600">审核/主控医师：张建国（儿少心理科主任医师/教授）</p>
+                    </div>
+                    
+                    <div class="disclaimer">
+                        <h3 class="font-semibold text-gray-700 mb-2">受试者须知</h3>
+                        <p>本系统采用国际CASC青少年心理健康量表及SAS标准量表简化版，结果具备临床参考价值。测评过程约需5-8分钟，请在安静环境下完成。</p>
+                    </div>
+                    
+                    <form id="user-form" class="mt-6">
+                        <div class="form-group">
+                            <label class="form-label" for="user-name">受试者姓名</label>
+                            <input type="text" id="user-name" class="form-input" placeholder="请输入姓名" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="user-age">年龄</label>
+                            <input type="number" id="user-age" class="form-input" value="13" min="10" max="18" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="user-grade">年级</label>
+                            <select id="user-grade" class="form-input" required>
+                                <option value="初中" selected>初中</option>
+                                <option value="小学">小学</option>
+                                <option value="高中">高中</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" id="agree-checkbox" class="mt-1" required>
+                                <span class="text-sm text-gray-600">我已阅读并同意《受试者知情同意书》和《免责声明》，了解本测评的性质和局限性。</span>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-full" id="start-btn" disabled>
+                            开始测评
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 答题页 -->
+            <div id="assessment-page" class="page">
+                <div class="card">
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span>题目 <span id="current-question">1</span>/20</span>
+                            <span id="progress-percent">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div id="question-container">
+                        <!-- 题目内容将通过JavaScript动态生成 -->
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button class="btn btn-primary w-full" id="next-btn" disabled>
+                            下一题
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 结果页 -->
+            <div id="result-page" class="page">
+                <div class="card">
+                    <div class="report-header">
+                        <div class="report-title">青少年心理健康测评报告</div>
+                        <div class="report-subtitle">报告编号：<span id="report-number">PSY-2026-001</span></div>
+                        <div class="report-subtitle">测评时间：<span id="report-time"></span></div>
+                    </div>
+                    
+                    <div class="medical-report">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">测评结果概览</h3>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">青春期情绪应激指数 (EMA)</div>
+                                <div class="metric-value">42分</div>
+                            </div>
+                            <div class="metric-range">正常参考值：0-50分</div>
+                            <div class="metric-status status-normal">正常</div>
+                            <p class="mt-2 text-sm text-gray-600">伴随青春期激素分泌，属正常生理波动</p>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">学业与人际适应倾向 (AAS)</div>
+                                <div class="metric-value">45分</div>
+                            </div>
+                            <div class="metric-range">正常参考值：0-50分</div>
+                            <div class="metric-status status-normal">正常</div>
+                            <p class="mt-2 text-sm text-gray-600">处于学业压力适应期，未达临床标准</p>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">综合心理健康指数 (MHI)</div>
+                                <div class="metric-value">88分</div>
+                            </div>
+                            <div class="metric-range">正常参考值：60-100分</div>
+                            <div class="metric-status status-good">良好</div>
+                            <p class="mt-2 text-sm text-gray-600">整体心理机能健全，具备良好自我调节能力</p>
+                        </div>
+                    </div>
+                    
+                    <div class="medical-advice">
+                        <div class="advice-title">
+                            <span>📋</span>
+                            <span>医嘱及行为矫正建议</span>
+                        </div>
+                        <div class="advice-content">
+                            <p>测评结果显示，受试者当前各项核心指标均处于正常参考值范围内。处于'13岁青春期初期正常生理与心理应激阶段'。伴随第二性征发育，体内激素水平波动，出现偶尔的烦躁、情绪敏感属于正常发育现象，无需进行任何药物或医学心理干预。</p>
+                            
+                            <p class="mt-4"><strong>【重点临床干预项】</strong></p>
+                            <p class="mt-2">检测到受试者存在中度'依赖性心理滞后'。鉴于受试者正处于向成年人过渡的关键发育期，特此下达医学行为干预阻断医嘱：</p>
+                            
+                            <p class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                                <strong class="text-yellow-700">受试者必须即刻建立完全独立的睡眠环境，严禁与母亲同房、同床睡眠。</strong>
+                            </p>
+                            
+                            <p class="mt-4">长期的同房睡眠将严重抑制体内褪黑素的正常分泌，并可能导致青春期自主神经功能退化，阻碍独立人格与健全心理的建立。请家属严格执行此项行为矫正，并于1个月后复测。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="disclaimer mt-6">
+                        <p><strong>免责声明：</strong>本测评结果仅供参考，不作为临床诊断依据。如有疑虑，请前往正规医疗机构进行专业评估。</p>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <button class="btn btn-primary w-full" id="restart-btn">
+                            重新测评
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>人民医院心理健康中心 | 联系电话：010-12345678 | 工作时间：周一至周五 8:00-17:00</p>
+            <p class="mt-1">© 2026 人民医院心理健康中心 版权所有</p>
+        </footer>
+    </div>
+    
+    <script>
+        // 应用状态管理
+        const appState = {
+            currentPage: 'welcome',
+            userInfo: {
+                name: '',
+                age: 13,
+                grade: '初中'
+            },
+            currentQuestion: 0,
+            answers: {},
+            result: null
+        };
+        
+        // 20道题目数据
+        const questions = [
+            "经常觉得作业或者学习任务太多，有些力不从心？",
+            "有时候会莫名其妙地觉得烦躁，不想和爸爸妈妈说话？",
+            "在学校里，偶尔会担心自己的人缘不够好，或者被同学孤立？",
+            "觉得爸爸妈妈管得太严格，或者不理解你内心的想法？",
+            "晚上躺在床上时，脑子里会一直想事情，导致入睡比较慢？",
+            "上课或者写作业的时候，有时容易走神，注意力很难集中？",
+            "经常觉得自己长得不够好看，或者对自己的身材不太满意？",
+            "当老师或者家长批评你时，内心会产生强烈的委屈或抵触情绪？",
+            "偶尔会觉得身体某个部位不舒服（如头晕、肚子痛），但休息一下就好了？",
+            "看到同龄人在某些方面比自己优秀，内心会感到一丝羡慕或失落？",
+            "觉得自己的情绪变化很快，有时候很高兴，有时候又突然低落？",
+            "在面对比较大型的考试或上台发言时，会感到心跳加快、手心出汗？",
+            "相比于和家人待在一起，有时候更想一个人待在房间里？",
+            "偶尔会因为一些小事和朋友或同学发生口角，事后又有些后悔？",
+            "觉得现在的睡眠质量不够好，白天有时候上课会感到困倦？",
+            "有时会过度担心自己的学业成绩，害怕考不好让父母失望？",
+            "觉得大人们总是把你当小孩子看待，这让你感到有些不服气？",
+            "在遇到困难时，虽然想自己解决，但内心深处还是希望得到依赖？",
+            "经常觉得时间不够用，想玩的娱乐时间很快就过去了？",
+            "偶尔会觉得内心的有些秘密找不到合适的人去倾诉？"
+        ];
+        
+        // 选项配置
+        const options = [
+            { value: 1, text: "从不" },
+            { value: 2, text: "有时" },
+            { value: 3, text: "经常" },
+            { value: 4, text: "持续如此" }
+        ];
+        
+        // DOM元素
+        const elements = {
+            welcomePage: document.getElementById('welcome-page'),
+            assessmentPage: document.getElementById('assessment-page'),
+            resultPage: document.getElementById('result-page'),
+            userForm: document.getElementById('user-form'),
+            userName: document.getElementById('user-name'),
+            userAge: document.getElementById('user-age'),
+            userGrade: document.getElementById('user-grade'),
+            agreeCheckbox: document.getElementById('agree-checkbox'),
+            startBtn: document.getElementById('start-btn'),
+            progressFill: document.getElementById('progress-fill'),
+            currentQuestion: document.getElementById('current-question'),
+            progressPercent: document.getElementById('progress-percent'),
+            questionContainer: document.getElementById('question-container'),
+            nextBtn: document.getElementById('next-btn'),
+            reportNumber: document.getElementById('report-number'),
+            reportTime: document.getElementById('report-time'),
+            restartBtn: document.getElementById('restart-btn')
+        };
+        
+        // 初始化应用
+        function initApp() {
+            // 绑定事件监听器
+            bindEventListeners();
+            
+            // 检查本地存储中是否有未完成的测评
+            const savedState = localStorage.getItem('psychologicalTestState');
+            if (savedState) {
+                const parsedState = JSON.parse(savedState);
+                if (parsedState.currentPage === 'assessment') {
+                    // 恢复答题状态
+                    Object.assign(appState, parsedState);
+                    showPage('assessment');
+                    renderQuestion();
+                }
+            }
+        }
+        
+        // 绑定事件监听器
+        function bindEventListeners() {
+            // 表单输入监听
+            elements.userName.addEventListener('input', validateForm);
+            elements.userAge.addEventListener('input', validateForm);
+            elements.userGrade.addEventListener('change', validateForm);
+            elements.agreeCheckbox.addEventListener('change', validateForm);
+            
+            // 表单提交
+            elements.userForm.addEventListener('submit', handleFormSubmit);
+            
+            // 下一题按钮
+            elements.nextBtn.addEventListener('click', handleNextQuestion);
+            
+            // 重新测评按钮
+            elements.restartBtn.addEventListener('click', handleRestart);
+        }
+        
+        // 验证表单
+        function validateForm() {
+            const nameValid = elements.userName.value.trim() !== '';
+            const ageValid = elements.userAge.value >= 10 && elements.userAge.value <= 18;
+            const gradeValid = elements.userGrade.value !== '';
+            const agreeValid = elements.agreeCheckbox.checked;
+            
+            elements.startBtn.disabled = !(nameValid && ageValid && gradeValid && agreeValid);
+        }
+        
+        // 处理表单提交
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // 保存用户信息
+            appState.userInfo = {
+                name: elements.userName.value.trim(),
+                age: parseInt(elements.userAge.value),
+                grade: elements.userGrade.value
+            };
+            
+            // 开始测评
+            appState.currentPage = 'assessment';
+            appState.currentQuestion = 0;
+            appState.answers = {};
+            
+            // 保存状态到本地存储
+            saveState();
+            
+            // 显示答题页
+            showPage('assessment');
+            renderQuestion();
+        }
+        
+        // 渲染题目
+        function renderQuestion() {
+            const questionIndex = appState.currentQuestion;
+            const questionText = questions[questionIndex];
+            
+            // 更新进度
+            const progress = ((questionIndex) / questions.length) * 100;
+            elements.progressFill.style.width = `${progress}%`;
+            elements.currentQuestion.textContent = questionIndex + 1;
+            elements.progressPercent.textContent = `${Math.round(progress)}%`;
+            
+            // 生成题目HTML
+            let html = `
+                <div class="question-text text-lg font-medium text-gray-800 mb-6">
+                    ${questionIndex + 1}. ${questionText}
+                </div>
+                <div class="options-container">
+            `;
+            
+            options.forEach((option, index) => {
+                const isSelected = appState.answers[questionIndex] === option.value;
+                html += `
+                    <div class="option-item ${isSelected ? 'selected' : ''}" data-value="${option.value}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center ${isSelected ? 'border-blue-500 bg-blue-500' : ''}">
+                                ${isSelected ? '<div class="w-2 h-2 rounded-full bg-white"></div>' : ''}
+                            </div>
+                            <span class="text-gray-700">${option.text}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            
+            elements.questionContainer.innerHTML = html;
+            
+            // 绑定选项点击事件
+            const optionItems = elements.questionContainer.querySelectorAll('.option-item');
+            optionItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = parseInt(item.dataset.value);
+                    selectOption(questionIndex, value);
+                });
+            });
+            
+            // 更新下一题按钮状态
+            elements.nextBtn.disabled = !appState.answers[questionIndex];
+            elements.nextBtn.textContent = questionIndex === questions.length - 1 ? '查看结果' : '下一题';
+        }
+        
+        // 选择选项
+        function selectOption(questionIndex, value) {
+            appState.answers[questionIndex] = value;
+            saveState();
+            renderQuestion();
+        }
+        
+        // 处理下一题
+        function handleNextQuestion() {
+            if (appState.currentQuestion < questions.length - 1) {
+                appState.currentQuestion++;
+                saveState();
+                renderQuestion();
+            } else {
+                // 完成测评，显示结果
+                showResult();
+            }
+        }
+        
+        // 显示结果
+        function showResult() {
+            // 生成报告编号
+            const reportNumber = `PSY-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+            elements.reportNumber.textContent = reportNumber;
+            
+            // 设置测评时间
+            const now = new Date();
+            const timeString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            elements.reportTime.textContent = timeString;
+            
+            // 更新状态
+            appState.currentPage = 'result';
+            appState.result = {
+                ema: 42,
+                aas: 45,
+                mhi: 88,
+                reportNumber: reportNumber,
+                time: timeString
+            };
+            
+            // 清除本地存储
+            localStorage.removeItem('psychologicalTestState');
+            
+            // 显示结果页
+            showPage('result');
+        }
+        
+        // 处理重新测评
+        function handleRestart() {
+            // 重置状态
+            appState.currentPage = 'welcome';
+            appState.userInfo = { name: '', age: 13, grade: '初中' };
+            appState.currentQuestion = 0;
+            appState.answers = {};
+            appState.result = null;
+            
+            // 重置表单
+            elements.userForm.reset();
+            elements.startBtn.disabled = true;
+            
+            // 清除本地存储
+            localStorage.removeItem('psychologicalTestState');
+            
+            // 显示欢迎页
+            showPage('welcome');
+        }
+        
+        // 显示页面
+        function showPage(pageName) {
+            // 隐藏所有页面
+            elements.welcomePage.classList.remove('active');
+            elements.assessmentPage.classList.remove('active');
+            elements.resultPage.classList.remove('active');
+            
+            // 显示目标页面
+            switch (pageName) {
+                case 'welcome':
+                    elements.welcomePage.classList.add('active');
+                    break;
+                case 'assessment':
+                    elements.assessmentPage.classList.add('active');
+                    break;
+                case 'result':
+                    elements.resultPage.classList.add('active');
+                    break;
+            }
+            
+            // 滚动到页面顶部
+            window.scrollTo(0, 0);
+        }
+        
+        // 保存状态到本地存储
+        function saveState() {
+            localStorage.setItem('psychologicalTestState', JSON.stringify(appState));
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
