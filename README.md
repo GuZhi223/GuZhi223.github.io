@@ -28,7 +28,7 @@
 
 主页里展示了我目前比较想让人看到的几个仓库：
 
-- [JumpMaster](https://github.com/GuZhi223/JumpMaster) — 微信跳一跳 Android 辅助工具，基于图像识别自动计算跳跃距离和按压时间，支持本地模式（MediaProjection + AccessibilityService）和无线 ADB 模式。Kotlin + Jetpack Compose。
+- [JumpMaster](https://github.com/GuZhi223/JumpMaster) — 微信跳一跳 Android 辅助，图像识别自动跳跃。Kotlin + Jetpack Compose。
 - [hnjingsai_help](https://github.com/GuZhi223/hnjingsai_help) — 针对 `henanjingsai.cn` 的油猴脚本，顺手整理了约 244 道题的题库。
 - [chaoxing-GUI-Helper](https://github.com/GuZhi223/chaoxing-GUI-Helper) — 学习通/超星自动化流程的图形化启动器，2.0 版用 Flet + MVVM + EventBus 重构。
 - [ono](https://github.com/GuZhi223/ono) — fork 来学习的 QQNT Xposed 模块，用于阅读 Android 模块结构和 Hook 思路。
