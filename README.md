@@ -17,6 +17,7 @@
 | [projects/particles/](projects/particles/) | 星门塔罗 \| 3D 手势抽牌：输入问题后用「张开手 → 握拳 → 张开手」的手势在 3D 牌阵中抽取塔罗牌 | Three.js、MediaPipe Hands |
 | [projects/trust/](projects/trust/) | 《信任的进化》中文网页复活版——Nicky Case 博弈论互动游戏的本地化部署与移动端适配 | PIXI.js、Howler.js |
 | [projects/nutrition/](projects/nutrition/) | 减脂期饮食与营养素计算器：根据生活化减脂理论，输入性别、体重和运动量即可估算每日碳水、蛋白质和脂肪目标 | 原生 JS（OOP） |
+| [projects/china-history-review/](projects/china-history-review/) | 中国近代史答题式期末复习工具：支持章节筛选、错题补漏、离线使用和可选 AI 提示 | 原生 JS、PWA |
 | [projects/love-gallery/](projects/love-gallery/) | 爱心展示合集：从互联网收集的约 50 个"低脂"爱心 HTML 页面，已清理无关推广入口 | HTML / CSS / JS |
 | [projects/halloween/](projects/halloween/) | 万圣节弹窗彩蛋：模拟 Windows 风格弹窗逐个弹出祝福语，手机和电脑自适应爱心大小 | 原生 JS |
 | [projects/love/](projects/love/) | 节日礼物页：点击按钮后排版爱心阵列并播放背景音乐 | 原生 JS |
@@ -62,6 +63,7 @@ Font Awesome (CDN)
 │   │   └── notes/                    # 脚注
 │   ├── particles/                    # 星门塔罗（3D 手势抽牌）
 │   ├── nutrition/                    # 营养素计算器
+│   ├── china-history-review/         # 中国近代史答题式复习 PWA
 │   ├── love-gallery/                 # 爱心展示合集
 │   │   └── demos/                    #   约 50 个子目录（网络收集）
 │   ├── halloween/                    # 万圣节弹窗彩蛋

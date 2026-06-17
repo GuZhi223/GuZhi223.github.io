@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#8f2f2f" />
+  <meta name="description" content="中国近代史纲要答题式复习工具，支持离线使用和自动保存进度。" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="近代史复习" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+  <title>中国近代史答题式复习</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark" aria-hidden="true">史</div>
+    <div class="title-block">
+      <p class="eyebrow">期末复习 · 自动保存</p>
+      <h1>中国近代史答题式复习</h1>
+      <p class="topbar-subtitle">按章节推进，错题回流补漏</p>
+    </div>
+    <button id="installBtn" class="icon-btn hidden" type="button" aria-label="安装到桌面">安装</button>
+  </header>
+
+  <main class="app-shell">
+    <section class="summary-card" aria-label="学习进度">
+      <div class="summary-head">
+        <div>
+          <span class="muted">总体掌握度</span>
+          <strong id="progressPercent">0%</strong>
+        </div>
+        <span id="lastStudy" class="muted">尚未开始</span>
+      </div>
+      <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
+      <div class="stage-rail" aria-label="复习流程">
+        <span class="stage-step is-current"><b>01</b>拆解</span>
+        <span class="stage-step"><b>02</b>作答</span>
+        <span class="stage-step"><b>03</b>检题</span>
+        <span class="stage-step is-remedial"><b>04</b>补漏</span>
+      </div>
+      <div class="stats-grid">
+        <button class="stat" data-mode="all"><span id="totalCount">0</span><small>全部</small></button>
+        <button class="stat" data-mode="unlearned"><span id="unlearnedCount">0</span><small>未学习</small></button>
+        <button class="stat" data-mode="mastered"><span id="masteredCount">0</span><small>已掌握</small></button>
+        <button class="stat" data-mode="uncertain"><span id="uncertainCount">0</span><small>模糊</small></button>
+        <button class="stat" data-mode="wrong"><span id="wrongCount">0</span><small>错题</small></button>
+      </div>
+    </section>
+
+    <section class="control-card">
+      <div class="control-row">
+        <label>
+          <span>章节</span>
+          <select id="chapterSelect"></select>
+        </label>
+        <label>
+          <span>复习模式</span>
+          <select id="modeSelect">
+            <option value="all">顺序复习</option>
+            <option value="unlearned">只看未学习</option>
+            <option value="mastered">只看已掌握</option>
+            <option value="uncertain">只看模糊题</option>
+            <option value="wrong">只看错题</option>
+            <option value="random">随机抽题</option>
+            <option value="remediation">补漏复习</option>
+          </select>
+        </label>
+      </div>
+      <div class="search-row">
+        <input id="searchInput" type="search" placeholder="搜索题目或答案关键词" autocomplete="off" />
+        <button id="randomBtn" class="secondary-btn" type="button">随机一题</button>
+      </div>
+    </section>
+
+    <section id="emptyState" class="empty-card hidden">
+      <h2>当前筛选下没有题目</h2>
+      <p>试试切换章节或复习模式。</p>
+    </section>
+
+    <article id="questionCard" class="question-card">
+      <div class="question-meta">
+        <span id="chapterBadge" class="badge"></span>
+        <span id="typeBadge" class="badge badge-soft"></span>
+        <span id="positionText" class="position"></span>
+      </div>
+
+      <h2 id="questionText"></h2>
+
+      <section id="deconstructPanel" class="deconstruct-panel">
+        <button id="deconstructToggle" class="deconstruct-toggle" type="button">
+          <span>题目拆解</span>
+          <span class="toggle-arrow">▸</span>
+        </button>
+        <div id="deconstructContent" class="deconstruct-content hidden">
+          <div class="deconstruct-section">
+            <h4>审题分析</h4>
+            <p id="deconstructBreakdown"></p>
+          </div>
+          <div class="deconstruct-section">
+            <h4>答题要点提示</h4>
+            <ul id="deconstructPoints"></ul>
+          </div>
+          <div id="deconstructTrap" class="deconstruct-trap hidden">
+            <h4>易错提醒</h4>
+            <p id="deconstructTrapText"></p>
+          </div>
+          <div class="deconstruct-section">
+            <h4>关联题目</h4>
+            <div id="deconstructRelated" class="related-links"></div>
+          </div>
+          <div class="deconstruct-actions">
+            <button id="startAnswerBtn" class="primary-btn" type="button">开始作答</button>
+          </div>
+        </div>
+      </section>
+
+      <label class="answer-label" for="userAnswer">先写下你能想到的要点</label>
+      <textarea id="userAnswer" rows="6" placeholder="输入会自动保存。也可以只在脑中作答，然后展开参考答案。"></textarea>
+      <div class="answer-tools">
+        <span id="wordCount" class="muted">0 字</span>
+        <button id="clearAnswerBtn" class="text-btn" type="button">清空本题作答</button>
+      </div>
+
+      <button id="showAnswerBtn" class="primary-btn" type="button">展开参考答案</button>
+
+      <section id="referenceAnswer" class="reference-answer hidden" aria-live="polite">
+        <h3>参考答案</h3>
+        <p id="answerText"></p>
+        <div id="keywordWrap" class="keyword-wrap"></div>
+      </section>
+
+      <section class="self-check">
+        <p>对照答案后，自评本题：</p>
+        <div class="rating-grid">
+          <button class="rating mastered" data-status="mastered" type="button">掌握</button>
+          <button class="rating uncertain" data-status="uncertain" type="button">模糊</button>
+          <button class="rating wrong" data-status="wrong" type="button">错题</button>
+          <button class="rating reset" data-status="unlearned" type="button">暂不标记</button>
+        </div>
+      </section>
+
+      <section id="remediatePanel" class="remediate-panel hidden">
+        <h3>补漏练习</h3>
+        <div id="remediateOffline" class="remediate-offline">
+          <p class="muted">选择你的错误类型，获取针对性提示：</p>
+          <div class="error-type-grid">
+            <button class="error-type-btn" data-type="missing_point" type="button">遗漏要点</button>
+            <button class="error-type-btn" data-type="wrong_factual" type="button">事实错误</button>
+            <button class="error-type-btn" data-type="unclear_logic" type="button">逻辑不清</button>
+          </div>
+          <div id="remediateHint" class="remediate-hint hidden"></div>
+        </div>
+        <div id="remediateLLM" class="remediate-llm hidden">
+          <div id="llmDiagnosis" class="llm-diagnosis"></div>
+          <button id="llmHintBtn" class="secondary-btn" type="button">让 AI 给补漏提示</button>
+          <div id="llmHint" class="llm-hint hidden"></div>
+        </div>
+        <div class="remediate-actions">
+          <button id="retryAnswerBtn" class="primary-btn" type="button">重新作答</button>
+        </div>
+      </section>
+
+      <nav class="question-nav" aria-label="题目导航">
+        <button id="prevBtn" class="secondary-btn" type="button">上一题</button>
+        <button id="questionListBtn" class="secondary-btn" type="button">题目列表</button>
+        <button id="nextBtn" class="primary-btn" type="button">下一题</button>
+      </nav>
+    </article>
+
+    <section class="utility-card">
+      <h2>进度管理</h2>
+      <p class="muted">进度自动保存在当前浏览器中。换手机或清除浏览器数据前，请先导出备份。</p>
+      <div class="utility-actions">
+        <button id="exportBtn" class="secondary-btn" type="button">导出进度</button>
+        <label class="secondary-btn file-label">导入进度<input id="importInput" type="file" accept="application/json,.json" /></label>
+        <button id="resetBtn" class="danger-btn" type="button">重置全部进度</button>
+      </div>
+    </section>
+
+    <details class="utility-card ai-settings-card">
+      <summary>
+        <span>AI 补漏助手</span>
+        <span class="badge badge-soft">可选</span>
+      </summary>
+      <p class="muted">只在标记“模糊”或“错题”后参与，用来诊断缺漏、给补漏提示。不填则使用离线提示。</p>
+      <div class="ai-settings-row">
+        <label>
+          <span>API 地址</span>
+          <input id="apiBaseUrl" type="url" placeholder="https://api.openai.com/v1" />
+        </label>
+        <label>
+          <span>API Key</span>
+          <input id="apiKey" type="password" placeholder="sk-..." />
+        </label>
+        <label>
+          <span>模型名称</span>
+          <input id="apiModel" type="text" placeholder="gpt-4o-mini" />
+        </label>
+      </div>
+      <div class="ai-settings-actions">
+        <button id="saveApiBtn" class="secondary-btn" type="button">保存设置</button>
+        <button id="testApiBtn" class="secondary-btn" type="button">测试连接</button>
+        <button id="clearApiBtn" class="text-btn" type="button">清除密钥</button>
+      </div>
+      <p id="apiStatus" class="muted"></p>
+    </details>
+  </main>
+
+  <dialog id="questionDialog">
+    <div class="dialog-head">
+      <div>
+        <p class="eyebrow">快速跳题</p>
+        <h2>题目列表</h2>
+      </div>
+      <button id="closeDialogBtn" class="icon-btn" type="button">关闭</button>
+    </div>
+    <div id="questionList" class="question-list"></div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
