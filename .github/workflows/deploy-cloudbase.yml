@@ -64,7 +64,19 @@ jobs:
         run: tcb hosting delete "$CLOUD_PATH" --dir --env-id "$TCB_ENV_ID" --yes
 
       - name: Deploy to CloudBase Hosting
-        run: tcb hosting deploy /tmp/cloudbase-site "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes
+        run: |
+          for attempt in 1 2 3; do
+            echo "Deploy attempt $attempt"
+            if tcb hosting deploy /tmp/cloudbase-site "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes; then
+              exit 0
+            fi
+            if [ "$attempt" = "3" ]; then
+              exit 1
+            fi
+            sleep $((attempt * 20))
+          done
 
       - name: Verify deployment
-        run: tcb hosting list "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --json
+        run: |
+          curl --fail --silent --show-error --head "https://guzhi223-d1g8bie1p67d34918-1363634311.tcloudbaseapp.com/guzhi223/"
+          curl --fail --silent --show-error --head "https://guzhi223-d1g8bie1p67d34918-1363634311.tcloudbaseapp.com/guzhi223/projects/data-structure-quiz/"
