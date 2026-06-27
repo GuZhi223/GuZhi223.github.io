@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
-      TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+      TCB_ENV_ID: guzhi223-d1g8bie1p67d34918
       TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
       TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
       CLOUD_PATH: /guzhi223
@@ -45,7 +45,7 @@ jobs:
       - name: Validate CloudBase secrets
         run: |
           missing=0
-          for name in TCB_ENV_ID TENCENTCLOUD_SECRET_ID TENCENTCLOUD_SECRET_KEY; do
+          for name in TENCENTCLOUD_SECRET_ID TENCENTCLOUD_SECRET_KEY; do
             if [ -z "${!name}" ]; then
               echo "::error::$name is not configured. Add it in GitHub repository Settings > Secrets and variables > Actions."
               missing=1
