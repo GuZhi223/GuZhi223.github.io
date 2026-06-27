@@ -67,4 +67,4 @@ jobs:
         run: tcb hosting deploy /tmp/cloudbase-site "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes
 
       - name: Verify deployment
-        run: tcb hosting list --env-id "$TCB_ENV_ID" --limit 20 --json
+        run: tcb hosting list "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --json
