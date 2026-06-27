@@ -1,0 +1,58 @@
+name: Deploy to CloudBase Hosting
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      clean_deploy:
+        description: Delete the CloudBase /guzhi223 directory before deploying
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+concurrency:
+  group: cloudbase-hosting-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+      TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
+      TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
+      CLOUD_PATH: /guzhi223
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static files
+        run: |
+          mkdir -p /tmp/cloudbase-site
+          rsync -av ./ /tmp/cloudbase-site/ \
+            --exclude='.git/' \
+            --exclude='.github/'
+
+      - name: Install CloudBase CLI
+        run: npm install -g @cloudbase/cli
+
+      - name: Login to CloudBase
+        run: tcb login --apiKeyId "$TENCENTCLOUD_SECRET_ID" --apiKey "$TENCENTCLOUD_SECRET_KEY"
+
+      - name: Check hosting status
+        run: tcb hosting detail --env-id "$TCB_ENV_ID"
+
+      - name: Clean CloudBase directory
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.clean_deploy == 'true' }}
+        run: tcb hosting delete "$CLOUD_PATH" --dir --env-id "$TCB_ENV_ID" --yes
+
+      - name: Deploy to CloudBase Hosting
+        run: tcb hosting deploy /tmp/cloudbase-site "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes
+
+      - name: Verify deployment
+        run: tcb hosting list --env-id "$TCB_ENV_ID" --limit 20 --json
