@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://guzhi223.github.io/sitemap.xml

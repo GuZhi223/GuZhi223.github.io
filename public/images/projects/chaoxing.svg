@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <rect width="640" height="420" fill="#f4f6fb"/>
+  <rect x="70" y="58" width="500" height="304" rx="18" fill="#ffffff" stroke="#d8deef"/>
+  <rect x="70" y="58" width="500" height="52" rx="18" fill="#14161b"/>
+  <circle cx="100" cy="84" r="6" fill="#ff6b6b"/>
+  <circle cx="122" cy="84" r="6" fill="#f4b63f"/>
+  <circle cx="144" cy="84" r="6" fill="#56c995"/>
+  <rect x="104" y="144" width="150" height="170" rx="12" fill="#edf1ff"/>
+  <rect x="286" y="146" width="230" height="24" rx="8" fill="#4f6ef7"/>
+  <rect x="286" y="198" width="190" height="18" rx="9" fill="#cbd4f8"/>
+  <rect x="286" y="236" width="218" height="18" rx="9" fill="#cbd4f8"/>
+  <rect x="286" y="286" width="118" height="38" rx="10" fill="#111113"/>
+  <text x="118" y="236" fill="#4f6ef7" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="30" font-weight="800">Flet</text>
+  <text x="104" y="392" fill="#62636a" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="18">chaoxing-GUI-Helper 桌面工具预览</text>
+</svg>

@@ -32,12 +32,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare static files
-        run: |
-          mkdir -p /tmp/cloudbase-site
-          rsync -av ./ /tmp/cloudbase-site/ \
-            --exclude='.git/' \
-            --exclude='.github/'
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for CloudBase path
+        run: npm run build
+        env:
+          VITE_BASE_PATH: /guzhi223/
+
+      - name: Check dist links
+        run: npm run check:dist
 
       - name: Install CloudBase CLI
         run: npm install -g @cloudbase/cli
@@ -67,7 +77,7 @@ jobs:
         run: |
           for attempt in 1 2 3; do
             echo "Deploy attempt $attempt"
-            if tcb hosting deploy /tmp/cloudbase-site "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes; then
+            if tcb hosting deploy dist "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes; then
               exit 0
             fi
             if [ "$attempt" = "3" ]; then

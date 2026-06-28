@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <rect width="640" height="420" fill="#111827"/>
+  <circle cx="320" cy="210" r="142" fill="none" stroke="#8ea2ff" stroke-width="2" opacity=".55"/>
+  <circle cx="320" cy="210" r="86" fill="none" stroke="#56c995" stroke-width="2" opacity=".5"/>
+  <g fill="#f6f7fb">
+    <rect x="292" y="84" width="56" height="84" rx="8" transform="rotate(-10 320 126)"/>
+    <rect x="414" y="158" width="56" height="84" rx="8" transform="rotate(28 442 200)"/>
+    <rect x="170" y="158" width="56" height="84" rx="8" transform="rotate(-28 198 200)"/>
+    <rect x="292" y="250" width="56" height="84" rx="8" transform="rotate(8 320 292)"/>
+  </g>
+  <path d="M74 320c56-52 99-54 129-8 18 28 44 38 78 30" fill="none" stroke="#56c995" stroke-width="10" stroke-linecap="round"/>
+  <rect x="68" y="54" width="196" height="42" rx="12" fill="#1f2937"/>
+  <text x="88" y="82" fill="#f6f7fb" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="20">3D 手势塔罗</text>
+</svg>

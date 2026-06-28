@@ -1,0 +1,93 @@
+import type { FeaturedProject, RepositoryItem } from '../types/content';
+
+export const featuredProjects: FeaturedProject[] = [
+  {
+    id: 'jumpmaster',
+    title: 'JumpMaster',
+    summary: '微信跳一跳 Android 辅助工具，把图像识别结果转换成可执行的按压控制。',
+    problem: '移动端游戏辅助迁移时，图像识别、权限、ADB 和 Compose 界面需要一起打通。',
+    contribution: '整理识别流程，迁移 Android 端界面与调试链路，让工具从脚本思路变成可操作应用。',
+    technologies: ['Android', 'Kotlin', 'Jetpack Compose', '图像识别'],
+    image: '/images/projects/jumpmaster.svg',
+    imageAlt: 'JumpMaster Android 工具界面风格预览',
+    githubUrl: 'https://github.com/GuZhi223/JumpMaster',
+    status: '近期完成',
+  },
+  {
+    id: 'particles',
+    title: '星门塔罗 / 3D 手势塔罗',
+    summary: '用摄像头手势在 3D 牌阵里完成抽牌交互的网页实验。',
+    problem: '普通网页互动很容易停留在按钮点击，摄像头手势和 3D 场景能带来更强的现场感。',
+    contribution: '把 Three.js 场景、MediaPipe 手势识别和抽牌流程整合到一个可直接打开的页面。',
+    technologies: ['Three.js', 'MediaPipe', 'Camera', 'Web Interactive'],
+    image: '/images/projects/particles.svg',
+    imageAlt: '3D 手势塔罗网页界面预览',
+    githubUrl: 'https://github.com/GuZhi223/GuZhi223.github.io/tree/main/projects/particles',
+    demoUrl: '/projects/particles/',
+    status: '在线体验',
+  },
+  {
+    id: 'chaoxing',
+    title: 'chaoxing-GUI-Helper',
+    summary: '学习通/超星流程工具的图形化启动器，围绕配置、任务状态和桌面交互做重构。',
+    problem: '命令行脚本不适合反复配置和观察状态，需要更清楚的桌面端操作入口。',
+    contribution: '用 Flet + MVVM + EventBus 重构界面层，拆分配置、课程读取和任务启停逻辑。',
+    technologies: ['Python', 'Flet', 'MVVM', 'EventBus'],
+    image: '/images/projects/chaoxing.svg',
+    imageAlt: 'chaoxing-GUI-Helper 桌面工具界面风格预览',
+    githubUrl: 'https://github.com/GuZhi223/chaoxing-GUI-Helper',
+    status: '重构实践',
+  },
+];
+
+export const repositories: RepositoryItem[] = [
+  {
+    name: 'hnjingsai_help',
+    description: '面向网页题库的文本检索与匹配脚本实践，整理题目数据并练习 DOM 解析。',
+    technologies: ['油猴脚本', 'JavaScript', '题库整理'],
+    githubUrl: 'https://github.com/GuZhi223/hnjingsai_help',
+    status: '脚本实践',
+  },
+  {
+    name: 'ono',
+    description: '用于学习 QQNT Xposed 模块组织方式的 fork 仓库，重点阅读 Android Hook 思路。',
+    technologies: ['Xposed', 'Android', '源码阅读'],
+    githubUrl: 'https://github.com/GuZhi223/ono',
+    status: '学习记录',
+  },
+  {
+    name: 'qqzone-fetch',
+    description: 'QQ 空间动态数据整理实验，练习翻页抓取、去重、JSON/CSV 导出和资源下载。',
+    technologies: ['油猴脚本', 'Python', '数据导出'],
+    githubUrl: 'https://github.com/GuZhi223/qqzone-fetch',
+    status: '数据整理',
+  },
+  {
+    name: 'zcfe-libtest',
+    description: '轻量 C/C++ 单元测试库，练习断言宏、测试用例管理和结果输出。',
+    technologies: ['C/C++', '单元测试', '库设计'],
+    githubUrl: 'https://github.com/GuZhi223/zcfe-libtest',
+    status: '课程延伸',
+  },
+  {
+    name: 'wzj-sign',
+    description: 'Android 自动化流程实验，主要练习原生界面、接口调用和移动端状态管理。',
+    technologies: ['Android', 'Kotlin', 'Jetpack Compose'],
+    githubUrl: 'https://github.com/GuZhi223/wzj-sign',
+    status: '移动端实验',
+  },
+  {
+    name: 'WeChatVConsole',
+    description: '微信内置浏览器 H5 调试实验，尝试通过模块注入方式辅助观察页面运行状态。',
+    technologies: ['LSPosed', 'Android', 'H5 调试'],
+    githubUrl: 'https://github.com/GuZhi223/WeChatVConsole',
+    status: '调试工具',
+  },
+  {
+    name: 'milk',
+    description: '数字分身对话系统实验，围绕 persona、记忆检索和纠错反馈探索前端侧对话闭环。',
+    technologies: ['AI Chat', 'Persona', 'JavaScript'],
+    githubUrl: 'https://github.com/GuZhi223/milk',
+    status: 'AI 实验',
+  },
+];

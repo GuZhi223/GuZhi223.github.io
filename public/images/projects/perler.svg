@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <rect width="640" height="420" fill="#f3faf8"/>
+  <rect x="78" y="54" width="300" height="300" rx="14" fill="#ffffff" stroke="#cbe5dd"/>
+  <g fill="#14b8a6">
+    <circle cx="128" cy="104" r="12"/><circle cx="178" cy="104" r="12"/><circle cx="228" cy="104" r="12"/><circle cx="278" cy="104" r="12"/><circle cx="328" cy="104" r="12"/>
+    <circle cx="128" cy="154" r="12"/><circle cx="178" cy="154" r="12"/><circle cx="228" cy="154" r="12"/><circle cx="278" cy="154" r="12"/><circle cx="328" cy="154" r="12"/>
+  </g>
+  <g fill="#4f6ef7">
+    <circle cx="128" cy="204" r="12"/><circle cx="178" cy="204" r="12"/><circle cx="228" cy="204" r="12"/><circle cx="278" cy="204" r="12"/><circle cx="328" cy="204" r="12"/>
+    <circle cx="128" cy="254" r="12"/><circle cx="178" cy="254" r="12"/><circle cx="228" cy="254" r="12"/><circle cx="278" cy="254" r="12"/><circle cx="328" cy="254" r="12"/>
+  </g>
+  <rect x="418" y="92" width="140" height="34" rx="10" fill="#111113"/>
+  <rect x="418" y="150" width="96" height="22" rx="8" fill="#14b8a6"/>
+  <rect x="418" y="192" width="120" height="22" rx="8" fill="#9ddfd1"/>
+  <rect x="418" y="264" width="108" height="42" rx="12" fill="#4f6ef7"/>
+  <text x="92" y="390" fill="#62636a" font-family="Arial, 'Microsoft YaHei', sans-serif" font-size="18">拼豆图纸生成器预览</text>
+</svg>
