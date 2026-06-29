@@ -34,7 +34,7 @@ export const works: WorkItem[] = [
     category: 'tool',
     origin: 'original',
     technologies: ['Canvas', '原生 JS'],
-    image: '/images/projects/perler.svg',
+    image: '/images/projects/perler.png',
   },
   {
     id: 'nutrition',

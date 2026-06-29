@@ -191,12 +191,11 @@
 .status-panel-header {
   display: flex;
   justify-content: space-between;
-  padding: 16px 18px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-soft);
   font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.1em;
 }
 
 .status-dot {
@@ -208,12 +207,12 @@
   padding: 4px 18px 18px;
 }
 
-.status-panel div {
+.status-panel dl > div {
   padding: 18px 0;
   border-bottom: 1px solid var(--color-border);
 }
 
-.status-panel div:last-child {
+.status-panel dl > div:last-child {
   border-bottom: 0;
 }
 
