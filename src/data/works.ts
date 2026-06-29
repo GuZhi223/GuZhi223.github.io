@@ -24,7 +24,7 @@ export const works: WorkItem[] = [
     category: 'interactive',
     origin: 'original',
     technologies: ['Three.js', 'MediaPipe', 'Camera'],
-    image: '/images/projects/particles.svg',
+    image: '/images/projects/particles.png',
   },
   {
     id: 'perler-bead',
