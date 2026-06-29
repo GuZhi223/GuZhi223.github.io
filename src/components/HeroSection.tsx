@@ -29,21 +29,21 @@ export function HeroSection() {
         </div>
         <aside className="status-panel" aria-label="当前状态">
           <div className="status-panel-header">
-            <span>CURRENTLY</span>
+            <span>当前状态</span>
             <span className="status-dot">在线</span>
           </div>
           <dl>
             <div>
-              <dt>Learning</dt>
-              <dd>Android internals & C++</dd>
+              <dt>正在学</dt>
+              <dd>Android 底层和 C++</dd>
             </div>
             <div>
-              <dt>Building</dt>
-              <dd>Small tools that actually work</dd>
+              <dt>正在做</dt>
+              <dd>能真正跑起来的小工具</dd>
             </div>
             <div>
-              <dt>Status</dt>
-              <dd>Still shipping</dd>
+              <dt>状态</dt>
+              <dd>边学边交付</dd>
             </div>
           </dl>
         </aside>
