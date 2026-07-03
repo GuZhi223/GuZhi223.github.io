@@ -22,6 +22,7 @@
       --pink-soft: #f6d8e3;
       --ink: #35363a;
       --ink-soft: #5e6066;
+      --trait-min-size: 8px;
       --font-cute: "ZCOOL KuaiLe Web", "幼圆", "YouYuan", "PingFang SC", "Microsoft YaHei UI", system-ui, sans-serif;
     }
 
@@ -99,7 +100,7 @@
       margin: 0;
       color: var(--ink);
       font-family: var(--font-cute);
-      font-size: clamp(8px, var(--font-vmin), 25px);
+      font-size: clamp(var(--trait-min-size), var(--font-vmin), 25px);
       font-weight: 400;
       line-height: 1;
       white-space: nowrap;
@@ -178,6 +179,7 @@
     }
 
     @media (max-width: 520px) {
+      :root { --trait-min-size: 6.2px; }
       .replay { width: 34px; height: 34px; opacity: .3; }
       .hint { font-size: 10px; }
     }
@@ -278,11 +280,13 @@
       return t * t * (3 - 2 * t);
     }
 
-    function fontSizeFor(text, index, rand) {
-      const lengthPenalty = Math.max(0, text.length - 4) * 0.11;
-      const emphasis = index < 12 ? 0.14 : 0;
-      const size = 2.12 + rand() * 0.62 + emphasis - lengthPenalty;
-      return clamp(size, 1.16, 2.78);
+    function fontSizeFor(text, index, rand, rowDepth) {
+      const lengthPenalty = Math.max(0, text.length - 4) * 0.07;
+      const emphasis = index < 12 ? 0.08 : 0;
+      const mobileEase = window.innerWidth < 520 ? 0.78 : 1;
+      const edgeEase = 1 - Math.abs(rowDepth - 0.52) * 0.2;
+      const size = (1.9 + rand() * 0.36 + emphasis - lengthPenalty) * mobileEase * edgeEase;
+      return clamp(size, 1.02, 2.28);
     }
 
     function isInsideHeart(x, y) {
@@ -311,24 +315,29 @@
     function buildHeartPositions(count) {
       const rand = seededRandom(1012026);
       const points = [];
+      const rowCounts = [2, 5, 8, 10, 12, 13, 13, 12, 10, 8, 5, 2, 1];
+      const rowWidths = [24, 48, 68, 78, 83, 78, 70, 60, 50, 38, 26, 14, 2];
+      const top = window.innerWidth < 520 ? 17 : 18.5;
+      const height = window.innerWidth < 520 ? 67 : 64;
 
-      for (let i = 0; i < count; i++) {
-        const normalized = (i + 0.5) / count;
-        const radius = Math.sqrt(normalized);
-        const angle = i * GOLDEN_ANGLE + Math.PI / 2;
-        const boundary = heartBoundaryRadius(angle);
-        const heartX = Math.cos(angle) * boundary * radius;
-        const heartY = Math.sin(angle) * boundary * radius;
-        const jitter = 0.12 + radius * 0.2;
+      for (let row = 0, index = 0; row < rowCounts.length && index < count; row++) {
+        const rowCount = rowCounts[row];
+        const rowDepth = row / (rowCounts.length - 1);
+        const y = top + rowDepth * height;
+        const width = rowWidths[row];
 
-        const rawX = CONFIG.centerX
-          + heartX * CONFIG.spreadX
-          + (rand() - 0.5) * jitter;
-        const rawY = CONFIG.centerY
-          - heartY * CONFIG.spreadY
-          + (rand() - 0.5) * jitter;
+        for (let col = 0; col < rowCount && index < count; col++, index++) {
+          const offset = rowCount === 1 ? 0 : (col / (rowCount - 1) - 0.5) * width;
+          const rowBreathe = (rand() - 0.5) * 0.46;
+          const colBreathe = (rand() - 0.5) * 0.36;
+          const rawX = CONFIG.centerX + offset + colBreathe;
+          const rawY = y + rowBreathe;
+          const dx = (rawX - CONFIG.centerX) / Math.max(width / 2, 1);
+          const radius = clamp(Math.sqrt(dx * dx + rowDepth * rowDepth), 0, 1);
+          const angle = Math.atan2(rawY - CONFIG.centerY, rawX - CONFIG.centerX);
 
-        points.push({ x: rawX, y: rawY, radius, angle });
+          points.push({ x: rawX, y: rawY, radius, angle, rowDepth });
+        }
       }
 
       return points;
@@ -365,8 +374,8 @@
 
       CONFIG.traits.forEach((text, index) => {
         const point = positions[index];
-        const fontSize = fontSizeFor(text, index, rand);
-        const sideMargin = clamp(4.6 + text.length * fontSize * 0.21, 5.5, 15.5);
+        const fontSize = fontSizeFor(text, index, rand, point.rowDepth);
+        const sideMargin = clamp(2.6 + text.length * fontSize * 0.12, 4.2, 10.5);
         const finalX = clamp(point.x, sideMargin, 100 - sideMargin);
         const finalY = clamp(point.y, 7.6, 92.2);
         const opacity = 0.82 + rand() * 0.14;
