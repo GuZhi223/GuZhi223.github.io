@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#fff7fb" />
+  <title>你有101个优点 · 在线可爱字体版</title>
+  <style>
+    @font-face {
+      font-family: "ZCOOL KuaiLe Web";
+      font-style: normal;
+      font-display: swap;
+      font-weight: 400;
+      src:
+        url("https://cdn.jsdelivr.net/fontsource/fonts/zcool-kuaile@5.2.9/chinese-simplified-400-normal.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/fontsource/fonts/zcool-kuaile@5.2.9/chinese-simplified-400-normal.woff") format("woff");
+    }
+
+    :root {
+      --bg: #fffafc;
+      --pink: #ea7fa1;
+      --pink-soft: #f6d8e3;
+      --ink: #35363a;
+      --ink-soft: #5e6066;
+      --font-cute: "ZCOOL KuaiLe Web", "幼圆", "YouYuan", "PingFang SC", "Microsoft YaHei UI", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    body {
+      font-family: var(--font-cute);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .stage {
+      position: relative;
+      width: 100vw;
+      height: 100dvh;
+      min-height: 100vh;
+      overflow: hidden;
+      cursor: pointer;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 50% 52%, rgba(246,216,227,.32), transparent 26%),
+        linear-gradient(180deg, #fffdfd 0%, var(--bg) 100%);
+    }
+
+    .title {
+      position: absolute;
+      left: 50%;
+      top: 54.5%;
+      z-index: 20;
+      margin: 0;
+      color: var(--pink);
+      font-family: var(--font-cute);
+      font-size: clamp(20px, 4.4vmin, 40px);
+      font-weight: 400;
+      line-height: 1;
+      letter-spacing: 0.045em;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      text-shadow:
+        0 0 5px rgba(255,255,255,.95),
+        0 0 12px rgba(255,255,255,.95),
+        0 2px 0 rgba(255,255,255,.42);
+    }
+
+    .title .char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(0.28em) scale(.98);
+      filter: blur(2.5px);
+      transition:
+        opacity 340ms ease,
+        transform 460ms cubic-bezier(.2,.8,.2,1),
+        filter 380ms ease;
+    }
+
+    .title .char.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0);
+    }
+
+    .trait {
+      position: absolute;
+      left: 50%;
+      top: 54.5%;
+      z-index: 2;
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--font-cute);
+      font-size: clamp(8px, var(--font-vmin), 25px);
+      font-weight: 400;
+      line-height: 1;
+      white-space: nowrap;
+      opacity: 0;
+      filter: blur(1.6px);
+      transform: translate(-50%, -50%) scale(.83);
+      transform-origin: center;
+      will-change: left, top, opacity, transform, filter;
+      pointer-events: none;
+      text-shadow: 0 1px 0 rgba(255,255,255,.75), 0 0 6px rgba(255,255,255,.35);
+    }
+
+    .trait-inner {
+      display: inline-block;
+      transform-origin: center;
+      animation: breathe var(--breath-duration, 6.2s) ease-in-out infinite;
+      animation-delay: var(--breath-delay, 0s);
+      will-change: transform, opacity;
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: translateY(0) scale(.997);
+        opacity: .975;
+      }
+      50% {
+        transform: translateY(-0.04em) scale(1.008);
+        opacity: 1;
+      }
+    }
+
+    .trait.late { color: var(--ink-soft); }
+
+    .replay {
+      position: fixed;
+      right: max(14px, env(safe-area-inset-right));
+      top: max(14px, env(safe-area-inset-top));
+      z-index: 30;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(234,127,161,.14);
+      border-radius: 999px;
+      color: #7b7d84;
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 6px 24px rgba(234,127,161,.08);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      opacity: .18;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .stage:hover .replay,
+    .replay:focus-visible,
+    .replay:hover { opacity: .84; }
+    .replay:active { transform: scale(.94); }
+
+    .hint {
+      position: fixed;
+      left: 50%;
+      bottom: max(13px, env(safe-area-inset-bottom));
+      z-index: 20;
+      color: #b2a8af;
+      font-size: 12px;
+      letter-spacing: .08em;
+      opacity: 0;
+      transform: translate(-50%, 8px);
+      transition: opacity 500ms ease, transform 500ms ease;
+      pointer-events: none;
+    }
+
+    .hint.show {
+      opacity: .62;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 520px) {
+      .replay { width: 34px; height: 34px; opacity: .3; }
+      .hint { font-size: 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .title .char,
+      .hint { transition: none !important; }
+      .trait-inner { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage" aria-label="你有101个优点动画，点击屏幕可重播">
+    <h1 class="title" id="title" aria-label="你有101个优点"></h1>
+    <button class="replay" id="replay" type="button" aria-label="重新播放" title="重新播放">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20 11a8 8 0 1 0-2.34 5.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M20 5v6h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="hint" id="hint">点击屏幕重播</div>
+  </main>
+
+  <script>
+    /*
+      可编辑区域：
+      itemInterval：每条文字出现的间隔；
+      itemMotion：单条文字飞出的时间；
+      spiralCurve：曲线感强弱，越大越绕；
+      spreadX / spreadY：最终铺开的宽度和高度。
+    */
+    const CONFIG = {
+      title: "你有101个优点",
+      titleStart: 80,
+      titleInterval: 92,
+      traitsStart: 720,
+      itemInterval: 126,
+      itemMotion: 1740,
+      hintDelay: 16050,
+      centerX: 50,
+      centerY: 54.5,
+      spreadX: 41.2,
+      spreadY: 39,
+      spiralCurve: 0.38,
+      traits: [
+        "有趣", "可爱", "真诚", "帅气", "善良", "聪明", "勇敢", "努力", "机灵", "伶俐",
+        "游戏厉害", "有上进心", "活泼", "嗓音好听", "愿意分享", "积极", "社交能力强", "大方", "爱护小动物", "宽容",
+        "愿意反思", "温柔", "纯洁", "尊重别人", "谨慎", "懂得拒绝", "三观正", "爱动脑筋", "会穿搭", "声音好听",
+        "爱笑", "正直", "有主见", "言而有信", "有礼貌", "有担当", "会照顾人", "心思细腻", "有边界感", "为人慷慨",
+        "愿意尝试", "认识你", "负责", "冷静", "懂得珍惜", "情绪稳定", "会夸人", "会给人带来快乐", "好奇心强", "有想象力",
+        "会说话", "会给自己留后路", "有特点", "浪漫", "天真", "宅", "体贴", "有正能量", "热心肠", "和你有共同话题",
+        "不虚假", "说到做到", "偶尔呆呆的", "自信大方", "会安慰人", "专一", "幽默", "社牛", "亲和力强", "有使命感",
+        "有责任感", "勇敢果断", "有魄力", "有智慧", "有素质", "有耐心", "有气场", "有气质", "有独特眼光", "与众不同",
+        "很沉稳", "坦诚", "性格好", "有能力", "爱自己", "用心", "贴心", "细心", "友善", "独立",
+        "可靠", "有品位", "有领导力", "才华横溢", "观察力强", "洞察力强", "做事靠谱", "有艺术细胞", "逻辑清晰", "气场强大",
+        "独一无二"
+      ]
+    };
+
+    const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+    const stage = document.getElementById("stage");
+    const title = document.getElementById("title");
+    const hint = document.getElementById("hint");
+    const replay = document.getElementById("replay");
+
+    let timers = [];
+    let traitStates = [];
+    let animationFrame = 0;
+    let playStartedAt = 0;
+
+    function seededRandom(seed) {
+      let t = seed >>> 0;
+      return () => {
+        t += 0x6D2B79F5;
+        let r = Math.imul(t ^ (t >>> 15), 1 | t);
+        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function easeOutQuart(t) {
+      return 1 - Math.pow(1 - t, 4);
+    }
+
+    function smoothstep(t) {
+      return t * t * (3 - 2 * t);
+    }
+
+    function fontSizeFor(text, index, rand) {
+      const lengthPenalty = Math.max(0, text.length - 4) * 0.11;
+      const emphasis = index < 12 ? 0.14 : 0;
+      const size = 2.12 + rand() * 0.62 + emphasis - lengthPenalty;
+      return clamp(size, 1.16, 2.78);
+    }
+
+    function buildFibonacciPositions(count) {
+      const rand = seededRandom(1012026);
+      const points = [];
+
+      for (let i = 0; i < count; i++) {
+        const normalized = (i + 6) / (count + 6);
+        const radius = Math.sqrt(normalized);
+        const angle = i * GOLDEN_ANGLE - Math.PI / 2.12;
+        const jitter = 0.34 + radius * 0.46;
+
+        const rawX = CONFIG.centerX
+          + Math.cos(angle) * radius * CONFIG.spreadX
+          + (rand() - 0.5) * jitter;
+        const rawY = CONFIG.centerY
+          + Math.sin(angle) * radius * CONFIG.spreadY
+          + (rand() - 0.5) * jitter;
+
+        points.push({ x: rawX, y: rawY, radius, angle });
+      }
+
+      return points;
+    }
+
+    function buildControlPoint(finalX, finalY, angle, radius, rand) {
+      const dx = finalX - CONFIG.centerX;
+      const dy = finalY - CONFIG.centerY;
+      const tangentAngle = angle + Math.PI / 2;
+      const curveAmount = (6.5 + radius * 7.5) * CONFIG.spiralCurve;
+      const bias = (rand() - 0.5) * 1.1;
+      const t = 0.58 + rand() * 0.07;
+
+      return {
+        x: lerp(CONFIG.centerX, finalX, t) + Math.cos(tangentAngle) * (curveAmount + bias),
+        y: lerp(CONFIG.centerY, finalY, t) + Math.sin(tangentAngle) * (curveAmount * 0.72 + bias * 0.6) - 0.25
+      };
+    }
+
+    function buildScene() {
+      title.innerHTML = "";
+      traitStates.forEach(state => state.node.remove());
+      traitStates = [];
+
+      [...CONFIG.title].forEach(char => {
+        const span = document.createElement("span");
+        span.className = "char";
+        span.textContent = char;
+        title.appendChild(span);
+      });
+
+      const positions = buildFibonacciPositions(CONFIG.traits.length);
+      const rand = seededRandom(5201314);
+
+      CONFIG.traits.forEach((text, index) => {
+        const point = positions[index];
+        const fontSize = fontSizeFor(text, index, rand);
+        const sideMargin = clamp(4.6 + text.length * fontSize * 0.21, 5.5, 15.5);
+        const finalX = clamp(point.x, sideMargin, 100 - sideMargin);
+        const finalY = clamp(point.y, 7.6, 92.2);
+        const opacity = 0.82 + rand() * 0.14;
+        const weight = 400;
+        const rotate = (rand() - 0.5) * 0.65;
+        const breatheDuration = 5.6 + rand() * 1.8;
+        const breatheDelay = -(point.radius * 2.2 + rand() * 1.1);
+
+        const node = document.createElement("span");
+        const inner = document.createElement("span");
+        node.className = "trait" + (index > 75 ? " late" : "");
+        inner.className = "trait-inner";
+        inner.textContent = `${index + 1}.${text}`;
+        node.appendChild(inner);
+
+        node.style.setProperty("--font-vmin", `${fontSize}vmin`);
+        node.style.setProperty("--weight", weight);
+        node.style.setProperty("--breath-duration", `${breatheDuration.toFixed(2)}s`);
+        node.style.setProperty("--breath-delay", `${breatheDelay.toFixed(2)}s`);
+        node.style.left = `${CONFIG.centerX}%`;
+        node.style.top = `${CONFIG.centerY}%`;
+
+        stage.insertBefore(node, replay);
+
+        traitStates.push({
+          node,
+          finalX,
+          finalY,
+          opacity,
+          rotate,
+          delay: CONFIG.traitsStart + index * CONFIG.itemInterval,
+          duration: CONFIG.itemMotion + Math.round(rand() * 180),
+          control: buildControlPoint(finalX, finalY, point.angle, point.radius, rand)
+        });
+      });
+    }
+
+    function clearTimers() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    }
+
+    function later(fn, delay) {
+      const id = setTimeout(fn, delay);
+      timers.push(id);
+    }
+
+    function resetTraits() {
+      traitStates.forEach(state => {
+        state.node.style.left = `${CONFIG.centerX}%`;
+        state.node.style.top = `${CONFIG.centerY}%`;
+        state.node.style.opacity = "0";
+        state.node.style.filter = "blur(1.6px)";
+        state.node.style.transform = `translate(-50%, -50%) scale(.83) rotate(${state.rotate.toFixed(2)}deg)`;
+      });
+    }
+
+    function setTraitProgress(state, progress) {
+      const p = easeOutQuart(progress);
+      const inv = 1 - p;
+      let x = inv * inv * CONFIG.centerX + 2 * inv * p * state.control.x + p * p * state.finalX;
+      let y = inv * inv * CONFIG.centerY + 2 * inv * p * state.control.y + p * p * state.finalY;
+
+      const settle = clamp((progress - 0.74) / 0.26, 0, 1);
+      const settleEase = smoothstep(settle);
+      x += (state.finalX - x) * settleEase;
+      y += (state.finalY - y) * settleEase;
+
+      const scale = 0.83 + 0.17 * easeOutCubic(progress);
+      const blur = (1 - progress) * 1.6;
+      const opacity = state.opacity * clamp(progress * 1.28, 0, 1);
+
+      state.node.style.left = `${x}%`;
+      state.node.style.top = `${y}%`;
+      state.node.style.opacity = opacity.toFixed(3);
+      state.node.style.filter = `blur(${blur.toFixed(2)}px)`;
+      state.node.style.transform = `translate(-50%, -50%) scale(${scale.toFixed(3)}) rotate(${state.rotate.toFixed(2)}deg)`;
+    }
+
+    function animateTraits(now) {
+      const elapsed = now - playStartedAt;
+      let active = false;
+
+      for (const state of traitStates) {
+        const localTime = elapsed - state.delay;
+        if (localTime < 0) {
+          active = true;
+          continue;
+        }
+
+        const progress = clamp(localTime / state.duration, 0, 1);
+        setTraitProgress(state, progress);
+        if (progress < 1) active = true;
+      }
+
+      if (active) {
+        animationFrame = requestAnimationFrame(animateTraits);
+      } else {
+        animationFrame = 0;
+      }
+    }
+
+    function play() {
+      clearTimers();
+      hint.classList.remove("show");
+
+      const chars = [...title.querySelectorAll(".char")];
+      chars.forEach(char => char.classList.remove("show"));
+      resetTraits();
+      void stage.offsetWidth;
+
+      chars.forEach((char, index) => {
+        later(() => char.classList.add("show"), CONFIG.titleStart + index * CONFIG.titleInterval);
+      });
+
+      playStartedAt = performance.now();
+      animationFrame = requestAnimationFrame(animateTraits);
+      later(() => hint.classList.add("show"), CONFIG.hintDelay);
+    }
+
+    function showStaticFinal() {
+      [...title.querySelectorAll(".char")].forEach(char => char.classList.add("show"));
+      traitStates.forEach(state => setTraitProgress(state, 1));
+      hint.classList.add("show");
+    }
+
+    function restart(event) {
+      if (event) event.stopPropagation();
+      play();
+    }
+
+    replay.addEventListener("click", restart);
+    stage.addEventListener("click", event => {
+      if (!event.target.closest("button")) play();
+    });
+
+    window.addEventListener("keydown", event => {
+      if (event.code === "Space" || event.code === "Enter") {
+        event.preventDefault();
+        play();
+      }
+    });
+
+    buildScene();
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      showStaticFinal();
+    } else {
+      requestAnimationFrame(play);
+    }
+  </script>
+</body>
+</html>

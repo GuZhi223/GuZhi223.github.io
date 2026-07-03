@@ -109,6 +109,15 @@ export const works: WorkItem[] = [
     technologies: ['HTML', 'CSS', 'JS'],
   },
   {
+    id: 'advantages-101',
+    title: '你有101个优点',
+    description: '用斐波那契柔和散布和可爱字体展示 101 个优点的点击重播动画网页。',
+    href: '/projects/advantages-101/',
+    category: 'interactive',
+    origin: 'original',
+    technologies: ['HTML', 'CSS', 'JS'],
+  },
+  {
     id: 'mouse-test',
     title: '鼠标灵敏度测试',
     description: '记录鼠标移动轨迹和速度，生成可视化结果，适合测试 DPI 和手感。',
