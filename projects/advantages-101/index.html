@@ -12,8 +12,8 @@
       font-display: swap;
       font-weight: 400;
       src:
-        url("https://cdn.jsdelivr.net/fontsource/fonts/zcool-kuaile@5.2.9/chinese-simplified-400-normal.woff2") format("woff2"),
-        url("https://cdn.jsdelivr.net/fontsource/fonts/zcool-kuaile@5.2.9/chinese-simplified-400-normal.woff") format("woff");
+        url("./assets/fonts/zcool-kuaile-chinese-simplified-400-normal.woff2") format("woff2"),
+        url("./assets/fonts/zcool-kuaile-chinese-simplified-400-normal.woff") format("woff");
     }
 
     :root {
@@ -285,21 +285,47 @@
       return clamp(size, 1.16, 2.78);
     }
 
-    function buildFibonacciPositions(count) {
+    function isInsideHeart(x, y) {
+      const value = x * x + y * y - 1;
+      return value * value * value - x * x * y * y * y <= 0;
+    }
+
+    function heartBoundaryRadius(angle) {
+      let low = 0;
+      let high = 2.1;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+
+      for (let i = 0; i < 24; i++) {
+        const mid = (low + high) / 2;
+        if (isInsideHeart(cos * mid, sin * mid)) {
+          low = mid;
+        } else {
+          high = mid;
+        }
+      }
+
+      return low;
+    }
+
+    function buildHeartPositions(count) {
       const rand = seededRandom(1012026);
       const points = [];
 
       for (let i = 0; i < count; i++) {
-        const normalized = (i + 6) / (count + 6);
+        const normalized = (i + 0.5) / count;
         const radius = Math.sqrt(normalized);
-        const angle = i * GOLDEN_ANGLE - Math.PI / 2.12;
-        const jitter = 0.34 + radius * 0.46;
+        const angle = i * GOLDEN_ANGLE + Math.PI / 2;
+        const boundary = heartBoundaryRadius(angle);
+        const heartX = Math.cos(angle) * boundary * radius;
+        const heartY = Math.sin(angle) * boundary * radius;
+        const jitter = 0.12 + radius * 0.2;
 
         const rawX = CONFIG.centerX
-          + Math.cos(angle) * radius * CONFIG.spreadX
+          + heartX * CONFIG.spreadX
           + (rand() - 0.5) * jitter;
         const rawY = CONFIG.centerY
-          + Math.sin(angle) * radius * CONFIG.spreadY
+          - heartY * CONFIG.spreadY
           + (rand() - 0.5) * jitter;
 
         points.push({ x: rawX, y: rawY, radius, angle });
@@ -334,7 +360,7 @@
         title.appendChild(span);
       });
 
-      const positions = buildFibonacciPositions(CONFIG.traits.length);
+      const positions = buildHeartPositions(CONFIG.traits.length);
       const rand = seededRandom(5201314);
 
       CONFIG.traits.forEach((text, index) => {
