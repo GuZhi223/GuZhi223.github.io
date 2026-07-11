@@ -199,7 +199,7 @@ button:disabled{cursor:not-allowed;opacity:.45}
 <div class="form-row"><label>标签</label><select class="field" id="tagSelect"></select></div>
 <div class="form-row"><label>转盘</label><select class="field" id="poolSelect"></select></div>
 <div class="form-row"><label>指定结果</label><select class="field" id="manualResult"><option value="">随机结果</option></select></div>
-<div class="form-row"><label>应用到当前角色</label><select class="field" id="manualApply"><option value="no">仅查看结果</option><option value="yes">应用通用数值与物品效果</option></select></div>
+<div class="form-row"><label>应用到当前角色</label><select class="field" id="manualApply"><option value="no">仅查看结果</option><option value="yes">安全应用到面板（不触发后续）</option></select></div>
 <div class="tool-actions"><button class="btn primary" id="manualRollBtn">投掷当前池</button><button class="btn" id="exportSaveBtn">导出存档</button><button class="btn" id="importSaveBtn">导入存档</button><input accept="application/json,.json" class="hidden" id="importFile" type="file"/></div>
 <div class="pool-info" id="poolInfo">选择标签与转盘后，可查看选项数与权重。</div><p style="margin:10px 0 0;color:#9da5c7;font-size:12px;line-height:1.65">v4 规则：所有启用词条按源文件权重投掷。前置条件不满足时自动重抽。完整领域直接进入领域池。所有人类势力仅映射剧情分支一、二、三。</p>
 </div></section>
@@ -305,6 +305,7 @@ let currentWheel={pool:null,candidates:[],rotation:0,selectedIndex:-1};
 let autoTimer=null;
 let showAllChips=false;
 let audioCtx=null,lastTickAt=0,gearNoise=null,gearTickPhase=0,activeUtterance=null,cachedVoices=[],resultHolding=false;
+let manualSandbox=false;
 
 function hashSeed(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0||1}
 function rnd(){
@@ -370,9 +371,9 @@ function pushUndo(){undoStack.push(JSON.stringify({...state,busy:false,auto:fals
 function saveLocal(silent=true){try{localStorage.setItem('douluo-auto-wheel-v4',JSON.stringify({...state,busy:false,auto:false,turbo:false}));if(!silent)toast('存档完成')}catch(e){if(!silent)toast('浏览器未允许本地存档')}}
 function loadLocal(){let raw=null;try{raw=localStorage.getItem('douluo-auto-wheel-v4')}catch(e){toast('当前环境未开放本地存档');return}if(!raw){toast('没有找到 v4 本地存档');return}try{stopAuto();state=normalizeState(JSON.parse(raw));document.getElementById('softText').checked=!!state.settings.softText;renderAll();ensurePlan();saveLocal();toast('已读取并校验存档')}catch(e){toast('存档格式损坏')}}
 
-function qRoll(tag,name,handler='',extra={}){state.queue.push({type:'roll',tag,name,handler,...extra})}
-function qAction(handler,extra={}){state.queue.push({type:'action',handler,...extra})}
-function prepend(tasks){state.queue=[...tasks,...state.queue]}
+function qRoll(tag,name,handler='',extra={}){if(!manualSandbox)state.queue.push({type:'roll',tag,name,handler,...extra})}
+function qAction(handler,extra={}){if(!manualSandbox)state.queue.push({type:'action',handler,...extra})}
+function prepend(tasks){if(!manualSandbox)state.queue=[...tasks,...state.queue]}
 function taskRoll(tag,name,handler='',extra={}){return {type:'roll',tag,name,handler,...extra}}
 function taskAction(handler,extra={}){return {type:'action',handler,...extra}}
 
@@ -1098,6 +1099,7 @@ function ensurePlan(){
 }
 
 function endGame(title,text,kind='normal'){
+  if(manualSandbox){logEvent('自由转盘未触发结局',text,'normal');return}
   if(state.finished)return;state.alive=kind!=='bad';state.finished=true;state.phase='ending';state.ending=text;state.queue=[];stopAuto();logEvent(title,text,kind==='bad'?'bad':'major');renderAll();saveLocal();showEnding(title,text)
 }
 function showEnding(title,text){document.getElementById('endingTitle').textContent=title;document.getElementById('endingText').textContent=soft(text);const rare=state.domains.length+state.soulBones.length+(state.godTrial?1:0),summary=[['路线',routeNames[state.route]||'未知'],['终局等级',state.beast?state.beast.cultivation+'年修为':state.level+'级'],['时间',fmtTang(state.tangAge)],['阵营',state.faction||state.beast?.area||'自由'],['武魂或本体',state.beast?.species||state.martialSouls.join('、')||'未知'],['命运步数',state.step+' 步'],['重大纪事',state.logs.filter(x=>x.kind==='major'||x.kind==='bad').length+' 条'],['稀有收获',rare+' 项'],['命运种子',state.seed]];document.getElementById('endingSummary').innerHTML=summary.map(x=>'<div class="summary-item"><small>'+esc(x[0])+'</small><b>'+esc(x[1])+'</b></div>').join('');document.getElementById('endingModal').classList.add('show')}
@@ -1202,18 +1204,23 @@ async function manualRoll(){
 }
 
 function applyManualResult(p,text,task){
-  const name=p.name||'',clean=text.replace(/（.*$/,'').trim(),tagNames=(p.tags||[]).map(id=>TAGS[id]?.name||id);
-  if(state.beast)applyBeastOutcome(text,task,name);else applyGeneric(text,name,task);
-  if(/性别/.test(name)){state.gender=clean;if(state.beast)state.beast.gender=clean}
-  if(/容貌/.test(name)){const rank=parseAppearance(text);if(rank){state.appearance=rank+'级';state.appearanceRank=APPEARANCE[rank]??state.appearanceRank}}
-  if(/先天魂力|故事开始时的魂力等级/.test(name)){state.innatePower=parseInitialLevel(text);state.noSoulPower=/无魂力/.test(text);setLevel(state.innatePower,text)}
-  if(tagNames.includes(TAG.SOUL)){addUnique(state.martialSouls,clean)}
-  if(tagNames.includes(TAG.TALENT)){addUnique(state.talents,clean)}
-  if(tagNames.includes(TAG.DOMAIN)){addDomain(clean.replace(/领域抽取结果[:：]?/g,''))}
-  if(tagNames.includes(TAG.BONE)&&!/是否获得/.test(name)){addUnique(state.soulBones,clean)}
-  if(tagNames.includes(TAG.FACTION)){setFaction(text,18)}
-  if(tagNames.includes(TAG.RING)&&/\d+年魂环/.test(text)){const years=extractYears(text);state.rings.push({index:state.rings.length+1,years,text,type:'',species:''})}
-  toast('指定结果已应用到角色面板')
+  const name=p.name||'',clean=text.replace(/（.*$/,'').trim(),tagNames=(p.tags||[]).map(id=>TAGS[id]?.name||id),flow={queue:deepCopy(state.queue),flags:deepCopy(state.flags),phase:state.phase,finished:state.finished,alive:state.alive,ending:state.ending,pendingRing:deepCopy(state.pendingRing),storyDone:deepCopy(state.storyDone),specialDone:deepCopy(state.specialDone)};
+  manualSandbox=true;
+  try{
+    if(state.beast)applyBeastOutcome(text,task,name);else applyGeneric(text,name,task);
+    if(/性别/.test(name)){state.gender=clean;if(state.beast)state.beast.gender=clean}
+    if(/容貌/.test(name)){const rank=parseAppearance(text);if(rank){state.appearance=rank+'级';state.appearanceRank=APPEARANCE[rank]??state.appearanceRank}}
+    if(/先天魂力|故事开始时的魂力等级/.test(name)){state.innatePower=parseInitialLevel(text);state.noSoulPower=/无魂力/.test(text);setLevel(state.innatePower,text)}
+    if(tagNames.includes(TAG.SOUL)){addUnique(state.martialSouls,clean)}
+    if(tagNames.includes(TAG.TALENT)){addUnique(state.talents,clean)}
+    if(tagNames.includes(TAG.DOMAIN)){addDomain(clean.replace(/领域抽取结果[:：]?/g,''))}
+    if(tagNames.includes(TAG.BONE)&&!/是否获得/.test(name)){addUnique(state.soulBones,clean)}
+    if(tagNames.includes(TAG.FACTION)){setFaction(text,18)}
+    if(tagNames.includes(TAG.RING)&&/\d+年魂环/.test(text)){const years=extractYears(text);state.rings.push({index:state.rings.length+1,years,text,type:'',species:''})}
+  }finally{
+    manualSandbox=false;state.queue=flow.queue;state.flags=flow.flags;state.phase=flow.phase;state.finished=flow.finished;state.alive=flow.alive;state.ending=flow.ending;state.pendingRing=flow.pendingRing;state.storyDone=flow.storyDone;state.specialDone=flow.specialDone;document.getElementById('endingModal').classList.remove('show')
+  }
+  toast('结果已应用到面板，未触发后续流程')
 }
 
 function undo(){if(!undoStack.length||state.busy)return;stopAuto();state=normalizeState(JSON.parse(undoStack.pop()));renderAll();ensurePlan();saveLocal();toast('已撤销一步')}
