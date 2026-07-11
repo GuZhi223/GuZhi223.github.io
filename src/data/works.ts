@@ -17,6 +17,15 @@ export const originLabels: Record<WorkOrigin, string> = {
 
 export const works: WorkItem[] = [
   {
+    id: 'douluo-wheel',
+    title: '斗罗大陆自动转盘游戏',
+    description: '斗罗大陆主题的自动转盘互动游戏，打开网页即可直接体验。',
+    href: '/projects/douluo-wheel/',
+    category: 'interactive',
+    origin: 'original',
+    technologies: ['HTML', 'CSS', 'JavaScript'],
+  },
+  {
     id: 'particles',
     title: '星门塔罗 / 3D 手势塔罗',
     description: '输入问题后，用“张开手、握拳、张开手”的手势在 3D 牌阵中抽牌。',
