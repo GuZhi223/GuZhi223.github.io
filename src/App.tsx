@@ -24,7 +24,7 @@ function App() {
           }
         });
       },
-      { threshold: 0.16 },
+      { threshold: 0.04, rootMargin: '0px 0px -6% 0px' },
     );
 
     elements.forEach((element) => {
