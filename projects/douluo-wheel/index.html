@@ -304,7 +304,7 @@ let undoStack=[];
 let currentWheel={pool:null,candidates:[],rotation:0,selectedIndex:-1};
 let autoTimer=null;
 let showAllChips=false;
-let audioCtx=null,lastTickAt=0,gearNoise=null,gearTickPhase=0;
+let audioCtx=null,lastTickAt=0,gearNoise=null,gearTickPhase=0,activeUtterance=null,cachedVoices=[];
 
 function hashSeed(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0||1}
 function rnd(){
@@ -338,12 +338,17 @@ function getAudio(){if(!audioCtx){const AC=window.AudioContext||window.webkitAud
 function spinTick(strength=.5){
   if(!state.settings.spinSound||state.turbo)return;const now=performance.now();if(now-lastTickAt<52)return;lastTickAt=now;const ac=getAudio();if(!ac)return;const t=ac.currentTime;gearTickPhase++;
   if(!gearNoise||gearNoise.sampleRate!==ac.sampleRate){gearNoise=ac.createBuffer(1,Math.ceil(ac.sampleRate*.055),ac.sampleRate);const d=gearNoise.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3)}
-  const src=ac.createBufferSource(),filter=ac.createBiquadFilter(),ng=ac.createGain();src.buffer=gearNoise;filter.type='bandpass';filter.frequency.setValueAtTime(1450+strength*750+(gearTickPhase%2)*180,t);filter.Q.setValueAtTime(2.2,t);ng.gain.setValueAtTime(.0001,t);ng.gain.exponentialRampToValueAtTime(.026+strength*.024,t+.002);ng.gain.exponentialRampToValueAtTime(.0001,t+.045);src.connect(filter).connect(ng).connect(ac.destination);src.start(t);src.stop(t+.055);
-  const knock=ac.createOscillator(),kg=ac.createGain();knock.type='triangle';knock.frequency.setValueAtTime(125+strength*55+(gearTickPhase%2)*14,t);knock.frequency.exponentialRampToValueAtTime(72,t+.032);kg.gain.setValueAtTime(.0001,t);kg.gain.exponentialRampToValueAtTime(.035+strength*.018,t+.002);kg.gain.exponentialRampToValueAtTime(.0001,t+.04);knock.connect(kg).connect(ac.destination);knock.start(t);knock.stop(t+.045);
-  const ping=ac.createOscillator(),pg=ac.createGain();ping.type='sine';ping.frequency.setValueAtTime(2100+(gearTickPhase%3)*170,t);pg.gain.setValueAtTime(.009+strength*.006,t);pg.gain.exponentialRampToValueAtTime(.0001,t+.018);ping.connect(pg).connect(ac.destination);ping.start(t);ping.stop(t+.02)
+  const src=ac.createBufferSource(),filter=ac.createBiquadFilter(),ng=ac.createGain();src.buffer=gearNoise;filter.type='bandpass';filter.frequency.setValueAtTime(1450+strength*750+(gearTickPhase%2)*180,t);filter.Q.setValueAtTime(2.2,t);ng.gain.setValueAtTime(.0001,t);ng.gain.exponentialRampToValueAtTime(.034+strength*.031,t+.002);ng.gain.exponentialRampToValueAtTime(.0001,t+.045);src.connect(filter).connect(ng).connect(ac.destination);src.start(t);src.stop(t+.055);
+  const knock=ac.createOscillator(),kg=ac.createGain();knock.type='triangle';knock.frequency.setValueAtTime(125+strength*55+(gearTickPhase%2)*14,t);knock.frequency.exponentialRampToValueAtTime(72,t+.032);kg.gain.setValueAtTime(.0001,t);kg.gain.exponentialRampToValueAtTime(.045+strength*.023,t+.002);kg.gain.exponentialRampToValueAtTime(.0001,t+.04);knock.connect(kg).connect(ac.destination);knock.start(t);knock.stop(t+.045);
+  const ping=ac.createOscillator(),pg=ac.createGain();ping.type='sine';ping.frequency.setValueAtTime(2100+(gearTickPhase%3)*170,t);pg.gain.setValueAtTime(.012+strength*.008,t);pg.gain.exponentialRampToValueAtTime(.0001,t+.018);ping.connect(pg).connect(ac.destination);ping.start(t);ping.stop(t+.02)
 }
 function resultChime(text){if(!state.settings.resultSound||state.turbo)return;const ac=getAudio();if(!ac)return;const bad=/死亡|击杀|陨落|失败|反噬|失去/.test(text),rare=/神|十万年|领域|传说|极致|魂骨|觉醒/.test(text),notes=bad?[196,146.8]:rare?[523.25,659.25,783.99]:[392,523.25];notes.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+i*.105;o.type=bad?'sawtooth':'sine';o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.055,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.36);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.4)})}
-function speakResult(text){if(!state.settings.voiceResult||state.turbo||!('speechSynthesis'in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(soft(text));u.lang='zh-CN';u.rate=.92;u.pitch=1;window.speechSynthesis.speak(u)}
+function refreshVoices(){if('speechSynthesis'in window)cachedVoices=window.speechSynthesis.getVoices()||[]}
+function speechAvailable(){return !!window.AndroidBridge||'speechSynthesis'in window}
+function speakResult(text){
+  if(!state.settings.voiceResult||state.turbo)return;const spoken=soft(text);if(window.AndroidBridge?.speak){window.AndroidBridge.speak(spoken);return}if(!('speechSynthesis'in window))return;
+  const synth=window.speechSynthesis;refreshVoices();synth.cancel();synth.resume();const u=new SpeechSynthesisUtterance(spoken),zh=cachedVoices.find(v=>/^zh[-_]/i.test(v.lang)&&/China|CN|大陆|普通话|Xiaoxiao|Huihui|Kangkang/i.test(v.name))||cachedVoices.find(v=>/^zh/i.test(v.lang));u.lang=zh?.lang||'zh-CN';if(zh)u.voice=zh;u.rate=.9;u.pitch=1;u.volume=.55;activeUtterance=u;u.onend=()=>{if(activeUtterance===u)activeUtterance=null};u.onerror=e=>{if(activeUtterance===u){activeUtterance=null;console.warn('语音朗读失败',e.error);if(!/interrupted|canceled/.test(e.error||''))toast('朗读失败：'+(e.error||'语音引擎不可用'))}};setTimeout(()=>{if(activeUtterance===u){synth.resume();synth.speak(u)}},80)
+}
 function announceResult(text){resultChime(text);speakResult(text)}
 function soft(s){if(!state.settings.softText)return s;return String(s).replace(/卖屁股/g,'以不体面的方式谋生').replace(/槽了/g,'侵犯').replace(/从早配到晚/g,'遭到长期控制').replace(/日日夜夜都在配你/g,'长期控制你').replace(/精华/g,'力量').replace(/魅魔/g,'魅惑体质')}
 function fmtAge(n){if(n==null||Number.isNaN(n))return '未确定';return Number.isInteger(n)?n+'岁':n.toFixed(1)+'岁'}
@@ -1167,7 +1172,7 @@ function renderResult(){
 }
 function renderAll(){renderStatus();renderWheelPreview();renderSheet();renderLog();renderResult();document.getElementById('softText').checked=!!state.settings.softText;document.getElementById('voiceResult').checked=!!state.settings.voiceResult;document.getElementById('spinSound').checked=!!state.settings.spinSound;document.getElementById('resultSound').checked=!!state.settings.resultSound}
 
-function exportBlob(name,text,type='text/plain'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},300)}
+function exportBlob(name,text,type='text/plain'){if(window.AndroidBridge?.saveText){window.AndroidBridge.saveText(name,String(text),type);return}const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},300)}
 function chronicle(){
   const lines=['《斗罗大陆 · 命运轮盘 v4人物传记》','',`命运种子：${state.seed}`,`路线：${routeNames[state.route]||'未知'}`,`终局：${state.ending||'尚未完结'}`,`时间：${fmtTang(state.tangAge)}`,state.beast?`本体：${state.beast.species||state.beast.type}，${state.beast.cultivation}年修为`:`等级：${state.level}级，武魂：${state.martialSouls.join('、')||'未定'}`,`阵营：${state.faction||state.beast?.area||'自由'}`,'','【命运纪事】'];for(const x of state.logs)lines.push(`${fmtTang(x.tangAge)}｜${x.title}｜${x.text}`);return lines.join('\n')
 }
@@ -1219,13 +1224,14 @@ document.getElementById('manualResult').onchange=e=>{if(e.target.value!==''){doc
 document.getElementById('majorOnly').onchange=renderLog;
 document.querySelector('.sheet').addEventListener('click',e=>{if(e.target.closest('[data-expand-chips]')){showAllChips=!showAllChips;renderSheet()}});
 document.getElementById('softText').onchange=e=>{state.settings.softText=e.target.checked;renderAll();saveLocal()};
-document.getElementById('voiceResult').onchange=e=>{state.settings.voiceResult=e.target.checked;if(e.target.checked&&!('speechSynthesis'in window)){e.target.checked=false;state.settings.voiceResult=false;toast('当前浏览器不支持语音朗读')}else if(e.target.checked)speakResult('语音朗读已开启');saveLocal()};
+document.getElementById('voiceResult').onchange=e=>{state.settings.voiceResult=e.target.checked;if(e.target.checked&&!speechAvailable()){e.target.checked=false;state.settings.voiceResult=false;toast('当前浏览器不支持语音朗读')}else if(e.target.checked)speakResult('语音朗读已开启');saveLocal()};
 document.getElementById('spinSound').onchange=e=>{state.settings.spinSound=e.target.checked;if(e.target.checked)spinTick(.5);saveLocal()};
 document.getElementById('resultSound').onchange=e=>{state.settings.resultSound=e.target.checked;if(e.target.checked)resultChime('音效已开启');saveLocal()};
 document.getElementById('closeEndingBtn').onclick=()=>document.getElementById('endingModal').classList.remove('show');
 document.getElementById('endingNewBtn').onclick=()=>{document.getElementById('endingModal').classList.remove('show');document.getElementById('seedInput').value=randomSeed();document.getElementById('newModal').classList.add('show')};
 window.addEventListener('keydown',e=>{if(e.code==='Space'&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();executeNext()}if(e.key==='Escape'){document.getElementById('newModal').classList.remove('show');document.getElementById('endingModal').classList.remove('show')}});
 
+if('speechSynthesis'in window){refreshVoices();window.speechSynthesis.onvoiceschanged=refreshVoices}
 initFreeWheel();renderAll();
 let existing=null;try{existing=localStorage.getItem('douluo-auto-wheel-v4')}catch(e){}if(existing){try{state=normalizeState(JSON.parse(existing));renderAll();ensurePlan()}catch(e){}}
 window.__DL_DEBUG={getState:()=>deepCopy(state),setState:x=>{state=normalizeState(x);renderAll();ensurePlan();return deepCopy(state)},pool:(tag,name)=>pool(tag,name),eligible:(text,task={},strategic=true)=>eligible(text,task,strategic),draw:(tag,name,task={})=>{const p=pool(tag,name);return p?drawWithRerolls(p,task):{error:'pool not found'}},setFaction:(text,stage=12)=>{setFaction(text,stage);return state.branch},ensureDomain:()=>ensureDomain(),ensurePlan:()=>ensurePlan(),optionWeight};
