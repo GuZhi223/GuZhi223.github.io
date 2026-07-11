@@ -1166,8 +1166,23 @@ function updatePoolInfo(){const tag=document.getElementById('tagSelect').value,i
 async function manualRoll(){
   if(state.busy)return;const tag=document.getElementById('tagSelect').value,id=document.getElementById('poolSelect').value,p=(POOLS_BY_TAG[tag]||[]).find(x=>x.id===id);if(!p)return;pushUndo();state.busy=true;renderStatus();const task={type:'roll',tag,name:p.name,handler:'manual'},chosen=document.getElementById('manualResult').value,enabled=p.options.filter(o=>o.enabled!==false);let draw;if(chosen!==''){const option=enabled[+chosen];if(!option){state.busy=false;renderAll();toast('指定结果已失效，请重新选择');return}const total=enabled.reduce((s,o)=>s+optionWeight(o),0),w=optionWeight(option);draw={option,candidates:enabled,rerolls:0,rejected:[],strategicRelaxed:false,controlled:true,sourceWeight:w,sourceProbability:total>0?w/total:1/enabled.length,effectiveProbability:1}}else draw=drawWithRerolls(p,task);
   if(draw.error){state.lastPool=p.name;state.lastResult=draw.error;state.lastDrawInfo={error:draw.error};logEvent('自由转盘无有效词条',draw.error,'bad')}
-  else{const idx=draw.candidates.findIndex(o=>(o.id||o.name)===(draw.option.id||draw.option.name));await animateSpin(p,draw.candidates,Math.max(0,idx),4200);state.step++;state.lastPool=p.name;state.lastResult=draw.option.name;state.lastDrawInfo=draw;if(document.getElementById('manualApply').value==='yes'){if(state.beast)applyBeastOutcome(draw.option.name,task,p.name);else applyGeneric(draw.option.name,p.name,task)}if(draw.rerolls)logEvent('自动重抽','自由转盘共重抽 '+draw.rerolls+' 次。','major');logEvent((draw.controlled?'指定结果 · ':'自由转盘 · ')+p.name,draw.option.name,'major')}
+  else{const idx=draw.candidates.findIndex(o=>(o.id||o.name)===(draw.option.id||draw.option.name));await animateSpin(p,draw.candidates,Math.max(0,idx),4200);state.step++;state.lastPool=p.name;state.lastResult=draw.option.name;state.lastDrawInfo=draw;if(document.getElementById('manualApply').value==='yes')applyManualResult(p,draw.option.name,task);if(draw.rerolls)logEvent('自动重抽','自由转盘共重抽 '+draw.rerolls+' 次。','major');logEvent((draw.controlled?'指定结果 · ':'自由转盘 · ')+p.name,draw.option.name,'major')}
   state.busy=false;renderAll();saveLocal()
+}
+
+function applyManualResult(p,text,task){
+  const name=p.name||'',clean=text.replace(/（.*$/,'').trim(),tagNames=(p.tags||[]).map(id=>TAGS[id]?.name||id);
+  if(state.beast)applyBeastOutcome(text,task,name);else applyGeneric(text,name,task);
+  if(/性别/.test(name)){state.gender=clean;if(state.beast)state.beast.gender=clean}
+  if(/容貌/.test(name)){const rank=parseAppearance(text);if(rank){state.appearance=rank+'级';state.appearanceRank=APPEARANCE[rank]??state.appearanceRank}}
+  if(/先天魂力|故事开始时的魂力等级/.test(name)){state.innatePower=parseInitialLevel(text);state.noSoulPower=/无魂力/.test(text);setLevel(state.innatePower,text)}
+  if(tagNames.includes(TAG.SOUL)){addUnique(state.martialSouls,clean)}
+  if(tagNames.includes(TAG.TALENT)){addUnique(state.talents,clean)}
+  if(tagNames.includes(TAG.DOMAIN)){addDomain(clean.replace(/领域抽取结果[:：]?/g,''))}
+  if(tagNames.includes(TAG.BONE)&&!/是否获得/.test(name)){addUnique(state.soulBones,clean)}
+  if(tagNames.includes(TAG.FACTION)){setFaction(text,18)}
+  if(tagNames.includes(TAG.RING)&&/\d+年魂环/.test(text)){const years=extractYears(text);state.rings.push({index:state.rings.length+1,years,text,type:'',species:''})}
+  toast('指定结果已应用到角色面板')
 }
 
 function undo(){if(!undoStack.length||state.busy)return;stopAuto();state=normalizeState(JSON.parse(undoStack.pop()));renderAll();ensurePlan();saveLocal();toast('已撤销一步')}
@@ -1185,6 +1200,7 @@ document.getElementById('exportTextBtn').onclick=document.getElementById('ending
 document.getElementById('exportSaveBtn').onclick=exportSave;document.getElementById('importSaveBtn').onclick=()=>document.getElementById('importFile').click();
 document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=normalizeState(JSON.parse(r.result));stopAuto();renderAll();ensurePlan();saveLocal();toast('存档导入成功')}catch(err){toast('无法读取该存档')}};r.readAsText(f)};
 document.getElementById('manualRollBtn').onclick=manualRoll;document.getElementById('logSearch').oninput=renderLog;
+document.getElementById('manualResult').onchange=e=>{if(e.target.value!==''){document.getElementById('manualApply').value='yes';toast('已切换为应用到当前角色')}};
 document.getElementById('majorOnly').onchange=renderLog;
 document.querySelector('.sheet').addEventListener('click',e=>{if(e.target.closest('[data-expand-chips]')){showAllChips=!showAllChips;renderSheet()}});
 document.getElementById('softText').onchange=e=>{state.settings.softText=e.target.checked;renderAll();saveLocal()};
