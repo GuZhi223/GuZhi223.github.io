@@ -263,7 +263,7 @@ function makeBeastState(){return {
   silverDragonBlessing:false,speciesTraits:[]
 }}
 function defaultState(){return {
-  version:4,seed:'',rng:1,route:null,phase:'idle',alive:true,finished:false,ending:'',busy:false,auto:false,turbo:false,
+version:4,seed:'',rng:1,route:null,phase:'idle',alive:true,finished:false,ending:'',busy:false,auto:false,turbo:false,
   queue:[],history:[],logs:[],step:0,lastResult:'',lastPool:'',lastDrawInfo:null,settings:{softText:false,strategicReroll:true,voiceResult:true,spinSound:true,resultSound:true},
   name:'无名旅者',timeline:'斗罗大陆',gender:'',appearance:'',appearanceRank:-1,age:null,tangAge:null,elapsedYears:0,
   level:0,innatePower:null,maxLevel:99,noSoulPower:false,martialSoulTypes:[],martialSouls:[],talents:[],traits:[],titles:[],domains:[],
@@ -1105,7 +1105,7 @@ function showEnding(title,text){document.getElementById('endingTitle').textConte
 async function executeNext(){
   if(state.busy||state.finished)return;ensurePlan();if(!state.queue.length)return;pushUndo();const task=state.queue.shift();
   if(task.type==='roll'&&!conditionPass(task)){logEvent('自动跳过',(task.name||'事件')+'的前置条件未满足。','normal');renderAll();saveLocal();if(state.auto)scheduleAuto();return}
-  state.busy=true;renderStatus();try{
+  let resultHold=0;state.busy=true;renderStatus();try{
     if(task.type==='action')handleAction(task);else{
       const p=pool(task.tag,task.name);if(!p){logEvent('缺失转盘','未找到：'+task.tag+' / '+task.name,'bad')}
       else{
@@ -1117,16 +1117,17 @@ async function executeNext(){
           state.lastDrawInfo=draw;
           if(draw.rerolls){const details=draw.rejected.map(x=>'【'+shorten(x.name,22)+'】'+x.reason).join('；');logEvent('自动重抽','共重抽 '+draw.rerolls+' 次'+(details?'。'+details:''),'major')}
           if(draw.strategicRelaxed)logEvent('战略重抽放宽','战略重抽会清空全部候选，本次仅执行硬性前置条件。','normal');
-          handleResult(task,p,draw.option.name);announceResult(draw.option.name)
+          handleResult(task,p,draw.option.name);announceResult(draw.option.name);resultHold=resultHoldDelay(draw.option.name)
         }
       }
     }
   }catch(e){console.error(e);logEvent('运行异常',String(e.message||e),'bad')}
-  state.busy=false;ensurePlan();renderAll();saveLocal();if(state.auto)scheduleAuto()
+  state.busy=false;ensurePlan();renderAll();saveLocal();if(state.auto)scheduleAuto(resultHold)
 }
 function advanceDelay(){const el=document.getElementById('speedRange');return +el.min + +el.max - +el.value}
 function spinDuration(){return clamp(3000+advanceDelay()*1.2,3200,5200)}
-function scheduleAuto(){clearTimeout(autoTimer);if(!state.auto||state.finished)return;autoTimer=setTimeout(executeNext,state.turbo?35:advanceDelay())}
+function resultHoldDelay(text){return clamp(1200+soft(text).length*38,1600,3200)}
+function scheduleAuto(extraDelay=0){clearTimeout(autoTimer);if(!state.auto||state.finished)return;autoTimer=setTimeout(executeNext,state.turbo?35:advanceDelay()+extraDelay)}
 function stopAuto(){state.auto=false;state.turbo=false;clearTimeout(autoTimer);autoTimer=null;renderStatus()}
 function toggleAuto(turbo=false){if(state.finished)return;if(state.auto){stopAuto();renderAll();return}state.auto=true;state.turbo=turbo;renderAll();scheduleAuto()}
 
