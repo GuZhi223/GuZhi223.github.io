@@ -179,7 +179,7 @@ button:disabled{cursor:not-allowed;opacity:.45}
 <div class="wheel-wrap"><canvas height="900" id="wheel" width="900"></canvas><div class="pointer"></div><button class="spin-core" id="spinCore">转动<small>SPIN</small></button></div><details class="wheel-legend hidden" id="wheelLegend"><summary>查看转盘编号对照</summary><div class="wheel-legend-list" id="wheelLegendList"></div></details>
 <div class="result-card"><div class="result-label">本次命运</div><div id="resultText">等待第一次转动。</div><div class="result-meta" id="resultMeta">支持人类魂师与魂兽两条自动路线</div></div>
 <div class="control-row"><button class="btn gold" id="stepBtn">继续剧情</button><button class="btn primary" id="autoBtn">自动推进</button><button class="btn" id="turboBtn">极速结算</button></div>
-<div class="speed-row"><span>慢</span><input aria-label="剧情节奏：向左更慢，向右更快" id="speedRange" max="1800" min="120" step="40" type="range" value="1160"/><span>快</span><span id="speedText">自动间隔 0.8 秒 · 结果停顿 1.0×</span></div>
+<div class="speed-row"><span>久</span><input aria-label="转盘旋转时长：向左更久，向右更短" id="speedRange" max="1800" min="120" step="40" type="range" value="1160"/><span>短</span><span id="speedText">旋转时长 1.0× · 约 4.4 秒</span></div>
 </section>
 <section class="panel sheet-panel">
 <div class="panel-head"><h2>角色命盘</h2><span class="sub" id="phaseText">尚未创建角色</span></div>
@@ -1160,12 +1160,12 @@ async function executeNext(runOptions={}){
   }catch(e){console.error(e);logEvent('运行异常',String(e.message||e),'bad')}
   ensurePlan();resultHolding=resultHold>0&&!state.turbo;renderAll();saveLocal();if(resultHolding)await waitMs(resultHold);resultHolding=false;state.busy=false;renderAll();if(state.auto)scheduleAuto()
 }
-function advanceDelay(){const el=document.getElementById('speedRange');return +el.min + +el.max - +el.value}
-function spinDuration(){return clamp(3000+advanceDelay()*1.2,3200,5200)}
+function spinDurationMultiplier(){const el=document.getElementById('speedRange'),v=+el.value,mid=1160;return v<=mid?1+(mid-v)/(mid-(+el.min))*.8:1-(v-mid)/((+el.max)-mid)*.9}
+function advanceDelay(){return 800}
+function spinDuration(){return Math.round(4400*spinDurationMultiplier())}
 function waitMs(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-function resultHoldMultiplier(){const el=document.getElementById('speedRange'),v=+el.value,mid=1160;return v<=mid?1+(mid-v)/(mid-(+el.min))*.6:1-(v-mid)/((+el.max)-mid)*.4}
-function updateSpeedText(){const el=document.getElementById('speedRange'),m=resultHoldMultiplier(),lo=(1.5*m).toFixed(1),hi=(4.2*m).toFixed(1),gap=(advanceDelay()/1000).toFixed(1);document.getElementById('speedText').textContent=`自动间隔 ${gap} 秒 · 结果停顿 ${m.toFixed(1)}×（${lo}–${hi} 秒）`;el.setAttribute('aria-valuetext',`自动间隔${gap}秒，结果停顿${m.toFixed(1)}倍`)}
-function resultHoldDelay(text){return Math.round(clamp(1250+soft(text).length*48,1500,4200)*resultHoldMultiplier())}
+function updateSpeedText(){const el=document.getElementById('speedRange'),m=spinDurationMultiplier(),spin=(spinDuration()/1000).toFixed(1);document.getElementById('speedText').textContent=`旋转时长 ${m.toFixed(1)}× · 约 ${spin} 秒`;el.setAttribute('aria-valuetext',`转盘旋转时长${m.toFixed(1)}倍，约${spin}秒`)}
+function resultHoldDelay(text){return clamp(1250+soft(text).length*48,1500,4200)}
 function scheduleAuto(extraDelay=0){clearTimeout(autoTimer);if(!state.auto||state.finished)return;autoTimer=setTimeout(executeNext,state.turbo?35:advanceDelay()+extraDelay)}
 function stopAuto(){state.auto=false;state.turbo=false;clearTimeout(autoTimer);autoTimer=null;renderStatus()}
 function toggleAuto(turbo=false){if(state.finished)return;if(state.auto){stopAuto();renderAll();return}state.auto=true;state.turbo=turbo;renderAll();scheduleAuto()}
@@ -1240,7 +1240,7 @@ async function manualRoll(){
   if(state.busy)return;const tag=document.getElementById('tagSelect').value,id=document.getElementById('poolSelect').value,p=(POOLS_BY_TAG[tag]||[]).find(x=>x.id===id);if(!p)return;pushUndo();state.busy=true;renderStatus();const mainRng=state.rng;state.rng=manualRng;
   try{const task={type:'roll',tag,name:p.name,handler:'manual'},chosen=document.getElementById('manualResult').value,enabled=p.options.filter(o=>o.enabled!==false);let draw;if(chosen!==''){const option=enabled[+chosen];if(!option){toast('指定结果已失效，请重新选择');return}const total=enabled.reduce((s,o)=>s+optionWeight(o),0),w=optionWeight(option);draw={option,candidates:enabled,rerolls:0,rejected:[],strategicRelaxed:false,controlled:true,sourceWeight:w,sourceProbability:total>0?w/total:1/enabled.length,effectiveProbability:1}}else draw=drawWithRerolls(p,task);
     if(draw.error){state.lastPool=p.name;state.lastResult=draw.error;state.lastDrawInfo={error:draw.error};logEvent('自由转盘无有效词条',draw.error,'bad')}
-    else{const idx=draw.candidates.findIndex(o=>(o.id||o.name)===(draw.option.id||draw.option.name)),mode=document.getElementById('manualApply').value;await animateSpin(p,draw.candidates,Math.max(0,idx),4200);state.lastPool=p.name;state.lastResult=draw.option.name;state.lastDrawInfo=draw;if(mode==='force')lockForcedResult(p,draw.option);else if(mode==='yes')applyManualResult(p,draw.option.name,task);if(draw.rerolls)logEvent('自动重抽','自由转盘共重抽 '+draw.rerolls+' 次。','major');logEvent((mode==='force'?'作弊锁定 · ':draw.controlled?'指定结果 · ':'自由转盘 · ')+p.name,draw.option.name,'major');announceResult(draw.option.name)}
+    else{const idx=draw.candidates.findIndex(o=>(o.id||o.name)===(draw.option.id||draw.option.name)),mode=document.getElementById('manualApply').value;await animateSpin(p,draw.candidates,Math.max(0,idx),spinDuration());state.lastPool=p.name;state.lastResult=draw.option.name;state.lastDrawInfo=draw;if(mode==='force')lockForcedResult(p,draw.option);else if(mode==='yes')applyManualResult(p,draw.option.name,task);if(draw.rerolls)logEvent('自动重抽','自由转盘共重抽 '+draw.rerolls+' 次。','major');logEvent((mode==='force'?'作弊锁定 · ':draw.controlled?'指定结果 · ':'自由转盘 · ')+p.name,draw.option.name,'major');announceResult(draw.option.name)}
     resultHolding=!!draw.option&&!state.turbo;renderAll();if(resultHolding)await waitMs(resultHoldDelay(draw.option.name))
   }catch(e){console.error(e);logEvent('自由转盘异常',String(e.message||e),'bad')}
   finally{resultHolding=false;manualRng=state.rng;state.rng=mainRng;state.busy=false;renderAll();saveLocal();updatePoolInfo()}
