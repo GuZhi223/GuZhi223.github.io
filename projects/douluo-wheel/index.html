@@ -313,7 +313,7 @@ version:4,seed:'',rng:1,route:null,phase:'idle',alive:true,finished:false,ending
   queue:[],history:[],logs:[],step:0,lastResult:'',lastPool:'',lastDrawInfo:null,settings:{softText:false,strategicReroll:true,voiceResult:true,spinSound:true,resultSound:true,pace:1160},
   name:'无名旅者',timeline:'斗罗大陆',gender:'',appearance:'',appearanceRank:-1,age:null,tangAge:null,elapsedYears:0,
   level:0,innatePower:null,maxLevel:99,noSoulPower:false,martialSoulTypes:[],martialSouls:[],talents:[],traits:[],titles:[],domains:[],
-  rings:[],soulBones:[],inventory:[],faction:'',factionHistory:[],branch:null,branchStartTangAge:-999,factionStages:[],
+  rings:[],soulBones:[],soulBoneMeta:{},inventory:[],faction:'',factionHistory:[],branch:null,branchStartTangAge:-999,factionStages:[],
   flags:{pendingFullDomain:0,pendingDomainPrototype:false},storyDone:[],specialDone:[],godTrial:null,seaExam:null,pendingRing:null,forcedResults:{},
   secondaryRingsDone:false,beast:null,notes:[]
 }}
@@ -324,6 +324,10 @@ function normalizeState(raw){
   s.settings=Object.assign({softText:false,strategicReroll:true,voiceResult:true,spinSound:true,resultSound:true,pace:1160},r.settings||{});
   s.settings.pace=clamp(Math.round(Number(s.settings.pace)||1160),120,1800);
   for(const k of ['queue','history','logs','martialSoulTypes','martialSouls','talents','traits','titles','domains','rings','soulBones','inventory','factionHistory','factionStages','storyDone','specialDone','notes'])if(!Array.isArray(s[k]))s[k]=[];
+  s.rings=s.rings.map((ring,index)=>normalizeRing(ring,index)).filter(Boolean);
+  const rawBoneMeta=r.soulBoneMeta&&typeof r.soulBoneMeta==='object'&&!Array.isArray(r.soulBoneMeta)?r.soulBoneMeta:{},boneNames=[],boneMeta={};
+  for(const entry of s.soulBones){const name=soulBoneName(entry);if(!name||boneNames.includes(name))continue;boneNames.push(name);boneMeta[name]=normalizeSoulBoneMeta(typeof entry==='object'?entry:rawBoneMeta[name],name)}
+  s.soulBones=boneNames;s.soulBoneMeta=boneMeta;
   const appearanceKey=(String(s.appearance||'').toUpperCase().match(/(?:^|[^A-Z])(EX|[A-FS])(?:级|$)/)||[])[1];let appearanceRank=Number(s.appearanceRank);if(appearanceKey)appearanceRank=APPEARANCE[appearanceKey];else if(!Number.isFinite(appearanceRank))appearanceRank=-1;appearanceRank=clamp(Math.round(appearanceRank),-1,APPEARANCE.EX);s.appearanceRank=appearanceRank;if(appearanceKey)s.appearance=appearanceKey+'级';else if(appearanceRank>=0)s.appearance=(Object.keys(APPEARANCE).find(k=>APPEARANCE[k]===appearanceRank)||'F')+'级';
   if(s.factionStages.includes(18)){addUnique(s.factionStages,6);addUnique(s.factionStages,12)}else if(s.factionStages.includes(12))addUnique(s.factionStages,6);
   s.flags=Object.assign({pendingFullDomain:0,pendingDomainPrototype:false},r.flags||{});
@@ -377,7 +381,7 @@ function pickWeighted(options,randomFn=rnd){
 }
 function addUnique(arr,x){if(x&& !arr.includes(x))arr.push(x)}
 function hasAny(term){
-  const all=[...state.talents,...state.traits,...state.titles,...state.domains,...state.martialSoulTypes,...state.martialSouls,...state.inventory,...state.soulBones];
+  const boneTerms=state.soulBones.flatMap(b=>[soulBoneName(b),soulBoneDisplay(b)]),all=[...state.talents,...state.traits,...state.titles,...state.domains,...state.martialSoulTypes,...state.martialSouls,...state.inventory,...boneTerms];
   if(state.godTrial){all.push(state.godTrial.tier,state.godTrial.deity,(state.godTrial.deity||'')+'神位')}
   if(state.beast){
     all.push(state.beast.type,state.beast.primaryType,state.beast.species,...state.beast.nameSuffixes,...state.beast.speciesTraits,
@@ -487,7 +491,7 @@ function eligible(text,task={},strategic=true){
   if(task.only&&!task.only.some(x=>text.includes(x)))return failCondition('路线限定');
   if(task.exclude&&task.exclude.some(x=>text.includes(x)))return failCondition('排除词条');
   if(task.handler==='bonePart'){
-    const part=text.replace(/（.*$/,'').trim();if(state.soulBones.some(x=>String(x).includes(part)||part.includes(String(x))))return failCondition('该魂骨部位已拥有');
+    const part=text.replace(/（.*$/,'').trim();if(state.soulBones.some(x=>{const name=soulBoneName(x);return name.includes(part)||part.includes(name)}))return failCondition('该魂骨部位已拥有');
   }
   if(task.handler==='beastType'&&state.beast){
     if(/出生前20000年/.test(state.beast.period)&&text.includes('海魂兽'))return failCondition('该时期不能选择海魂兽');
@@ -630,10 +634,46 @@ function parseAppearance(text){const m=String(text||'').toUpperCase().match(/(EX
 function parseTangAge(text){if(/刚刚出生/.test(text))return 0;const before=text.match(/出生前\s*(\d+)年/);if(before)return -+before[1];const m=text.match(/唐三\s*(\d+)岁/);if(m)return +m[1];if(/武魂觉醒前/.test(text))return 5.9;return 0}
 function parseInitialLevel(text){if(/先天无魂力/.test(text))return 0;if(/先天二十级/.test(text))return 20;if(/先天满魂力/.test(text))return 10;const m=text.match(/(\d+)级/);return m?+m[1]:0}
 function extractYears(text){
-  const nums=[...text.matchAll(/(\d+)年/g)].map(m=>+m[1]);
-  if(nums.length)return Math.max(...nums);
+  text=String(text||'');const nums=[];
+  for(const m of text.matchAll(/(\d+(?:\.\d+)?)\s*万年/g))nums.push(Math.round(+m[1]*10000));
+  for(const m of text.matchAll(/(\d+)\s*年/g))nums.push(+m[1]);
+  for(const m of text.matchAll(/(\d+)\s*(?=魂环|魂骨)/g))nums.push(+m[1]);
   const map=[['百万年',1000000],['九十万年',900000],['八十万年',800000],['七十万年',700000],['六十万年',600000],['五十万年',500000],['四十万年',400000],['三十万年',300000],['二十万年',200000],['十万年',100000],['万年',10000],['千年',1000],['百年',100],['十年',10]];
-  for(const [k,v] of map)if(text.includes(k))return v;return 0
+  for(const [k,v] of map)if(text.includes(k))nums.push(v);return nums.length?Math.max(...nums):0
+}
+function normalizeRing(ring,index=0){
+  if(ring==null)return null;
+  if(typeof ring==='object'&&!Array.isArray(ring)){const years=Math.max(0,Math.round(Number(ring.years)||extractYears(String(ring.text||''))||0));return {...ring,index:Number(ring.index)||index+1,years,text:String(ring.text||'未知魂环'),type:String(ring.type||''),species:String(ring.species||'')}}
+  const text=String(ring);return {index:index+1,years:extractYears(text),text,type:'',species:''}
+}
+function soulBoneName(bone){return String(bone&&typeof bone==='object'?(bone.name||bone.part||bone.text||''):bone||'').replace(/（.*$/,'').trim()}
+function normalizeSoulBoneMeta(meta,name=''){
+  meta=meta&&typeof meta==='object'&&!Array.isArray(meta)?meta:{};const inferred=extractYears(name),years=Math.max(0,Math.round(Number(meta.years)||inferred||0)),bonusYears=Math.max(0,Math.round(Number(meta.bonusYears)||0));
+  return {years,knownYears:meta.knownYears===true||(!('knownYears'in meta)&&years>0),bonusYears}
+}
+function soulBoneDisplay(bone){const name=soulBoneName(bone);if(!name)return '';const b=normalizeSoulBoneMeta(state.soulBoneMeta?.[name],name);if(b.knownYears&&b.years>0)return name+'·'+b.years+'年';if(b.bonusYears>0)return name+'·基础年限未知·已提升'+b.bonusYears+'年';return name}
+function addSoulBone(name,years=0){
+  name=String(name||'').replace(/（.*$/,'').trim();if(!name)return false;
+  if(state.soulBones.some(b=>{const current=soulBoneName(b);return current.includes(name)||name.includes(current)}))return false;
+  years=Math.max(0,Math.round(Number(years)||0));state.soulBones.push(name);state.soulBoneMeta??={};state.soulBoneMeta[name]={years,knownYears:years>0,bonusYears:0};return true
+}
+function extractBoneYears(text,fallback=0){
+  text=String(text||'');const explicit=text.match(/((?:\d+(?:\.\d+)?万|\d+|[一二三四五六七八九十百千万]+)年)[^，。；（）]{0,10}魂骨/);if(explicit)return extractYears(explicit[0]);
+  if(/(?:对应|与你魂环对应)(?:魂环)?年限/.test(text))return Math.max(0,Math.round(Number(fallback)||Number(state.pendingRing?.years)||Number(state.rings[state.rings.length-1]?.years)||0));
+  return Math.max(0,Math.round(Number(fallback)||0))
+}
+function applyEquipmentYearReward(text){
+  const m=String(text||'').match(/全部\s*(魂环(?:\s*[+＋、和与]\s*魂骨)?|魂骨)\s*(?:年限)?\s*(?:提升|增加|提高|\+)\s*(\d+)\s*年/);if(!m)return false;
+  const target=m[1],delta=Math.max(0,Math.round(+m[2]||0));if(!delta)return false;let ringCount=0,boneCount=0;
+  if(target.includes('魂环')){
+    state.rings=state.rings.map((ring,index)=>{const r=normalizeRing(ring,index);if(!r)return r;r.years=Math.max(0,r.years)+delta;ringCount++;return r});
+    if(state.pendingRing){state.pendingRing=normalizeRing(state.pendingRing,Math.max(0,(state.pendingRing.index||1)-1));state.pendingRing.years+=delta}
+  }
+  if(target.includes('魂骨')){
+    state.soulBoneMeta??={};for(const bone of state.soulBones){const name=soulBoneName(bone);if(!name)continue;const b=normalizeSoulBoneMeta(state.soulBoneMeta[name],name);if(b.knownYears)b.years+=delta;else b.bonusYears+=delta;state.soulBoneMeta[name]=b;boneCount++}
+  }
+  const applied=[],missing=[];if(target.includes('魂环'))(ringCount?applied:missing).push(ringCount?ringCount+'枚魂环':'魂环');if(target.includes('魂骨'))(boneCount?applied:missing).push(boneCount?boneCount+'块魂骨':'魂骨');
+  logEvent(applied.length?'装备年限提升':'年限奖励暂无目标',(applied.length?'已为 '+applied.join('、')+' 各提升 '+delta+' 年。':'当前没有可提升的'+missing.join('或')+'。')+(applied.length&&missing.length?' 当前暂无'+missing.join('或')+'，该部分未生效。':''),applied.length?'good':'normal');return true
 }
 function addDomain(name){name=String(name||'').replace(/[，。；（）].*$/,'').trim();if(!name||/^(完整领域|领域雏形|完整领域池子|领域抽取池)$/.test(name))return;if(name.length<28)addUnique(state.domains,name)}
 function addTrait(name){name=name.trim();if(!name)return;if(/领域/.test(name))addDomain(name);else addUnique(state.traits,name)}
@@ -653,7 +693,7 @@ function queueDomainRoll(source='full',reason='获得完整领域'){
   if(!state.queue.some(t=>t.handler==='domain'))prepend([taskRoll(TAG.DOMAIN,'完整领域池子','domain',{domainSource:source,domainReason:reason})])
 }
 function queueGodTrial(reason='获得神考'){if(!state.godTrial&&!state.queue.some(t=>t.handler==='godTier'))prepend([taskRoll(TAG.GOD,'神考池子','godTier',{reason})])}
-function queueSoulBone(reason='获得魂骨'){if(!state.queue.some(t=>t.handler==='bonePart'))prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart',{reason})])}
+function queueSoulBone(reason='获得魂骨',boneYears=0){if(!state.queue.some(t=>t.handler==='bonePart'))prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart',{reason,boneYears})])}
 function currentMartialPool(){const type=state.martialSoulTypes[0]||'兽武魂';return getMartialPool(type)}
 function queueOutcomeFollowups(task,text){
   const tasks=[];
@@ -661,7 +701,7 @@ function queueOutcomeFollowups(task,text){
     state.flags.pendingFullDomain=(+state.flags.pendingFullDomain||0)+1;tasks.push(taskRoll(TAG.DOMAIN,'完整领域池子','domain',{domainSource:'full',domainReason:'词条直接获得完整领域'}));
   }
   if(/获得领域雏形/.test(text)){addUnique(state.traits,'领域雏形');state.flags.pendingDomainPrototype=true}
-  if(/获得(?:十万年|对应吸收上限的)?魂骨/.test(text)&&!/外附魂骨/.test(text)&&!['boneChance','bonePart','ringAge'].includes(task.handler))tasks.push(taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart',{reason:'词条奖励魂骨'}));
+  if(/(?:额外)?获得(?:了)?(?:一块)?(?:(?:\d+(?:\.\d+)?万|\d+|[一二三四五六七八九十百千万]+)年|与你魂环对应年限的|对应吸收上限的)?(?:魂环)?魂骨/.test(text)&&!/外附魂骨/.test(text)&&!['boneChance','bonePart','ringAge'].includes(task.handler))tasks.push(taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart',{reason:'词条奖励魂骨',boneYears:extractBoneYears(text,task.boneYears)}));
   if(/获得神考/.test(text)&&task.handler!=='godTier'&&!state.godTrial)tasks.push(taskRoll(TAG.GOD,'神考池子','godTier',{reason:'词条奖励神考'}));
   if(/武魂变异/.test(text)&&task.handler!=='martialDetail')tasks.push(taskRoll(TAG.SOUL,'变异武魂','martialDetail',{replaceSoul:true,type:'变异武魂'}));
   if(/武魂二次觉醒/.test(text)&&task.handler!=='martialAwaken')tasks.push(taskRoll(TAG.SOUL,currentMartialPool(),'martialAwaken',{type:state.martialSoulTypes[0]||''}));
@@ -689,7 +729,8 @@ function applyGeneric(text,poolName='',task={}){
   if(/获得当前神位的领域/.test(text)&&state.godTrial?.deity)addDomain(state.godTrial.deity+'领域');
   const dom=text.match(/(?:获得|领悟|学会)(?:了)?([^，。；（）【】]{1,14}领域)/);if(dom&&!/完整领域|领域雏形/.test(dom[1]))addDomain(dom[1]);
   if(/获得领域雏形|先天领域雏形/.test(text)){addUnique(state.traits,'领域雏形');state.flags.pendingDomainPrototype=true}
-  if(/外附魂骨/.test(text))addUnique(state.soulBones,'外附魂骨');
+  if(/外附魂骨/.test(text))addSoulBone('外附魂骨',extractBoneYears(text));
+  applyEquipmentYearReward(text);
   if(/学会反转术式/.test(text))addUnique(state.traits,'反转术式');
   if(/自创神位/.test(text)){state.maxLevel=Math.max(state.maxLevel,169);addUnique(state.traits,'自创神位');logEvent('等级上限解除','自创神位使等级上限提升至 169 级。','major')}
   const deathImmune=(/极致武魂和概念武魂可以免疫/.test(text)&&(state.martialSoulTypes.includes('极致武魂')||state.martialSoulTypes.includes('概念型武魂')))||
@@ -807,8 +848,8 @@ function handleResult(task,p,text){
     case 'ringAge':handleRingAge(task,text);break;
     case 'ringType':handleRingType(task,text);break;
     case 'ringSpecies':handleRingSpecies(task,text);break;
-    case 'boneChance':if(/^是/.test(text))prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart')]);break;
-    case 'bonePart':addUnique(state.soulBones,text.replace(/（.*$/,'').trim());break;
+    case 'boneChance':if(/^是/.test(text))prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart',{boneYears:task.boneYears})]);break;
+    case 'bonePart':addSoulBone(text.replace(/（.*$/,'').trim(),task.boneYears);break;
     case 'domain':
       addDomain(text);if(task.domainSource==='full')state.flags.pendingFullDomain=Math.max(0,(+state.flags.pendingFullDomain||0)-1);else{state.flags.pendingDomainPrototype=false;state.traits=state.traits.filter(x=>x!=='领域雏形')}break;
     case 'godTier':handleGodTier(text);break;
@@ -840,7 +881,7 @@ function handleResult(task,p,text){
 
 function handleRingAge(task,text){
   const years=extractYears(text);state.pendingRing={index:task.index,years,text,type:'',species:''};
-  const guaranteed=/魂骨/.test(text)&&/获得|拿下/.test(text);if(guaranteed)prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart')]);
+  const guaranteed=/魂骨/.test(text)&&/获得|拿下/.test(text);if(guaranteed)prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart',{boneYears:extractBoneYears(text,years)})]);
   const typePool='你吸收的'+ROMAN_RING[task.index-1]+'魂环是什么类型的魂兽（抽完右滑去魂兽初始抽取池进行抽取对应的魂兽）';
   if(pool(TAG.RING,typePool))prepend([taskRoll(TAG.RING,typePool,'ringType',{index:task.index,guaranteed})]);else finalizeRing(task.index,guaranteed)
 }
@@ -850,7 +891,7 @@ function handleRingType(task,text){
 function handleRingSpecies(task,text){if(state.pendingRing)state.pendingRing.species=text.replace(/（.*$/,'').trim();finalizeRing(task.index,task.guaranteed)}
 function finalizeRing(index,guaranteed=false){
   const r=state.pendingRing||{index,years:0,text:'未知魂环',type:'',species:''};state.rings[index-1]=r;state.pendingRing=null;
-  if(!guaranteed){const y=r.years;let chance=y<100?'是否获得十年魂骨（获得十年魂环后请摇这个选项）':y<1000?'是否获得百年魂骨（获得百年魂环后请摇这个选项）':y<10000?'是否获得千年魂骨（获得千年魂环后请摇这个选项）':y<100000?'是否获得万年魂骨（获得万年魂环后请摇这个选项）':null;if(chance)prepend([taskRoll(TAG.BONE,chance,'boneChance')]);else if(y>=100000)prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart')])}
+  if(!guaranteed){const y=r.years;let chance=y<100?'是否获得十年魂骨（获得十年魂环后请摇这个选项）':y<1000?'是否获得百年魂骨（获得百年魂环后请摇这个选项）':y<10000?'是否获得千年魂骨（获得千年魂环后请摇这个选项）':y<100000?'是否获得万年魂骨（获得万年魂环后请摇这个选项）':null;if(chance)prepend([taskRoll(TAG.BONE,chance,'boneChance',{boneYears:y})]);else if(y>=100000)prepend([taskRoll(TAG.BONE,'魂骨抽取池（已拥有部位则重抽）','bonePart',{boneYears:y})])}
   if(r.years>=100000&&state.level<80&&!state.flags.tenYearGrowth){state.flags.tenYearGrowth=true;prepend([taskRoll(TAG.RING,'80级之前获得十万年魂环得到的成长','specialGrowth')])}
 }
 function handleGodTier(text){
@@ -965,7 +1006,7 @@ function handleBeastSpecies(task,text){
 }
 function handleBeastRouteSplit(text){
   if(/化形为人/.test(text)){
-    const b=state.beast;if((state.tangAge??0)<-6){logEvent('跨越远古','化形后进入漫长沉眠，在唐三出生前六年苏醒，以避免人类形态耗尽寿元。','major');state.tangAge=-6}state.route='transformed';state.phase='human_setup';state.age=6;state.level=10;state.innatePower=10;state.noSoulPower=false;state.maxLevel=99;state.appearance='';state.appearanceRank=-1;state.martialSoulTypes=['兽武魂'];state.martialSouls=[b.species||b.type];state.talents.push('十万年魂兽化形');state.rings=[];state.soulBones=[];state.faction='';state.branch=null;state.factionStages=[];state.beast=null;
+    const b=state.beast;if((state.tangAge??0)<-6){logEvent('跨越远古','化形后进入漫长沉眠，在唐三出生前六年苏醒，以避免人类形态耗尽寿元。','major');state.tangAge=-6}state.route='transformed';state.phase='human_setup';state.age=6;state.level=10;state.innatePower=10;state.noSoulPower=false;state.maxLevel=99;state.appearance='';state.appearanceRank=-1;state.martialSoulTypes=['兽武魂'];state.martialSouls=[b.species||b.type];state.talents.push('十万年魂兽化形');state.rings=[];state.soulBones=[];state.soulBoneMeta={};state.faction='';state.branch=null;state.factionStages=[];state.beast=null;
     prepend([taskRoll(TAG.BASE,'基础设定3:你的性别是？','gender'),taskRoll(TAG.BASE,'基础设定4:容貌（B级以下无法恋爱）','appearance'),factionTask(6),taskAction('enterHumanPlay')]);logEvent('十万年化形','本体化作武魂，以六岁人类之身重新踏上魂师道路。','major')
   }else state.flags.beastContinue=true
 }
@@ -1244,7 +1285,7 @@ function renderSheet(){
   document.getElementById('statusStat').textContent=state.finished?(state.alive?'已完成本轮':'已陨落'):(state.noSoulPower?'先天无魂力':state.godTrial?state.godTrial.deity+state.godTrial.tier+'神考 '+state.godTrial.completed+'/'+state.godTrial.total:beast?beastTier(beast.cultivation)+'魂兽':'存活');
   const souls=beast?[beastDisplayName(),...beast.bloodlines.slice(1).map(x=>x.name+' '+x.pct.toFixed(0)+'%')]:[...state.martialSoulTypes,...state.martialSouls];document.getElementById('soulChips').innerHTML=chipHtml(souls,'gold');
   const traits=[...state.talents,...state.titles.map(x=>'称号·'+x),...state.domains,...state.traits];if(beast){traits.push(...Object.keys(beast.attributes).map(k=>k+'进化×'+beast.attributes[k]),...beast.laws);if(beast.reverseCharges)traits.push('反转术式×'+beast.reverseCharges);if(beast.pseudoReverseTier)traits.push('伪·反转术式·'+beast.pseudoReverseTier);if(beast.lightningShields.length)traits.push('伪·避雷术×'+beast.lightningShields.length);if(beast.silverDragonScale)traits.push('银龙王龙鳞');if(beast.silverDragonBlessing)traits.push('银龙王血脉庇护')}document.getElementById('traitChips').innerHTML=chipHtml(traits,'cyan');
-  const gear=[...state.rings.map((r,i)=>(i+1)+'环·'+(r.years?r.years+'年':'未知')+(r.species?'·'+r.species:'')),...state.soulBones];if(state.godTrial)gear.push(state.godTrial.deity+state.godTrial.tier+'神考 '+state.godTrial.completed+'/'+state.godTrial.total);if(state.seaExam)gear.push(state.seaExam.kind+' '+state.seaExam.completed+'/'+state.seaExam.total);document.getElementById('gearChips').innerHTML=chipHtml(gear)
+  const gear=[...state.rings.map((r,i)=>(i+1)+'环·'+(r.years?r.years+'年':'未知')+(r.species?'·'+r.species:'')),...state.soulBones.map(soulBoneDisplay).filter(Boolean)];if(state.godTrial)gear.push(state.godTrial.deity+state.godTrial.tier+'神考 '+state.godTrial.completed+'/'+state.godTrial.total);if(state.seaExam)gear.push(state.seaExam.kind+' '+state.seaExam.completed+'/'+state.seaExam.total);document.getElementById('gearChips').innerHTML=chipHtml(gear)
 }
 function formatCultivation(n){if(n>=10000)return (n/10000).toFixed(n%10000?1:0)+'万';return String(n)}
 function beastProgress(n){const bounds=[10,100,1000,10000,100000,1000000];for(let i=1;i<bounds.length;i++)if(n<bounds[i])return clamp((Math.log10(n)-Math.log10(bounds[i-1]))/(Math.log10(bounds[i])-Math.log10(bounds[i-1]))*100,0,100);return 100}
@@ -1293,7 +1334,7 @@ function applyManualResult(p,text,task){
     if(tagNames.includes(TAG.SOUL)){addUnique(state.martialSouls,clean)}
     if(tagNames.includes(TAG.TALENT)){addUnique(state.talents,clean)}
     if(tagNames.includes(TAG.DOMAIN)){addDomain(clean.replace(/领域抽取结果[:：]?/g,''))}
-    if(tagNames.includes(TAG.BONE)&&!/是否获得/.test(name)){addUnique(state.soulBones,clean)}
+    if(tagNames.includes(TAG.BONE)&&!/是否获得/.test(name)){addSoulBone(clean,extractBoneYears(text))}
     if(tagNames.includes(TAG.RING)&&/\d+年魂环/.test(text)){const years=extractYears(text);state.rings.push({index:state.rings.length+1,years,text,type:'',species:''})}
     if(state.beast&&tagNames.includes(TAG.BBASE)){
       if(/什么级别|初始级别|修为级别/.test(name))handleBeastRealm(text);
