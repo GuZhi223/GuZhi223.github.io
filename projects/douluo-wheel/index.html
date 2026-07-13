@@ -79,15 +79,15 @@ button:disabled{cursor:not-allowed;opacity:.45}
 .speed-row input{flex:1;accent-color:var(--violet)}
 .sheet{padding:14px 15px 16px}
 .hero-card{border:1px solid #343a58;border-radius:16px;background:linear-gradient(145deg,#1b1e31,#11131e);padding:14px;margin-bottom:12px;position:relative;overflow:hidden}
-.hero-card:after{content:"魂";position:absolute;right:-7px;bottom:-29px;font-family:STKaiti,"KaiTi",serif;font-size:105px;color:rgba(255,255,255,.024);transform:rotate(-8deg)}
-.hero-top{display:flex;align-items:center;gap:11px;position:relative;z-index:1}
+.hero-card:after{content:"魂";position:absolute;right:65px;bottom:-38px;font-family:STKaiti,"KaiTi",serif;font-size:105px;color:rgba(255,255,255,.012);transform:rotate(-8deg);pointer-events:none;z-index:0}
+.hero-top{display:flex;align-items:center;gap:11px;position:relative;z-index:2}
 .avatar{width:58px;height:58px;border-radius:16px;border:1px solid #685e8b;background:radial-gradient(circle at 32% 26%,#e6dca2,#6957b9 36%,#1a1b2b 70%);display:grid;align-items:center;justify-items:center;place-items:center;font-size:27px;box-shadow:inset 0 0 18px rgba(0,0,0,.467)}
 .hero-name{font-size:19px;font-weight:800;margin-bottom:3px}
 .hero-route{font-size:12px;color:var(--gold)}
 .hero-seed{font-size:10px;color:var(--muted);margin-top:4px;max-width:205px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.level-block{margin-left:auto;text-align:right;z-index:1}
-.level-num{font-size:30px;font-weight:900;line-height:1;background:linear-gradient(#fff,#d8bf6b);-webkit-background-clip:text;color:transparent}
-.level-label{font-size:10px;color:var(--muted);margin-top:4px}
+.level-block{margin-left:auto;position:relative;z-index:3;min-width:105px;text-align:right;flex-shrink:0}
+.level-num{position:relative;z-index:3;white-space:nowrap;font-size:30px;font-weight:900;line-height:1;background:linear-gradient(#fff,#d8bf6b);-webkit-background-clip:text;color:transparent;text-shadow:0 2px 8px rgba(0,0,0,.9),0 0 14px rgba(0,0,0,.55)}
+.level-label{position:relative;z-index:3;white-space:nowrap;font-size:10px;color:#c5cada;margin-top:4px;text-shadow:0 1px 5px rgba(0,0,0,.9)}
 .progress{height:7px;border-radius:99px;background:#090a10;margin-top:13px;overflow:hidden;position:relative;z-index:1;border:1px solid #2e3145}
 .progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6c55dd,#e6c662);border-radius:99px;transition:width .4s}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;grid-gap:8px;gap:8px;margin-bottom:12px}
@@ -160,6 +160,7 @@ button:disabled{cursor:not-allowed;opacity:.45}
 @media(max-width:1200px){.main-grid{grid-template-columns:minmax(430px,1fr) minmax(330px,.78fr)}.timeline-panel{grid-column:1/-1}.log{height:380px}.bottom-grid{grid-template-columns:1fr}}
 @media(max-width:780px){.app{padding:9px 9px 92px}.topbar{align-items:flex-start;flex-wrap:wrap}.brand{min-width:0;width:100%}.brand small{display:none}.brand h1{font-size:17px}.brand-mark{width:38px;height:38px}.top-actions{width:100%;margin-left:0;gap:8px;justify-content:flex-end}.top-actions .status-pill,.top-actions #saveBtn,.top-actions #loadBtn{display:none}.top-actions #undoBtn,.top-actions #newBtn{min-width:104px;min-height:44px;padding:10px 16px;font-size:13px}.main-grid{grid-template-columns:1fr}.wheel-wrap{width:94%;max-width:470px;height:94vw;max-height:470px;aspect-ratio:auto}.spin-core{width:92px;height:92px;font-size:15px}.sheet-panel,.timeline-panel{grid-column:auto}.stat-grid{grid-template-columns:1fr 1fr}.bottom-grid{grid-template-columns:1fr}.route-grid{grid-template-columns:1fr}.route-card{display:grid;grid-template-columns:45px 1fr;text-align:left;align-items:center}.route-card .ico{grid-row:1/3;margin:0}.seed-box{grid-template-columns:1fr}.form-row{grid-template-columns:1fr;grid-gap:5px;gap:5px}.control-row{position:fixed;left:9px;right:9px;bottom:9px;z-index:60;grid-template-columns:1fr 1.25fr 1fr;padding:8px;background:rgba(13,15,25,.929);border:1px solid #3a405c;border-radius:16px;box-shadow:0 14px 38px rgba(0,0,0,.733);backdrop-filter:blur(14px)}.control-row .btn:last-child{grid-column:auto}.speed-row{display:none}.log{height:58vh;max-height:520px}.timeline-head{flex-wrap:wrap}.timeline-head input{flex-basis:70%}.current-task h2{font-size:19px}#resultText{font-size:15px}.result-card{padding:15px}}
 @media(max-width:780px){.speed-row{display:grid;grid-template-columns:auto minmax(120px,1fr) auto;grid-gap:8px;gap:8px;padding:11px 16px 15px}.speed-row input{width:100%;min-height:32px}.speed-row #speedText{grid-column:1/-1;text-align:center}}
+@media(max-width:420px){.level-block{min-width:92px}.level-num{font-size:26px}.hero-card:after{right:55px;opacity:.6}}
 </style>
 </head>
 <body>
@@ -487,6 +488,7 @@ function defaultState() {
     titles: [],
     domains: [],
     rings: [],
+    martialSoulRings: [[]],
     soulBones: [],
     soulBoneMeta: {},
     inventory: [],
@@ -495,10 +497,15 @@ function defaultState() {
     branch: null,
     branchStartTangAge: -999,
     factionStages: [],
-    flags: { pendingFullDomain: 0, pendingDomainPrototype: false },
+    flags: { pendingFullDomain: 0, pendingDomainPrototype: false, luoSanPaoLocked: false, luoSanPaoUnlockedByHerb: false },
     storyDone: [],
     specialDone: [],
     godTrial: null,
+    godhood: null,
+    endingTitle: "",
+    endingText: "",
+    endingKind: "",
+    deathCause: "",
     seaExam: null,
     pendingRing: null,
     forcedResults: {},
@@ -518,6 +525,17 @@ function normalizeState(raw) {
   s.settings.pace = clamp(Math.round(Number(s.settings.pace) || 1160), 120, 1800);
   for (const k of ["queue", "history", "logs", "martialSoulTypes", "martialSouls", "talents", "traits", "titles", "domains", "rings", "soulBones", "inventory", "factionHistory", "factionStages", "storyDone", "specialDone", "notes"]) if (!Array.isArray(s[k])) s[k] = [];
   s.rings = s.rings.map((ring, index) => normalizeRing(ring, index)).filter(Boolean);
+  const rawMartialSoulRings = Array.isArray(r.martialSoulRings) ? r.martialSoulRings : [];
+  s.martialSoulRings = rawMartialSoulRings.map((bucket) => Array.isArray(bucket) ? bucket.map((ring, index) => normalizeRing(ring, index)).filter(Boolean) : []);
+  if (!s.rings.length && s.martialSoulRings[0] && s.martialSoulRings[0].length) s.rings = s.martialSoulRings[0];
+  const martialSoulRingCount = Math.max(1, s.martialSouls.length, s.martialSoulRings.length);
+  while (s.martialSoulRings.length < martialSoulRingCount) s.martialSoulRings.push([]);
+  s.martialSoulRings[0] = s.rings;
+  if (s.pendingRing && typeof s.pendingRing === "object") {
+    const pendingSoulIndex = clamp(Math.round(Number(s.pendingRing.soulIndex) || 0), 0, s.martialSoulRings.length - 1);
+    s.pendingRing = normalizeRing(s.pendingRing, Math.max(0, (s.pendingRing.index || 1) - 1));
+    if (s.pendingRing) s.pendingRing.soulIndex = pendingSoulIndex;
+  } else s.pendingRing = null;
   const rawBoneMeta = r.soulBoneMeta && typeof r.soulBoneMeta === "object" && !Array.isArray(r.soulBoneMeta) ? r.soulBoneMeta : {}, boneNames = [], boneMeta = {};
   for (const entry of s.soulBones) {
     const name = soulBoneName(entry);
@@ -539,7 +557,14 @@ function normalizeState(raw) {
     addUnique(s.factionStages, 6);
     addUnique(s.factionStages, 12);
   } else if (s.factionStages.includes(12)) addUnique(s.factionStages, 6);
-  s.flags = Object.assign({ pendingFullDomain: 0, pendingDomainPrototype: false }, r.flags || {});
+  s.flags = Object.assign({ pendingFullDomain: 0, pendingDomainPrototype: false, luoSanPaoLocked: false, luoSanPaoUnlockedByHerb: false }, r.flags || {});
+  s.godhood = r.godhood && typeof r.godhood === "object" ? { deity: String(r.godhood.deity || "未知神祇"), tier: String(r.godhood.tier || "三级"), cap: Math.max(100, Number(r.godhood.cap) || 109) } : null;
+  s.endingTitle = String(r.endingTitle || ""); s.endingText = String(r.endingText || r.ending || ""); s.endingKind = String(r.endingKind || (s.finished && !s.alive ? "bad" : "normal"));
+  s.deathCause = String(r.deathCause || (s.finished && !s.alive ? s.endingText || "旧存档未记录具体原因" : ""));
+  const oldHerb = s.flags.luoSanPaoUnlockedByHerb || s.logs.some((x) => /(?:服用|吃下).*仙草|仙草.*(?:修复|破除)/.test(String((x == null ? void 0 : x.text) || "")));
+  if (oldHerb) { s.flags.luoSanPaoUnlockedByHerb = true; s.flags.luoSanPaoLocked = false; }
+  else if (s.martialSouls.some((x) => String(x).includes("罗三炮"))) s.flags.luoSanPaoLocked = true;
+  if (s.godhood && !s.beast && s.level < 100) { s.level = 100; s.logs.push({ title: "存档迁移", text: "检测到已获得完整神位，等级已修正至100级。", kind: "major", tangAge: s.tangAge }); }
   s.forcedResults = r.forcedResults && typeof r.forcedResults === "object" && !Array.isArray(r.forcedResults) ? r.forcedResults : {};
   if (s.flags.pendingDomain) {
     if (s.traits.includes("领域雏形")) s.flags.pendingDomainPrototype = true;
@@ -567,7 +592,35 @@ function normalizeState(raw) {
     }
     s.beast = b;
   }
+  if (s.route === "transformed") {
+    if (!Number.isFinite(Number(s.flags.transformedAtTangAge))) s.flags.transformedAtTangAge = s.tangAge;
+    if (!Number.isFinite(Number(s.flags.transformedHumanStartAge))) s.flags.transformedHumanStartAge = Math.min(Math.max(Number(s.age) || 6, 6), 25);
+  }
   return s;
+}
+function ensureMartialSoulRingBuckets() {
+  if (!Array.isArray(state.martialSoulRings)) state.martialSoulRings = [];
+  const count = Math.max(1, state.martialSouls.length, state.martialSoulRings.length);
+  while (state.martialSoulRings.length < count) state.martialSoulRings.push([]);
+  for (let i = 1; i < state.martialSoulRings.length; i++) if (!Array.isArray(state.martialSoulRings[i])) state.martialSoulRings[i] = [];
+  state.martialSoulRings[0] = state.rings;
+  return state.martialSoulRings;
+}
+function martialSoulRingsAt(soulIndex = 0) {
+  const buckets = ensureMartialSoulRingBuckets(), index = clamp(Math.round(Number(soulIndex) || 0), 0, buckets.length - 1);
+  return index === 0 ? state.rings : buckets[index];
+}
+function martialSoulLabel(soulIndex = 0) {
+  const prefix = ROMAN_RING[soulIndex] || "第" + (soulIndex + 1);
+  return prefix + "武魂";
+}
+function martialSoulName(soulIndex = 0) {
+  return state.martialSouls[soulIndex] || "未定武魂";
+}
+function ringDisplayText(ring) {
+  if (!ring) return "未知";
+  const years = Math.max(0, Math.round(Number(ring.years) || 0));
+  return years ? years + "年" : String(ring.text || "未知").replace(/魂环/g, "").trim() || "未知";
 }
 let state = defaultState();
 let undoStack = [];
@@ -1170,10 +1223,42 @@ function drawFreshAfterUndo(p, task, avoidKey, avoidName) {
     effectiveProbability: choiceWeight > 0 ? w / choiceWeight : 1 / choices.length
   };
 }
+function effectiveLevelCap() {
+  const normalCap = Math.max(1, Number(state.maxLevel) || 99);
+  return state.flags && state.flags.luoSanPaoLocked ? Math.min(normalCap, 29) : normalCap;
+}
+function hasLuoSanPaoSoul() { return state.martialSouls.some((x) => String(x).includes("罗三炮")); }
+function syncLuoSanPaoLock(reason = "") {
+  if (!hasLuoSanPaoSoul()) { state.flags.luoSanPaoLocked = false; return; }
+  if (state.flags.luoSanPaoUnlockedByHerb) return;
+  state.flags.luoSanPaoLocked = true;
+  if (state.level > 29) {
+    const old = state.level; state.level = 29;
+    logEvent("武魂缺陷", "武魂变异为罗三炮，魂力受到先天缺陷影响，被限制在29级。" + (reason ? "｜" + reason : ""), "major");
+    if (old !== 29) logEvent("魂力变化", old + "级 → 29级｜罗三炮武魂缺陷", "bad");
+  }
+}
+function unlockLuoSanPaoByHerb(text) {
+  if (!state.flags.luoSanPaoLocked || !/(?:服用|吃下).*仙草|仙草.*(?:服用|吃下)/.test(String(text || ""))) return false;
+  state.flags.luoSanPaoLocked = false; state.flags.luoSanPaoUnlockedByHerb = true;
+  logEvent("瓶颈解除", "仙草修复了罗三炮的武魂缺陷，魂力可以继续提升。", "major");
+  return true;
+}
+function godCap(tier) { return /神王/.test(tier) ? 159 : /一级/.test(tier) ? 139 : /二级/.test(tier) ? 119 : /自创/.test(tier) ? 169 : 109; }
+function grantGodhood(options = {}) {
+  if (state.beast) return false;
+  const tier = options.tier || "三级", deity = options.deity || "未知神祇", cap = Math.max(godCap(tier), Number(options.cap) || 0);
+  state.godhood = { deity, tier, cap }; state.maxLevel = Math.max(state.maxLevel || 99, cap);
+  if (state.godTrial) { state.godTrial.tier = tier; state.godTrial.deity = deity; }
+  setLevel(Math.max(100, state.level), "正式成神");
+  addUnique(state.traits, deity + "·" + tier + "神位");
+  logEvent("正式成神", "获得" + deity + "·" + tier + "神位，等级提升至至少100级，等级上限 " + state.maxLevel + " 级。", "major");
+  return true;
+}
 function setLevel(n, reason = "") {
   if (state.noSoulPower && n > state.level && !/神|成神|化形/.test(reason)) return;
   const old = state.level;
-  state.level = clamp(Math.round(n), 0, state.maxLevel || 99);
+  state.level = clamp(Math.round(n), 0, effectiveLevelCap());
   if (state.level !== old && reason) logEvent("魂力变化", old + "级 → " + state.level + "级｜" + reason, state.level > old ? "good" : "bad");
 }
 function changeLevel(delta, reason = "") {
@@ -1258,7 +1343,10 @@ function extractBoneYears(text, fallback = 0) {
   text = String(text || "");
   const explicit = text.match(/((?:\d+(?:\.\d+)?万|\d+|[一二三四五六七八九十百千万]+)年)[^，。；（）]{0,10}魂骨/);
   if (explicit) return extractYears(explicit[0]);
-  if (/(?:对应|与你魂环对应)(?:魂环)?年限/.test(text)) return Math.max(0, Math.round(Number(fallback) || Number((_a2 = state.pendingRing) == null ? void 0 : _a2.years) || Number((_b2 = state.rings[state.rings.length - 1]) == null ? void 0 : _b2.years) || 0));
+  if (/(?:对应|与你魂环对应)(?:魂环)?年限/.test(text)) {
+    const pending = state.pendingRing, rings = pending ? martialSoulRingsAt(pending.soulIndex || 0) : state.rings;
+    return Math.max(0, Math.round(Number(fallback) || Number(pending == null ? void 0 : pending.years) || Number((_b2 = rings[rings.length - 1]) == null ? void 0 : _b2.years) || 0));
+  }
   return Math.max(0, Math.round(Number(fallback) || 0));
 }
 function applyEquipmentYearReward(text) {
@@ -1269,15 +1357,22 @@ function applyEquipmentYearReward(text) {
   if (!delta) return false;
   let ringCount = 0, boneCount = 0;
   if (target.includes("魂环")) {
-    state.rings = state.rings.map((ring, index) => {
-      const r = normalizeRing(ring, index);
-      if (!r) return r;
-      r.years = Math.max(0, r.years) + delta;
-      ringCount++;
-      return r;
-    });
+    const buckets = ensureMartialSoulRingBuckets();
+    for (let soulIndex = 0; soulIndex < buckets.length; soulIndex++) {
+      const upgraded = martialSoulRingsAt(soulIndex).map((ring, index) => {
+        const r = normalizeRing(ring, index);
+        if (!r) return r;
+        r.years = Math.max(0, r.years) + delta;
+        ringCount++;
+        return r;
+      });
+      if (soulIndex === 0) state.rings = upgraded;
+      else state.martialSoulRings[soulIndex] = upgraded;
+    }
+    ensureMartialSoulRingBuckets();
     if (state.pendingRing) {
       state.pendingRing = normalizeRing(state.pendingRing, Math.max(0, (state.pendingRing.index || 1) - 1));
+      state.pendingRing.soulIndex = Math.max(0, Math.round(Number(state.pendingRing.soulIndex) || 0));
       state.pendingRing.years += delta;
     }
   }
@@ -1382,9 +1477,15 @@ function adjustAppearance(delta, reason = "") {
   state.appearance = k + "级";
   if (state.appearanceRank !== old && reason) logEvent("容貌变化", (Object.keys(APPEARANCE).find((x) => APPEARANCE[x] === old) || "?") + "级 → " + state.appearance + "｜" + reason, "good");
 }
+function isDirectDeathOutcome(text) {
+  const main = String(text || "").replace(/（[^）]*）/g, "").trim();
+  if (!main || /(?:战败|失败)[^，。；]{0,16}(?:成功逃离|逃离战场|脱身|幸存)/.test(main)) return false;
+  return /战败身死|当场身死|当场死亡|重伤战死|最终战死|当场战死|围攻至死|阵亡|爆体而亡|自爆死亡/.test(main) || /你[^。；，]*(?:被[^。；，]*(?:击杀|杀死|斩杀|秒杀|吞噬)|死亡|至死|身死|战死|自爆|砍死|打死)/.test(main);
+}
 function applyGeneric(text, poolName = "", task = {}) {
   var _a2;
   if (state.beast) return;
+  unlockLuoSanPaoByHerb(text);
   const before = state.level;
   for (const m of text.matchAll(/(?:等级|魂力)(?:等级)?\s*([+-])\s*(\d+)/g)) changeLevel((m[1] === "+" ? 1 : -1) * +m[2], text);
   for (const m of text.matchAll(/(?:等级|魂力)(?:提升|增加)\s*(\d+)级/g)) changeLevel(+m[1], text);
@@ -1420,14 +1521,14 @@ function applyGeneric(text, poolName = "", task = {}) {
   if (/外附魂骨/.test(text)) addSoulBone("外附魂骨", extractBoneYears(text));
   applyEquipmentYearReward(text);
   if (/学会反转术式/.test(text)) addUnique(state.traits, "反转术式");
-  if (/自创神位/.test(text)) {
-    state.maxLevel = Math.max(state.maxLevel, 169);
-    addUnique(state.traits, "自创神位");
-    logEvent("等级上限解除", "自创神位使等级上限提升至 169 级。", "major");
+  if (/自创神位/.test(text) && !/资格|候选|考核|失去|自斩/.test(text)) grantGodhood({ deity: "自创", tier: "自创神", cap: 169 });
+  else if (/(?:正式成神|获得(?:完整|正式)?[^，。；（）]{0,12}神位|继承(?:了)?[^，。；（）]{0,12}神位)/.test(text) && !/神考|资格|候选|传承资格|失去神位|自斩神位|考核/.test(text)) {
+    const deity = (text.match(/(?:获得|继承)(?:了)?([^，。；（）]{1,12}?)(?:完整)?神位/) || [])[1] || (state.godTrial == null ? void 0 : state.godTrial.deity) || "未知神祇";
+    const tier = /神王/.test(text) ? "神王" : /一级/.test(text) ? "一级" : /二级/.test(text) ? "二级" : /三级/.test(text) ? "三级" : (state.godTrial == null ? void 0 : state.godTrial.tier) || "三级";
+    grantGodhood({ deity, tier });
   }
   const deathImmune = /极致武魂和概念武魂可以免疫/.test(text) && (state.martialSoulTypes.includes("极致武魂") || state.martialSoulTypes.includes("概念型武魂")) || /任意七宗罪/.test(text) && state.titles.some((x) => SINS.includes(x)) || /任意七美德/.test(text) && state.titles.some((x) => VIRTUES.includes(x));
-  const main = text.replace(/（[^）]*）/g, "");
-  const directDeath = /你[^。；，]*(?:被[^。；，]*击杀|死亡|至死|身死|爆体而亡|自爆|砍死|打死|秒杀|吞噬)|最终战死/.test(main);
+  const directDeath = isDirectDeathOutcome(text);
   if (fatalMindBacklash) {
     if (manualSandbox) endGame("心魔反噬", text, "bad");
     else if (!consumeDeathShield("心魔反噬")) endGame("心魔反噬", text, "bad");
@@ -1611,6 +1712,7 @@ function handleResult(task, p, text) {
       if (task.replaceSoul && state.martialSouls.length) state.martialSouls[0] = item;
       else addUnique(state.martialSouls, item);
       if (task.type) addUnique(state.martialSoulTypes, task.type);
+      syncLuoSanPaoLock("获得或替换武魂");
       if (task.type === "真龙血脉" && /银龙王.*九大属性/.test(text)) {
         for (const attr of SILVER_DRAGON_ATTRIBUTES) addUnique(state.traits, "武魂属性·" + attr);
         logEvent("银龙王九大属性", "第二武魂附带锐金、木、水、火、土、时间、空间、生命、毁灭九项属性。", "major");
@@ -1621,6 +1723,7 @@ function handleResult(task, p, text) {
       const item = text.replace(/（.*$/, "").trim(), old = state.martialSouls[0] || "原武魂";
       state.martialSouls[0] = old + "·" + item + "融合觉醒";
       addUnique(state.traits, "武魂二次觉醒");
+      syncLuoSanPaoLock("武魂二次觉醒");
       break;
     }
     case "specialYes":
@@ -1666,7 +1769,7 @@ function handleResult(task, p, text) {
       break;
     case "storyResult":
       state.flags[task.flag] = text;
-      if (state.beast && String(task.flag || "").startsWith("beast")) handleBeastStoryOutcome(text);
+      if (state.beast && String(task.flag || "").startsWith("beast")) handleBeastStoryOutcome(text, task);
       break;
     case "killCity":
       if (isYes(text)) prepend([taskRoll(TAG.SLAUGHTER, "是否获得杀神领域", "killDomain")]);
@@ -1778,34 +1881,41 @@ function handleResult(task, p, text) {
   logEvent(p.name, text, /死亡|失败|重伤|失去|掉落|无魂力/.test(text) ? "bad" : /获得|成功|胜利|提升|加入|领悟|是/.test(text) ? "good" : "normal");
 }
 function handleRingAge(task, text) {
-  const years = extractYears(text);
-  state.pendingRing = { index: task.index, years, text, type: "", species: "" };
+  const soulIndex = Math.max(0, Math.round(Number(task.soulIndex) || 0)), years = extractYears(text);
+  state.pendingRing = { index: task.index, soulIndex, years, text, type: "", species: "" };
   const guaranteed = /魂骨/.test(text) && /获得|拿下/.test(text);
-  if (guaranteed) prepend([taskRoll(TAG.BONE, "魂骨抽取池（已拥有部位则重抽）", "bonePart", { boneYears: extractBoneYears(text, years) })]);
+  if (guaranteed) prepend([taskRoll(TAG.BONE, "魂骨抽取池（已拥有部位则重抽）", "bonePart", { boneYears: extractBoneYears(text, years), soulIndex, ringIndex: task.index })]);
   const typePool = "你吸收的" + ROMAN_RING[task.index - 1] + "魂环是什么类型的魂兽（抽完右滑去魂兽初始抽取池进行抽取对应的魂兽）";
-  if (pool(TAG.RING, typePool)) prepend([taskRoll(TAG.RING, typePool, "ringType", { index: task.index, guaranteed })]);
-  else finalizeRing(task.index, guaranteed);
+  if (pool(TAG.RING, typePool)) prepend([taskRoll(TAG.RING, typePool, "ringType", { index: task.index, soulIndex, guaranteed })]);
+  else finalizeRing(task.index, guaranteed, soulIndex);
 }
 function handleRingType(task, text) {
   if (!state.pendingRing) return;
   state.pendingRing.type = text.replace(/（.*$/, "").trim();
   const bp = beastSpeciesPool(state.pendingRing.type);
-  if (bp) prepend([taskRoll(TAG.BSPECIES, bp, "ringSpecies", { index: task.index, guaranteed: task.guaranteed })]);
-  else finalizeRing(task.index, task.guaranteed);
+  if (bp) prepend([taskRoll(TAG.BSPECIES, bp, "ringSpecies", { index: task.index, soulIndex: task.soulIndex, guaranteed: task.guaranteed })]);
+  else finalizeRing(task.index, task.guaranteed, task.soulIndex);
 }
 function handleRingSpecies(task, text) {
   if (state.pendingRing) state.pendingRing.species = text.replace(/（.*$/, "").trim();
-  finalizeRing(task.index, task.guaranteed);
+  finalizeRing(task.index, task.guaranteed, task.soulIndex);
 }
-function finalizeRing(index, guaranteed = false) {
-  const r = state.pendingRing || { index, years: 0, text: "未知魂环", type: "", species: "" };
-  state.rings[index - 1] = r;
+function finalizeRing(index, guaranteed = false, soulIndex = 0) {
+  const pendingSoulIndex = state.pendingRing ? Number(state.pendingRing.soulIndex) : NaN;
+  const owner = Math.max(0, Math.round(Number.isFinite(pendingSoulIndex) ? pendingSoulIndex : Number(soulIndex) || 0));
+  const r = state.pendingRing || { index, soulIndex: owner, years: 0, text: "未知魂环", type: "", species: "" };
+  r.index = index;
+  r.soulIndex = owner;
+  const rings = martialSoulRingsAt(owner);
+  rings[index - 1] = r;
+  ensureMartialSoulRingBuckets();
   state.pendingRing = null;
+  logEvent(martialSoulLabel(owner) + "魂环", martialSoulName(owner) + "的" + ROMAN_RING[index - 1] + "魂环已吸收：" + ringDisplayText(r) + (r.species ? "·" + r.species : "") + "。", "major");
   if (!guaranteed) {
     const y = r.years;
     let chance = y < 100 ? "是否获得十年魂骨（获得十年魂环后请摇这个选项）" : y < 1e3 ? "是否获得百年魂骨（获得百年魂环后请摇这个选项）" : y < 1e4 ? "是否获得千年魂骨（获得千年魂环后请摇这个选项）" : y < 1e5 ? "是否获得万年魂骨（获得万年魂环后请摇这个选项）" : null;
-    if (chance) prepend([taskRoll(TAG.BONE, chance, "boneChance", { boneYears: y })]);
-    else if (y >= 1e5) prepend([taskRoll(TAG.BONE, "魂骨抽取池（已拥有部位则重抽）", "bonePart", { boneYears: y })]);
+    if (chance) prepend([taskRoll(TAG.BONE, chance, "boneChance", { boneYears: y, soulIndex: owner, ringIndex: index })]);
+    else if (y >= 1e5) prepend([taskRoll(TAG.BONE, "魂骨抽取池（已拥有部位则重抽）", "bonePart", { boneYears: y, soulIndex: owner, ringIndex: index })]);
   }
   if (r.years >= 1e5 && state.level < 80 && !state.flags.tenYearGrowth) {
     state.flags.tenYearGrowth = true;
@@ -1829,11 +1939,7 @@ function handleGodReward(task, text) {
     const origin = state.godTrial.tier;
     let finalTier = /至高神王级/.test(text) ? "至高神王" : /准神王级/.test(text) ? "准神王" : /提升为一级神/.test(text) ? "一级" : /提升为二级神/.test(text) ? "二级" : origin, cap = origin === "神王" ? 159 : origin === "一级" ? 139 : origin === "二级" ? 119 : 109, cm = text.match(/等级限制解除(?:到|为)(\d+)级/);
     if (cm) cap = +cm[1];
-    state.godTrial.tier = finalTier;
-    state.maxLevel = Math.max(state.maxLevel, cap);
-    setLevel(Math.max(100, state.level), "完成神考");
-    addUnique(state.traits, (state.godTrial.deity || "未知神祇") + "·" + finalTier + "神位");
-    logEvent("百级成神", "完成" + state.godTrial.deity + origin + "神考，最终位格为" + finalTier + "，等级上限 " + state.maxLevel + " 级。", "major");
+    grantGodhood({ deity: state.godTrial.deity || "未知神祇", tier: finalTier, cap });
   }
 }
 function handleSeaExamType(text) {
@@ -1971,11 +2077,43 @@ function resolveBeastDeath(reason, text, threshold = 0) {
 }
 function escapeThreshold(text) {
   let best = Infinity;
-  for (const m of text.matchAll(/(\d+)万年(?:以上的魂兽|魂兽|以上)?可以逃走/g)) best = Math.min(best, +m[1] * 1e4);
-  for (const m of text.matchAll(/([一二两三四五六七八九十]+)万年(?:以上的魂兽|魂兽|以上)?可以逃走/g)) best = Math.min(best, cnNumberValue(m[1]) * 1e4);
-  for (const m of text.matchAll(/(\d+)\+年魂兽可逃走/g)) best = Math.min(best, +m[1]);
-  for (const m of text.matchAll(/(\d+)年以下(?:魂兽)?必死/g)) best = Math.min(best, +m[1]);
+  const add = (value) => best = Math.min(best, value);
+  for (const m of text.matchAll(/(\d+(?:\.\d+)?)万\+?年(?:以上(?:的)?魂兽|以上|魂兽)?(?:可|可以)逃走/g)) add(+m[1] * 1e4);
+  for (const m of text.matchAll(/([一二两三四五六七八九十]+)万\+?年(?:以上(?:的)?魂兽|以上|魂兽)?(?:可|可以)逃走/g)) add(cnNumberValue(m[1]) * 1e4);
+  for (const m of text.matchAll(/(\d+)\+年(?:魂兽)?(?:可|可以)逃走/g)) add(+m[1]);
+  for (const m of text.matchAll(/(\d+)年(?:以上|及以上)(?:的)?(?:魂兽)?(?:可|可以)逃走/g)) add(+m[1]);
+  for (const m of text.matchAll(/(\d+(?:\.\d+)?)万年以下(?:的)?(?:魂兽)?(?:必死|死亡|陨落)/g)) add(+m[1] * 1e4);
+  for (const m of text.matchAll(/([一二两三四五六七八九十]+)万年以下(?:的)?(?:魂兽)?(?:必死|死亡|陨落)/g)) add(cnNumberValue(m[1]) * 1e4);
+  for (const m of text.matchAll(/(\d+)年以下(?:的)?(?:魂兽)?(?:必死|死亡|陨落)/g)) add(+m[1]);
   return best;
+}
+function dragonEscapeThreshold(text) {
+  let best = Infinity;
+  const add = (value) => best = Math.min(best, value);
+  for (const m of text.matchAll(/龙族(?:血脉)?(?:魂兽)?\s*(\d+)\+年(?:魂兽)?(?:即可)?(?:可|可以)?(?:逃走|无视|无伤)/g)) add(+m[1]);
+  for (const m of text.matchAll(/(\d+)\+年\s*龙族(?:血脉)?(?:魂兽)?(?:即可)?(?:则)?(?:可|可以)?(?:逃走|无视|无伤)/g)) add(+m[1]);
+  for (const m of text.matchAll(/(\d+)年\s*龙族(?:血脉)?(?:魂兽)?(?:即可)?(?:则)?(?:可|可以)?(?:逃走|无视|无伤)/g)) add(+m[1]);
+  for (const m of text.matchAll(/(\d+(?:\.\d+)?)万\+?年\s*龙族(?:血脉)?(?:魂兽)?(?:即可)?(?:则)?(?:可|可以)?(?:逃走|无视|无伤)/g)) add(+m[1] * 1e4);
+  return best;
+}
+function hasConditionalBeastDeath(text) {
+  return /(?:(?:\d+(?:\.\d+)?|[一二两三四五六七八九十]+)万年|\d+年)以下(?:的)?(?:魂兽)?(?:必死|死亡|陨落)|必死/.test(text);
+}
+function resolveBeastEncounterLethal(text, cultivation, dragon) {
+  const threshold = escapeThreshold(text), dragonThreshold = dragonEscapeThreshold(text);
+  const conditionalDeath = hasConditionalBeastDeath(text);
+  const directText = text.replace(/（[^）]*）/g, "");
+  const directDeath = /被[^，。；（）]*(?:击杀|杀死|砍死|打死|秒杀|斩杀|猎杀|讨伐|吞噬|吃得一干二净)|成为[^，。；（）]*魂环|爆体而亡/.test(directText);
+  if (!conditionalDeath && !directDeath) return false;
+  const dragonFreeEscape = dragon && /龙族则无事|非龙族必死|拥有龙族血脉则无伤|龙族(?:血脉)?魂兽则无伤逃走/.test(text);
+  const canEscape = threshold !== Infinity && cultivation >= threshold || dragon && (dragonFreeEscape || dragonThreshold !== Infinity && cultivation >= dragonThreshold);
+  if (canEscape) {
+    logEvent("成功脱身", "修为或龙族血脉满足逃生条件。", "good");
+    return true;
+  }
+  const reason = threshold !== Infinity ? "魂兽遭遇陨落（未达" + threshold + "年逃生门槛）" : "魂兽遭遇陨落";
+  resolveBeastDeath(reason, text, threshold === Infinity ? 0 : threshold);
+  return true;
 }
 function applyBeastOutcome(text, task, poolName = "") {
   if (!state.beast) return;
@@ -1991,6 +2129,7 @@ function handleBeastEncounter(text) {
   const b = state.beast, c = b.cultivation, dragon = isDragonBeast(), plant = isPlantBeast(), road = isRoadsideBeast();
   if (/获得【主宰】名称/.test(text)) addNameSuffix("主宰");
   for (const s of ["侯", "王", "皇", "帝"]) if (text.includes("冠带【" + s + "】")) addNameSuffix(s);
+  if (resolveBeastEncounterLethal(text, c, dragon)) return;
   if (/伪·反转术式/.test(text)) {
     b.pseudoReverseTier = beastTier(c);
     logEvent("一次性技能", "获得当前大境界有效的伪·反转术式。", "good");
@@ -2129,14 +2268,6 @@ function handleBeastEncounter(text) {
     adjustCultivation(plant ? -5e4 : -1e4, text);
     return;
   }
-  const esc2 = escapeThreshold(text);
-  const specialDragonEscape = (text.match(/龙族(\d+)\+年即可逃走/) || [])[1];
-  const canEscape = esc2 !== Infinity && c >= esc2 || specialDragonEscape && dragon && c >= +specialDragonEscape || /10000年龙族魂兽可以无视/.test(text) && dragon && c >= 1e4 || /5万\+年龙族血脉魂兽则无伤/.test(text) && dragon && c >= 5e4 || /龙族血脉魂兽则无伤逃走/.test(text) && dragon;
-  const lethal = /必死|被击杀|被吃得一干二净|被吞噬得一干二净|你被[^，。]*杀|爆体而亡/.test(text.replace(/（[^）]*）/g, ""));
-  if (lethal) {
-    if (canEscape) logEvent("成功脱身", "修为或龙族血脉满足逃生条件。", "good");
-    else resolveBeastDeath("魂兽遭遇陨落", text);
-  }
 }
 function handleBeastSpecial(text) {
   const b = state.beast, c = b.cultivation;
@@ -2220,11 +2351,14 @@ function handleBeastRouteSplit(text) {
   var _a2;
   if (/化形为人/.test(text)) {
     const b = state.beast;
+    const transformedAtTangAge = state.tangAge;
     if (((_a2 = state.tangAge) != null ? _a2 : 0) < -6) {
       logEvent("跨越远古", "化形后进入漫长沉眠，在唐三出生前六年苏醒，以避免人类形态耗尽寿元。", "major");
       state.tangAge = -6;
     }
     state.route = "transformed";
+    state.flags.transformedAtTangAge = transformedAtTangAge;
+    state.flags.transformedHumanStartAge = 6;
     state.phase = "human_setup";
     state.age = 6;
     state.level = 10;
@@ -2237,6 +2371,7 @@ function handleBeastRouteSplit(text) {
     state.martialSouls = [b.species || b.type];
     state.talents.push("十万年魂兽化形");
     state.rings = [];
+    state.martialSoulRings = [state.rings];
     state.soulBones = [];
     state.soulBoneMeta = {};
     state.faction = "";
@@ -2244,7 +2379,7 @@ function handleBeastRouteSplit(text) {
     state.factionStages = [];
     state.beast = null;
     prepend([taskRoll(TAG.BASE, "基础设定3:你的性别是？", "gender"), taskRoll(TAG.BASE, "基础设定4:容貌（B级以下无法恋爱）", "appearance"), factionTask(6), taskAction("enterHumanPlay")]);
-    logEvent("十万年化形", "本体化作武魂，以六岁人类之身重新踏上魂师道路。", "major");
+    logEvent("十万年化形", "本体化作武魂，于唐三" + transformedAtTangAge + "岁时以六岁人类之身重新踏上魂师道路；魂兽时期时间不计入人类终局。", "major");
   } else state.flags.beastContinue = true;
 }
 function beastTier(c) {
@@ -2295,6 +2430,7 @@ function handleTribulation(task, text) {
     if (task.threshold === 1e6) {
       if (/兽神神位/.test(text)) {
         b.beastGod = true;
+        state.flags.beastFinalePending = true;
         addUnique(b.laws, "兽神神位");
         if (b.type === "海魂兽") prepend([taskRoll(TAG.BSTORY, "海神时期限定事件4（海魂兽自创兽神神位后的最终剧情，传承神位则无法进入该池）", "storyResult", { flag: "beastSeaEnding" })]);
         else prepend([taskRoll(TAG.BTRIB, "成就兽神神位后的选择（非兽神不可进入该池，海魂兽不用抽该池，海魂兽结局在海神限定剧情那里）", "beastEnding")]);
@@ -2396,6 +2532,20 @@ function ensureHumanRings() {
       qRoll(TAG.RING, pn, "ringAge", { index: i });
       return true;
     }
+  }
+  return false;
+}
+function ensureSecondaryMartialSoulRings() {
+  if (state.noSoulPower || state.level < 90 || state.martialSouls.length < 2) return false;
+  const poolName = "第二、三武魂魂环吸收池（要求90级以上才可抽取该池）";
+  if (!pool(TAG.RING, poolName)) return false;
+  const buckets = ensureMartialSoulRingBuckets();
+  for (let soulIndex = 1; soulIndex < state.martialSouls.length; soulIndex++) {
+    const rings = buckets[soulIndex] || [];
+    if (rings.length >= 9) continue;
+    const index = rings.length + 1;
+    qRoll(TAG.RING, poolName, "ringAge", { index, soulIndex, secondarySoul: true });
+    return true;
   }
   return false;
 }
@@ -2565,8 +2715,25 @@ function finishHumanStory() {
   const ending = state.flags["b" + state.branch + "_end"] || "你活过了大陆剧变，新的时代由此展开。";
   endGame("斗罗大陆篇终章", ending, "good");
 }
-function handleBeastStoryOutcome(text) {
+function handleBeastStoryOutcome(text, task = {}) {
   const b = state.beast, c = b.cultivation, dragon = isDragonBeast(), prototypes = lawPrototypeCount(), laws = fullLawCount();
+  if (task.flag === "beastSeaEnding") {
+    state.flags.beastSeaEnding = text;
+    const finishSea = (title, ending) => { state.flags.beastFinalePending = false; state.flags.beastFinaleCompleted = true; endGame(title, ending, "good"); };
+    if (/斩杀海神.*抢走海神神位/.test(text)) {
+      if (laws < 1 && prototypes < 2) return resolveBeastDeath("海神反杀", text);
+      addUnique(b.laws, "海神神位"); addUnique(state.traits, "海神神位"); return finishSea("双神权柄", "你斩杀海神，夺取海神神位，同时执掌兽神与海神的权柄。");
+    }
+    if (/打碎海神神位|海洋神域/.test(text)) {
+      const removed = b.laws.filter((x) => /法则/.test(x)).slice(0, 3); b.laws = b.laws.filter((x) => !removed.includes(x)); addUnique(state.domains, "海洋神域"); addUnique(state.traits, "宇宙唯一海洋兽神"); return finishSea("海洋兽神", "你打碎海神神位，建立海洋神域，成为宇宙唯一海洋兽神。");
+    }
+    if (/海洋半神界域|淹没斗罗星/.test(text)) {
+      const law = b.laws.find((x) => /法则/.test(x) && !/水/.test(x)); if (law) b.laws.splice(b.laws.indexOf(law), 1); addUnique(state.domains, "海洋半神界域"); return finishSea("海洋半神界域", "斗罗星化为你的海洋半神界域。");
+    }
+    if (/准神王/.test(text)) { addUnique(b.laws, "准神王"); addUnique(state.traits, "准神王"); return finishSea("神界准神王", "神界接纳了你，你成为准神王。"); }
+    if (/最终战死|与海神发生战斗/.test(text)) return resolveBeastDeath("海神冲突战死", text);
+    return finishSea("兽神终章", text);
+  }
   if (/成为海神岛魂兽供奉/.test(text)) state.flags.seaBeastPriest = true;
   if (/获得神王神考/.test(text)) state.godTrial = { tier: "神王", deity: "未知神王", completed: 0, total: 9 };
   if (/获得天使神位/.test(text)) {
@@ -2669,6 +2836,7 @@ function ensurePlan() {
     if (mapPendingStoryResults()) return;
     if (ensureDomain()) return;
     if (ensureHumanRings()) return;
+    if (ensureSecondaryMartialSoulRings()) return;
     if (ensureGodReward()) return;
     if (ensureFactionMilestone()) return;
     if (ensureSlaughter()) return;
@@ -2679,7 +2847,7 @@ function ensurePlan() {
     }
     if (ensureSealedGrowth()) return;
     if (nextStoryDue()) return;
-    if (((_b2 = state.tangAge) != null ? _b2 : 0) >= 26) {
+    if (state.route === "transformed" ? state.age >= 26 : ((_b2 = state.tangAge) != null ? _b2 : 0) >= 26) {
       qAction("finishStory");
       return;
     }
@@ -2690,7 +2858,15 @@ function ensurePlan() {
     if (ensureDomain()) return;
     if (ensureBeastThreshold()) return;
     if (ensureBeastPlot()) return;
-    if ((_c = state.beast) == null ? void 0 : _c.beastGod) return;
+    if ((_c = state.beast) == null ? void 0 : _c.beastGod) {
+      if (!state.flags.beastFinaleCompleted) {
+        state.flags.beastFinalePending = true;
+        if (state.flags.beastSeaEnding) return handleBeastStoryOutcome(state.flags.beastSeaEnding, { flag: "beastSeaEnding" });
+        const pn = state.beast.type === "海魂兽" ? "海神时期限定事件4（海魂兽自创兽神神位后的最终剧情，传承神位则无法进入该池）" : "成就兽神神位后的选择（非兽神不可进入该池，海魂兽不用抽该池，海魂兽结局在海神限定剧情那里）";
+        qRoll(state.beast.type === "海魂兽" ? TAG.BSTORY : TAG.BTRIB, pn, state.beast.type === "海魂兽" ? "storyResult" : "beastEnding", { flag: state.beast.type === "海魂兽" ? "beastSeaEnding" : "beastFinale" });
+      }
+      return;
+    }
     if (state.step > 650) return endGame("漫长纪元", "你的修行跨越了过于漫长的时间，命盘在此封存。", "normal");
     queueBeastCycle();
     return;
@@ -2706,6 +2882,10 @@ function endGame(title, text, kind = "normal") {
   state.finished = true;
   state.phase = "ending";
   state.ending = text;
+  state.endingTitle = title;
+  state.endingText = text;
+  state.endingKind = kind;
+  state.deathCause = kind === "bad" ? text : "";
   state.queue = [];
   stopAuto();
   logEvent(title, text, kind === "bad" ? "bad" : "major");
@@ -2717,7 +2897,8 @@ function showEnding(title, text) {
   var _a2, _b2;
   document.getElementById("endingTitle").textContent = title;
   document.getElementById("endingText").textContent = soft(text);
-  const rare = state.domains.length + state.soulBones.length + (state.godTrial ? 1 : 0), summary = [["路线", routeNames[state.route] || "未知"], ["终局等级", state.beast ? state.beast.cultivation + "年修为" : state.level + "级"], ["时间", fmtTang(state.tangAge)], ["阵营", state.faction || ((_a2 = state.beast) == null ? void 0 : _a2.area) || "自由"], ["武魂或本体", ((_b2 = state.beast) == null ? void 0 : _b2.species) || state.martialSouls.join("、") || "未知"], ["命运步数", state.step + " 步"], ["重大纪事", state.logs.filter((x) => x.kind === "major" || x.kind === "bad").length + " 条"], ["稀有收获", rare + " 项"], ["命运种子", state.seed]];
+  const god = state.godhood, status = state.alive ? (god ? "已成神" : "存活") : (god ? "已陨落 · 生前已成神" : "已陨落");
+  const rare = state.domains.length + state.soulBones.length + (god || state.godTrial ? 1 : 0), summary = [["路线", routeNames[state.route] || "未知"], ["终局等级", state.beast ? state.beast.cultivation + "年修为" : state.level + "级" + (god ? "（神级）" : "")], ["最终状态", status], ["神位", god ? god.deity + "·" + god.tier + "神" : "无"], ["陨落原因", state.alive ? "无" : state.deathCause || "旧存档未记录具体原因"], ["时间", fmtTang(state.tangAge)], ["阵营", state.faction || ((_a2 = state.beast) == null ? void 0 : _a2.area) || "自由"], ["武魂或本体", ((_b2 = state.beast) == null ? void 0 : _b2.species) || state.martialSouls.join("、") || "未知"], ["命运步数", state.step + " 步"], ["重大纪事", state.logs.filter((x) => x.kind === "major" || x.kind === "bad").length + " 条"], ["稀有收获", rare + " 项"], ["命运种子", state.seed]];
   document.getElementById("endingSummary").innerHTML = summary.map((x) => '<div class="summary-item"><small>' + esc(x[0]) + "</small><b>" + esc(x[1]) + "</b></div>").join("");
   document.getElementById("endingModal").classList.add("show");
 }
@@ -2974,7 +3155,7 @@ function renderWheelPreview() {
     hint.textContent = pv.c.length + " 个满足条件的选项 · 原池 " + pv.p.options.length + " 项" + (pv.c.length > 20 ? " · 转盘以编号显示" : "") + (pv.strategicRelaxed ? " · 已仅保留硬性条件" : "") + (state.auto ? " · 自动推进中，无需操作" : " · 点击下方“转动转盘”继续");
     legend.classList.toggle("hidden", pv.c.length <= 20);
     legendList.innerHTML = pv.c.length > 20 ? pv.c.map((o, i) => '<span title="' + esc(o.name) + '"><b>' + (i + 1) + "</b>" + esc(soft(o.name)) + "</span>").join("") : "";
-    if (((_a2 = currentWheel.pool) == null ? void 0 : _a2.id) !== pv.p.id || currentWheel.candidates.length !== pv.c.length) {
+    if (((_a2 = currentWheel.pool) == null ? void 0 : _a2.id) !== pv.p.id || (currentWheel.pool == null ? void 0 : currentWheel.pool.name) !== pv.p.name || currentWheel.candidates.length !== pv.c.length) {
       currentWheel = { pool: pv.p, candidates: pv.c, rotation: 0, selectedIndex: -1 };
       drawWheel(pv.p, pv.c.length ? pv.c : [{ name: "无有效选项" }], 0, -1);
     }
@@ -3022,10 +3203,12 @@ function renderSheet() {
   document.getElementById("timeStat").textContent = (state.timeline || "斗罗大陆") + " · " + fmtTang(state.tangAge);
   document.getElementById("ageStat").textContent = beast ? "存续 " + beast.chronologicalAge + "年 · " + (state.gender || "未知") : fmtAge(state.age) + " · " + (state.gender || "未知") + (state.appearance ? " · " + state.appearance : "");
   document.getElementById("factionStat").textContent = beast ? beast.area || "未定生存地" : (state.faction || "未加入势力") + (state.branch == null ? "" : " · " + (state.branch === 1 ? "分支一" : state.branch === 2 ? "分支二" : "分支三"));
-  document.getElementById("statusStat").textContent = state.finished ? state.alive ? "已完成本轮" : "已陨落" : state.noSoulPower ? "先天无魂力" : state.godTrial ? state.godTrial.deity + state.godTrial.tier + "神考 " + state.godTrial.completed + "/" + state.godTrial.total : beast ? beastTier(beast.cultivation) + "魂兽" : "存活";
+  document.getElementById("statusStat").textContent = state.finished ? state.alive ? (state.godhood ? "已成神 · " + state.godhood.deity : "已完成本轮") : (state.godhood ? "已陨落 · 生前为" + state.godhood.deity : "已陨落") : state.godhood ? "已成神 · " + state.godhood.deity : state.noSoulPower ? "先天无魂力" : state.godTrial ? state.godTrial.deity + state.godTrial.tier + "神考 " + state.godTrial.completed + "/" + state.godTrial.total : beast ? beastTier(beast.cultivation) + "魂兽" : "存活";
   const souls = beast ? [beastDisplayName(), ...beast.bloodlines.slice(1).map((x) => x.name + " " + x.pct.toFixed(0) + "%")] : [...state.martialSoulTypes, ...state.martialSouls];
   document.getElementById("soulChips").innerHTML = chipHtml(souls, "gold");
   const traits = [...state.talents, ...state.titles.map((x) => "称号·" + x), ...state.domains, ...state.traits];
+  if (!beast && state.flags.luoSanPaoLocked) traits.push("罗三炮武魂缺陷·魂力上限29级");
+  if (!beast && state.flags.luoSanPaoUnlockedByHerb) traits.push("仙草破除罗三炮瓶颈");
   if (beast) {
     traits.push(...Object.keys(beast.attributes).map((k) => k + "进化×" + beast.attributes[k]), ...beast.laws);
     if (beast.reverseCharges) traits.push("反转术式×" + beast.reverseCharges);
@@ -3035,7 +3218,18 @@ function renderSheet() {
     if (beast.silverDragonBlessing) traits.push("银龙王血脉庇护");
   }
   document.getElementById("traitChips").innerHTML = chipHtml(traits, "cyan");
-  const gear = [...state.rings.map((r, i) => i + 1 + "环·" + (r.years ? r.years + "年" : "未知") + (r.species ? "·" + r.species : "")), ...state.soulBones.map(soulBoneDisplay).filter(Boolean)];
+  const gear = [];
+  if (!beast) {
+    const buckets = ensureMartialSoulRingBuckets(), soulCount = Math.max(1, state.martialSouls.length, buckets.length);
+    for (let soulIndex = 0; soulIndex < soulCount; soulIndex++) {
+      const rings = martialSoulRingsAt(soulIndex);
+      for (let ringIndex = 0; ringIndex < rings.length; ringIndex++) {
+        const r = rings[ringIndex];
+        gear.push(martialSoulLabel(soulIndex) + "「" + martialSoulName(soulIndex) + "」·" + ROMAN_RING[ringIndex] + "魂环·" + ringDisplayText(r) + (r.species ? "·" + r.species : ""));
+      }
+    }
+  } else gear.push(...state.rings.map((r, i) => i + 1 + "环·" + ringDisplayText(r) + (r.species ? "·" + r.species : "")));
+  gear.push(...state.soulBones.map(soulBoneDisplay).filter(Boolean));
   if (state.godTrial) gear.push(state.godTrial.deity + state.godTrial.tier + "神考 " + state.godTrial.completed + "/" + state.godTrial.total);
   if (state.seaExam) gear.push(state.seaExam.kind + " " + state.seaExam.completed + "/" + state.seaExam.total);
   document.getElementById("gearChips").innerHTML = chipHtml(gear);
@@ -3108,7 +3302,22 @@ function exportBlob(name, text, type = "text/plain") {
 }
 function chronicle(clean = false) {
   var _a2;
-  const lines = ["《斗罗大陆 · 命运轮盘 v4人物传记》", "", `命运种子：${state.seed}`, `路线：${routeNames[state.route] || "未知"}`, `终局：${state.ending || "尚未完结"}`, `时间：${fmtTang(state.tangAge)}`, state.beast ? `本体：${state.beast.species || state.beast.type}，${state.beast.cultivation}年修为` : `等级：${state.level}级，武魂：${state.martialSouls.join("、") || "未定"}`, `阵营：${state.faction || ((_a2 = state.beast) == null ? void 0 : _a2.area) || "自由"}`, "", "【命运纪事】"];
+  const finalStatus = state.finished ? (state.alive ? (state.godhood ? "已成神" : "存活") : (state.godhood ? "已陨落（生前已成神）" : "已陨落")) : (state.godhood ? "已成神" : "进行中");
+  const lines = ["《斗罗大陆 · 命运轮盘 v4人物传记》", "", `命运种子：${state.seed}`, `路线：${routeNames[state.route] || "未知"}`, `终局：${state.endingText || state.ending || "尚未完结"}`, `最终状态：${finalStatus}`, `最终等级：${state.beast ? state.beast.cultivation + "年修为" : state.level + "级"}`, `神位：${state.godhood ? state.godhood.deity + "·" + state.godhood.tier + "神" : "无"}`, `陨落原因：${state.finished && !state.alive ? state.deathCause || "旧存档未记录具体原因" : "无"}`, `时间：${fmtTang(state.tangAge)}`, state.beast ? `本体：${state.beast.species || state.beast.type}，${state.beast.cultivation}年修为` : `等级：${state.level}级，武魂：${state.martialSouls.join("、") || "未定"}`, `阵营：${state.faction || ((_a2 = state.beast) == null ? void 0 : _a2.area) || "自由"}`, "", "【命运纪事】"];
+  if (!state.beast && (state.martialSouls.length || state.rings.length)) {
+    const buckets = ensureMartialSoulRingBuckets(), soulCount = Math.max(1, state.martialSouls.length, buckets.length);
+    lines.splice(lines.length - 1, 0, "【武魂魂环】");
+    for (let soulIndex = 0; soulIndex < soulCount; soulIndex++) {
+      const rings = martialSoulRingsAt(soulIndex);
+      lines.push(martialSoulLabel(soulIndex) + "「" + martialSoulName(soulIndex) + "」：");
+      if (!rings.length) lines.push("- 暂无魂环");
+      else for (let ringIndex = 0; ringIndex < rings.length; ringIndex++) {
+        const r = rings[ringIndex];
+        lines.push("- " + ROMAN_RING[ringIndex] + "魂环：" + ringDisplayText(r) + (r.species ? "·" + r.species : ""));
+      }
+    }
+    lines.push("");
+  }
   for (const x of state.logs) {
     let title = String(x.title || "命运记录"), text = String(x.text || "");
     if (clean) {
@@ -3289,6 +3498,7 @@ function applyManualResult(p, text, task) {
     }
     if (tagNames.includes(TAG.SOUL)) {
       addUnique(state.martialSouls, clean);
+      ensureMartialSoulRingBuckets();
     }
     if (tagNames.includes(TAG.TALENT)) {
       addUnique(state.talents, clean);
@@ -3301,7 +3511,8 @@ function applyManualResult(p, text, task) {
     }
     if (tagNames.includes(TAG.RING) && /\d+年魂环/.test(text)) {
       const years = extractYears(text);
-      state.rings.push({ index: state.rings.length + 1, years, text, type: "", species: "" });
+      const rings = martialSoulRingsAt(0);
+      rings.push({ index: rings.length + 1, soulIndex: 0, years, text, type: "", species: "" });
     }
     if (state.beast && tagNames.includes(TAG.BBASE)) {
       if (/什么级别|初始级别|修为级别/.test(name)) handleBeastRealm(text);
