@@ -20,7 +20,7 @@ export const works: WorkItem[] = [
     id: 'douluo-wheel',
     title: '斗罗命途 · 结构化转盘',
     description: '斗罗大陆主题的结构化转盘成长游戏，支持可复现种子、存档导出与浏览器语音反馈。',
-    href: '/projects/douluo-wheel/',
+    href: '/projects/douluo-wheel/v5/',
     category: 'interactive',
     origin: 'original',
     technologies: ['Vue 3', 'TypeScript', 'Vite'],
