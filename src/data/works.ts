@@ -18,12 +18,12 @@ export const originLabels: Record<WorkOrigin, string> = {
 export const works: WorkItem[] = [
   {
     id: 'douluo-wheel',
-    title: '斗罗大陆自动转盘游戏',
-    description: '斗罗大陆主题的自动转盘互动游戏，打开网页即可直接体验。',
+    title: '斗罗命途 · 结构化转盘',
+    description: '斗罗大陆主题的结构化转盘成长游戏，支持可复现种子、存档导出与浏览器语音反馈。',
     href: '/projects/douluo-wheel/',
     category: 'interactive',
     origin: 'original',
-    technologies: ['HTML', 'CSS', 'JavaScript'],
+    technologies: ['Vue 3', 'TypeScript', 'Vite'],
   },
   {
     id: 'particles',
