@@ -82,7 +82,6 @@ npm run check:dist
 |------|------|------|
 | [projects/particles/](projects/particles/) | 原创互动实验 | 星门塔罗 / 3D 手势抽牌，Three.js + MediaPipe Hands |
 | [projects/douluo-wheel/](projects/douluo-wheel/) | 原创互动实验 | 斗罗大陆主题自动转盘游戏（v4 原版） |
-| [projects/douluo-wheel/v5/](projects/douluo-wheel/v5/) | 原创互动实验 | 斗罗大陆主题结构化转盘成长游戏（Vue 3 / TypeScript / Vite） |
 | [projects/perler-bead/](projects/perler-bead/) | 原创工具 | 上传图片生成拼豆像素网格，支持导出 |
 | [projects/nutrition/](projects/nutrition/) | 原创工具 | 根据基础信息估算每日营养素目标 |
 | [projects/trust/](projects/trust/) | 汉化 / 本地化 | 《信任的进化》中文网页复活版 |
