@@ -25,6 +25,7 @@ requireExists('projects/trust/index.html');
 requireExists('projects/perler-bead/index.html');
 requireExists('projects/china-history-review/index.html');
 requireExists('projects/data-structure-quiz/index.html');
+requireExists('projects/mzti/index.html');
 requireExists('assignments/index.html');
 requireExists('.nojekyll');
 

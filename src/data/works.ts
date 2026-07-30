@@ -17,6 +17,15 @@ export const originLabels: Record<WorkOrigin, string> = {
 
 export const works: WorkItem[] = [
   {
+    id: 'mzti',
+    title: 'MZTI 帽子查询',
+    description: '40 道轻松的思想坐标问答；所有计算在浏览器本地完成，适合分享给朋友一起玩。',
+    href: '/projects/mzti/',
+    category: 'interactive',
+    origin: 'original',
+    technologies: ['原生 JavaScript', '离线可用', '本地计算'],
+  },
+  {
     id: 'particles',
     title: '星门塔罗 / 3D 手势塔罗',
     description: '输入问题后，用“张开手、握拳、张开手”的手势在 3D 牌阵中抽牌。',
