@@ -26,6 +26,15 @@ export const works: WorkItem[] = [
     technologies: ['原生 JavaScript', '离线可用', '本地计算'],
   },
   {
+    id: 'course-guide',
+    title: '2026级新生大一课程参考',
+    description: '面向 2026 级新生整理的大一课程信息与学习参考指南。',
+    href: '/projects/course-guide/',
+    category: 'course',
+    origin: 'course',
+    technologies: ['HTML', '课程指南'],
+  },
+  {
     id: 'particles',
     title: '星门塔罗 / 3D 手势塔罗',
     description: '输入问题后，用“张开手、握拳、张开手”的手势在 3D 牌阵中抽牌。',
