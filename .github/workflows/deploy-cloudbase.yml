@@ -114,30 +114,26 @@ jobs:
       - name: Deploy changed files to CloudBase Hosting
         if: ${{ steps.deploy-plan.outputs.mode == 'incremental' && steps.deploy-plan.outputs.changedFiles != '0' }}
         run: |
-          deploy_file() {
-            local relative_path="$1"
-            local parent_path
-            parent_path="$(dirname "$relative_path")"
-            local cloud_directory="$CLOUD_PATH"
-            if [ "$parent_path" != "." ]; then
-              cloud_directory="$CLOUD_PATH/$parent_path"
-            fi
-
-            for attempt in 1 2 3; do
-              echo "Uploading $relative_path (attempt $attempt)"
-              if tcb hosting deploy "dist/$relative_path" "$cloud_directory" --env-id "$TCB_ENV_ID" --yes; then
-                return 0
-              fi
-              if [ "$attempt" = "3" ]; then
-                return 1
-              fi
-              sleep $((attempt * 5))
-            done
-          }
-
+          mkdir -p .deploy-changed
           while IFS= read -r relative_path; do
-            [ -n "$relative_path" ] && deploy_file "$relative_path"
+            if [ -n "$relative_path" ]; then
+              target_path=".deploy-changed/$relative_path"
+              mkdir -p "$(dirname "$target_path")"
+              cp "dist/$relative_path" "$target_path"
+              echo "Staged $relative_path"
+            fi
           done < .deploy-plan/changed.txt
+
+          for attempt in 1 2 3; do
+            echo "Incremental batch deploy attempt $attempt"
+            if tcb hosting deploy .deploy-changed "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes; then
+              exit 0
+            fi
+            if [ "$attempt" = "3" ]; then
+              exit 1
+            fi
+            sleep $((attempt * 10))
+          done
 
       - name: Delete removed files from CloudBase Hosting
         if: ${{ steps.deploy-plan.outputs.deletedFiles != '0' }}
