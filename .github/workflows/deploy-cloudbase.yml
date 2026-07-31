@@ -27,6 +27,7 @@ jobs:
       TENCENTCLOUD_SECRET_ID: ${{ secrets.TENCENTCLOUD_SECRET_ID }}
       TENCENTCLOUD_SECRET_KEY: ${{ secrets.TENCENTCLOUD_SECRET_KEY }}
       CLOUD_PATH: /guzhi223
+      DEPLOY_MANIFEST_URL: https://guzhi223-d1g8bie1p67d34918-1363634311.tcloudbaseapp.com/guzhi223/.deploy-manifest.json
 
     steps:
       - name: Checkout
@@ -69,14 +70,38 @@ jobs:
       - name: Check hosting status
         run: tcb hosting detail --env-id "$TCB_ENV_ID"
 
+      - name: Download previous deploy manifest
+        run: curl --fail --silent --show-error "$DEPLOY_MANIFEST_URL?cachebust=$GITHUB_SHA" --output previous-deploy-manifest.json || true
+
       - name: Clean CloudBase directory
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.clean_deploy == 'true' }}
         run: tcb hosting delete "$CLOUD_PATH" --dir --env-id "$TCB_ENV_ID" --yes
 
-      - name: Deploy to CloudBase Hosting
+      - name: Plan CloudBase deployment
+        id: deploy-plan
+        env:
+          FORCE_FULL: ${{ github.event_name == 'workflow_dispatch' && inputs.clean_deploy == 'true' }}
+        run: |
+          args=(previous-deploy-manifest.json)
+          if [ "$FORCE_FULL" = "true" ]; then
+            args+=(--force-full)
+          fi
+          node scripts/plan-cloudbase-deploy.mjs "${args[@]}"
+          node -e '
+            const plan = require("./.deploy-plan/plan.json");
+            for (const [key, value] of Object.entries(plan)) {
+              console.log(`${key}=${value}`);
+            }
+          ' >> "$GITHUB_OUTPUT"
+
+      - name: Show deployment plan
+        run: cat .deploy-plan/plan.json
+
+      - name: Deploy all files to CloudBase Hosting
+        if: ${{ steps.deploy-plan.outputs.mode == 'full' }}
         run: |
           for attempt in 1 2 3; do
-            echo "Deploy attempt $attempt"
+            echo "Full deploy attempt $attempt"
             if tcb hosting deploy dist "$CLOUD_PATH" --env-id "$TCB_ENV_ID" --yes; then
               exit 0
             fi
@@ -85,6 +110,44 @@ jobs:
             fi
             sleep $((attempt * 20))
           done
+
+      - name: Deploy changed files to CloudBase Hosting
+        if: ${{ steps.deploy-plan.outputs.mode == 'incremental' && steps.deploy-plan.outputs.changedFiles != '0' }}
+        run: |
+          deploy_file() {
+            local relative_path="$1"
+            local parent_path
+            parent_path="$(dirname "$relative_path")"
+            local cloud_directory="$CLOUD_PATH"
+            if [ "$parent_path" != "." ]; then
+              cloud_directory="$CLOUD_PATH/$parent_path"
+            fi
+
+            for attempt in 1 2 3; do
+              echo "Uploading $relative_path (attempt $attempt)"
+              if tcb hosting deploy "dist/$relative_path" "$cloud_directory" --env-id "$TCB_ENV_ID" --yes; then
+                return 0
+              fi
+              if [ "$attempt" = "3" ]; then
+                return 1
+              fi
+              sleep $((attempt * 5))
+            done
+          }
+
+          while IFS= read -r relative_path; do
+            [ -n "$relative_path" ] && deploy_file "$relative_path"
+          done < .deploy-plan/changed.txt
+
+      - name: Delete removed files from CloudBase Hosting
+        if: ${{ steps.deploy-plan.outputs.deletedFiles != '0' }}
+        run: |
+          while IFS= read -r relative_path; do
+            if [ -n "$relative_path" ]; then
+              echo "Deleting $relative_path"
+              tcb hosting delete "$CLOUD_PATH/$relative_path" --env-id "$TCB_ENV_ID" --yes
+            fi
+          done < .deploy-plan/deleted.txt
 
       - name: Verify deployment
         run: |
