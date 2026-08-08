@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#315efb" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f131a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<meta name="description" content="郑州财经学院航空港校区新生100问：宿舍、吃饭、学习、校园、出行、活动、生活，一页查完。在校生实测整理，2026新生参考。">
+<meta property="og:title" content="郑州财经学院航空港校区｜新生100问">
+<meta property="og:description" content="宿舍/吃饭/学习/校园/出行/活动/生活，一页查完。在校生实测整理，2026新生参考。">
+<meta property="og:type" content="website">
+<title>郑州财经学院航空港校区｜新生100问</title>
+<style>
+:root {
+  --bg:#f6f7fb;
+  --card:#ffffff;
+  --text:#182230;
+  --muted:#6b7280;
+  --line:#e7eaf0;
+  --accent:#315efb;
+  --accent-soft:#edf2ff;
+  --shadow:0 8px 30px rgba(24,34,48,.06);
+  --ok:#1f7a4d;
+  --ok-bg:#eaf8f0;
+  --change:#9a6700;
+  --change-bg:#fff7df;
+  --exp:#6b46c1;
+  --exp-bg:#f4efff;
+  --unknown:#68707d;
+  --unknown-bg:#eef1f5;
+  --mark-bg:#ffe58f;
+  --mark-text:#2f2f2f;
+}
+@media (prefers-color-scheme:dark) {
+  :root {
+    --bg:#0f131a; --card:#171c24; --text:#eef2f7; --muted:#9da6b3;
+    --line:#2a313c; --accent:#7aa2ff; --accent-soft:#1b2a50;
+    --shadow:none; --ok:#79d5a5; --ok-bg:#173a2a; --change:#ffd56a;
+    --change-bg:#3a2f16; --exp:#c6a8ff; --exp-bg:#2c2145;
+    --unknown:#c0c6ce; --unknown-bg:#282e37;
+    --mark-bg:#7a5c00; --mark-text:#ffe08a;
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  line-height:1.65;
+}
+.hero{
+  padding:34px 18px 18px;
+  background:linear-gradient(145deg,var(--accent-soft),transparent 72%);
+}
+.wrap{max-width:920px;margin:auto}
+.kicker{font-size:13px;color:var(--accent);font-weight:700;letter-spacing:.06em}
+h1{font-size:29px;line-height:1.2;margin:8px 0 10px}
+.sub{color:var(--muted);font-size:15px;margin:0}
+.note{
+  margin-top:18px;padding:14px 15px;border:1px solid var(--line);
+  background:color-mix(in srgb,var(--card) 88%, transparent);border-radius:14px;font-size:13px;color:var(--muted)
+}
+
+.hero-meta{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;
+  font-size:12px;color:var(--muted)
+}
+.hero-meta .version{
+  display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;
+  border:1px solid var(--line);background:color-mix(in srgb,var(--card) 82%,transparent)
+}
+.quick{
+  margin-top:16px
+}
+.quick-title{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  margin:0 2px 9px;font-size:14px;font-weight:800
+}
+.quick-title small{font-size:11px;color:var(--muted);font-weight:500}
+.quick-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px
+}
+.quick-link{
+  appearance:none;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--text);
+  border-radius:12px;padding:10px 11px;cursor:pointer;box-shadow:var(--shadow);
+  font:inherit;line-height:1.35;min-height:58px
+}
+.quick-link:hover{border-color:color-mix(in srgb,var(--accent) 32%,var(--line))}
+.quick-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.quick-link b{display:block;font-size:13px}
+.quick-link span{display:block;margin-top:3px;color:var(--muted);font-size:11px}
+.map-link{
+  grid-column:1/-1;min-height:64px;
+  border-color:color-mix(in srgb,var(--accent) 28%,var(--line));
+  background:linear-gradient(135deg,var(--accent-soft),var(--card) 72%)
+}
+.map-link b{color:var(--accent);font-size:14px}
+.answer-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.answer-actions .copy-btn{margin-top:0}
+.share-btn{
+  border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:9px;padding:6px 9px;font-size:12px;cursor:pointer
+}
+.qa-card.flash{
+  animation:flashCard 1.45s ease
+}
+@keyframes flashCard{
+  0%,100%{box-shadow:var(--shadow)}
+  25%{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 22%,transparent)}
+}
+.toolbar{
+  position:sticky;top:0;z-index:20;
+  backdrop-filter:blur(14px);
+  background:color-mix(in srgb,var(--bg) 86%, transparent);
+  border-bottom:1px solid var(--line);
+}
+.toolbar-inner{max-width:920px;margin:auto;padding:10px 14px}
+.search-row{display:flex;gap:8px}
+.search{
+  width:100%;border:1px solid var(--line);background:var(--card);color:var(--text);
+  border-radius:12px;padding:11px 13px;font-size:15px;outline:none;
+}
+.search:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 15%,transparent)}
+.action{
+  flex:none;border:1px solid var(--line);background:var(--card);color:var(--text);
+  border-radius:12px;padding:0 12px;font-weight:650;cursor:pointer
+}
+.chips{display:flex;gap:8px;overflow:auto;padding:10px 0 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--text);
+  border-radius:999px;padding:6px 10px;font-size:13px;cursor:pointer
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:white}
+.meta-row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--muted)}
+.legend{display:flex;gap:6px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 7px;font-size:11px;font-weight:700}
+.badge.current{color:var(--ok);background:var(--ok-bg)}
+.badge.change{color:var(--change);background:var(--change-bg)}
+.badge.experience{color:var(--exp);background:var(--exp-bg)}
+.badge.unknown{color:var(--unknown);background:var(--unknown-bg)}
+main{max-width:920px;margin:auto;padding:16px 14px 60px}
+.section-title{display:flex;align-items:center;gap:8px;margin:20px 4px 10px;font-size:18px}
+.section-count{font-size:12px;color:var(--muted);font-weight:500}
+.qa-card{
+  background:var(--card);border:1px solid var(--line);border-radius:15px;
+  margin:10px 0;box-shadow:var(--shadow);overflow:hidden
+}
+.qa-card[open]{border-color:color-mix(in srgb,var(--accent) 28%,var(--line))}
+summary{
+  list-style:none;cursor:pointer;padding:15px 15px 14px;display:flex;gap:12px;align-items:flex-start;
+  transition:background .15s
+}
+summary::-webkit-details-marker{display:none}
+summary:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.qa-card{transition:border-color .15s}
+.qa-card:hover{border-color:color-mix(in srgb,var(--accent) 22%,var(--line))}
+.num{
+  min-width:33px;height:33px;border-radius:10px;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-size:12px;font-weight:800
+}
+.qwrap{min-width:0;flex:1}
+.qtext{font-weight:750;font-size:15.5px;line-height:1.5}
+.qmeta{margin-top:7px}
+.chev{display:flex;align-items:center;gap:5px;align-self:center;color:var(--muted);font-size:12px;font-weight:600;white-space:nowrap}
+.chev .arrow{font-size:15px;line-height:1;transition:.2s transform}
+.qa-card[open] .chev .arrow{transform:rotate(180deg)}
+.chev .hint-open{display:none}
+.qa-card[open] .chev .hint-closed{display:none}
+.qa-card[open] .chev .hint-open{display:inline}
+.answer{padding:0 15px 14px 60px;color:var(--text);font-size:14.5px}
+.answer p{margin:0}
+.copy-btn{
+  margin-top:12px;border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:9px;padding:6px 9px;font-size:12px;cursor:pointer
+}
+.empty{display:none;text-align:center;color:var(--muted);padding:54px 16px}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 10px 40px}
+.top{
+  position:fixed;right:16px;bottom:18px;width:44px;height:44px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);color:var(--text);box-shadow:var(--shadow);
+  display:grid;place-items:center;text-decoration:none;font-weight:900;
+  padding:0;font:inherit;cursor:pointer
+}
+.toast{
+  position:fixed;left:50%;bottom:76px;z-index:50;
+  max-width:calc(100vw - 32px);padding:9px 13px;border-radius:10px;
+  transform:translate(-50%,10px);background:var(--text);color:var(--card);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:13px;font-weight:650;text-align:center;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease,visibility .18s ease
+}
+.toast.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.map-modal{
+  position:fixed;inset:0;z-index:100;display:grid;place-items:center;
+  padding:12px;padding-top:max(12px,env(safe-area-inset-top));
+  padding-bottom:max(12px,env(safe-area-inset-bottom))
+}
+.map-backdrop{
+  position:absolute;inset:0;background:rgba(5,10,18,.76);
+  backdrop-filter:blur(5px);cursor:zoom-out
+}
+.map-panel{
+  position:relative;z-index:1;width:min(960px,100%);
+  max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);
+  display:flex;flex-direction:column;overflow:hidden;
+  border:1px solid var(--line);border-radius:18px;background:var(--card);
+  box-shadow:0 22px 70px rgba(0,0,0,.34)
+}
+.map-head{
+  flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:56px;padding:8px 9px 8px 16px;border-bottom:1px solid var(--line)
+}
+.map-head h2{margin:0;font-size:16px;line-height:1.3}
+.map-close{
+  flex:none;width:40px;height:40px;border:0;border-radius:11px;
+  background:var(--accent-soft);color:var(--accent);font:700 25px/1 sans-serif;cursor:pointer
+}
+.map-close:hover{filter:brightness(.97)}
+.map-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.map-body{
+  flex:0 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;
+  max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);
+  background:color-mix(in srgb,var(--bg) 78%,var(--card))
+}
+.map-image{display:none;width:100%;height:auto;margin:0 auto}
+.map-image.ready{display:block}
+.map-loading,.map-error{
+  min-height:180px;padding:24px;display:grid;place-items:center;
+  color:var(--muted);font-size:14px;text-align:center
+}
+.map-error a{color:var(--accent);font-weight:700}
+body.modal-open{overflow:hidden}
+mark{background:var(--mark-bg);color:var(--mark-text);border-radius:3px;padding:0 1px}
+@media (min-width:720px){
+  .hero{padding-top:48px} h1{font-size:36px}
+  .quick-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  main{padding-left:18px;padding-right:18px}
+}
+@media print{
+  body{background:#fff;color:#000}
+  .toolbar,.top,.toast,.footer,.copy-btn,.share-btn,.chips,.meta-row,.quick,.map-modal{display:none!important}
+  .hero{background:none;padding:8px 0}
+  .note{border-color:#ccc}
+  .qa-card{box-shadow:none;border:1px solid #ccc;break-inside:avoid;margin:6px 0}
+  .answer{padding:0 0 6px 60px}
+  .chev{display:none}
+}
+</style>
+</head>
+<body id="top">
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">2026 新生参考 · 在校生实测版</div>
+    <h1>郑州财经学院航空港校区<br>新生100问</h1>
+    <p class="sub">宿舍 / 吃饭 / 学习 / 校园 / 出行 / 活动 / 生活，一页查完。</p>
+    <div class="hero-meta">
+      <span class="version">v1.6 · 更新于 2026-08-08</span>
+      <span>非官方 · 在校生经验整理</span>
+    </div>
+    <div class="note">
+      <strong>说明：</strong>内容根据过去一学年的实际体验整理，整理时间为 2026 年 8 月。
+      商铺、营业时间、军训、热水、社团、校园开放区域等信息可能随新学期变化，请以学校最新通知为准。
+    </div>
+    <div class="quick" aria-label="新生先看">
+      <div class="quick-title">
+        <span>⚡ 新生先看这 7 项</span>
+        <small>查看地图或直达对应问题</small>
+      </div>
+      <div class="quick-grid">
+        <button class="quick-link map-link" id="openCampusMap" type="button" aria-haspopup="dialog" aria-controls="campusMapDialog"><b>🗺️ 校园地图</b><span>点击查看航空港校区导览图</span></button>
+        <button class="quick-link" type="button" data-jump="1"><b>🏠 六人寝</b><span>宿舍基本情况</span></button>
+        <button class="quick-link" type="button" data-jump="24"><b>🛵 校内外卖可送一楼</b><span>食堂档口 → 宿舍外卖架</span></button>
+        <button class="quick-link" type="button" data-jump="46"><b>📘 大一不能考四级</b><span>目前本校安排</span></button>
+        <button class="quick-link" type="button" data-jump="66"><b>🚫 学生不能骑电动车</b><span>自行车可以骑</span></button>
+        <button class="quick-link" type="button" data-jump="88"><b>💰 1500/月基本够用</b><span>2000 会更滋润</span></button>
+        <button class="quick-link" type="button" data-jump="91"><b>🌐 校园网勉强能用</b><span>稳定性比较看运气</span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search-row">
+      <input id="search" class="search" type="search" placeholder="搜索：空调 / 四级 / 快递 / 生活费……" autocomplete="off" aria-label="搜索问题">
+      <button id="toggleAll" class="action" type="button">展开</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="meta-row">
+      <div class="legend">
+        <span class="badge current">✓ 当前明确</span>
+        <span class="badge change">◷ 可能变化</span>
+        <span class="badge experience">◉ 个人体验</span>
+        <span class="badge unknown">? 暂不确定</span>
+      </div>
+      <div id="resultCount">100 条</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="content"></div>
+  <div id="empty" class="empty">没有找到相关问题，换个关键词试试。</div>
+</main>
+
+<div class="map-modal" id="campusMapDialog" role="dialog" aria-modal="true" aria-labelledby="campusMapTitle" hidden>
+  <div class="map-backdrop" data-map-close aria-hidden="true"></div>
+  <section class="map-panel" role="document">
+    <div class="map-head">
+      <h2 id="campusMapTitle">校园地图</h2>
+      <button class="map-close" type="button" data-map-close aria-label="关闭校园地图">×</button>
+    </div>
+    <div class="map-body">
+      <div class="map-loading" id="mapLoading" role="status">地图加载中…</div>
+      <img class="map-image" id="campusMapImage" alt="郑州财经学院航空港校区校园地图" data-src="https://icdn.binmt.cc/2608/6a77663b28688.jpg" decoding="async" referrerpolicy="no-referrer">
+      <div class="map-error" id="mapError" hidden>地图加载失败，<a href="https://icdn.binmt.cc/2608/6a77663b28688.jpg" target="_blank" rel="noopener noreferrer">点击查看原图</a>。</div>
+    </div>
+  </section>
+</div>
+
+<div class="footer">非学校官方页面 · 内容仅作新生生活参考</div>
+<div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<button class="top" id="backToTop" type="button" aria-label="返回顶部">↑</button>
+
+<script>
+const DATA = [{"n": 1, "cat": "宿舍", "status": "current", "q": "宿舍是几人间？", "a": "六人间。"}, {"n": 2, "cat": "宿舍", "status": "current", "q": "宿舍有独立卫生间吗？", "a": "有独卫独浴，基本可以算干湿分离；不过干区没有地漏。"}, {"n": 3, "cat": "宿舍", "status": "current", "q": "宿舍空调一年四季都能用吗？", "a": "可以。学校没有暖气，所以冬天基本也是靠空调。"}, {"n": 4, "cat": "宿舍", "status": "change", "q": "晚上几点断电断网，宿舍电费大概多少？", "a": "晚上不断电，也不断网。宿舍电费由舍友均摊，大约 0.5 元/度。据同学整理的上学期经验，一般月份整间宿舍约 100 元，夏天开空调后可能约 200—300 元；实际用量差异较大，以缴费记录为准。"}, {"n": 5, "cat": "宿舍", "status": "current", "q": "宿舍可以挂床帘吗？", "a": "可以，军训期间也可以挂。"}, {"n": 6, "cat": "宿舍", "status": "experience", "q": "衣柜大不大，28寸行李箱放得下吗？", "a": "空间差不多够，但不太建议塞衣柜。行李箱一般统一要求放在阳台。"}, {"n": 7, "cat": "宿舍", "status": "current", "q": "卷发棒算违禁电器吗？", "a": "算。发热类电器基本都属于违规电器，建议使用符合宿舍规定的充电式或低功率替代品。"}, {"n": 8, "cat": "宿舍", "status": "current", "q": "每层楼都有洗衣机吗？", "a": "有，南区、北区各有；一楼还有公共洗衣区，机器更多。"}, {"n": 9, "cat": "宿舍", "status": "current", "q": "洗衣机洗衣服一次多少钱？", "a": "根据模式不同，大概有 2 元、3 元、4 元几个档。"}, {"n": 10, "cat": "宿舍", "status": "current", "q": "宿舍可以贴墙纸装饰吗？", "a": "目前没有特别限制。"}, {"n": 11, "cat": "宿舍", "status": "change", "q": "热水供应是全天都有吗？", "a": "洗澡热水按时间段供应，正常基本够用；饮水机的热水全天都有。具体热水时段以新学期安排为准。"}, {"n": 12, "cat": "宿舍", "status": "change", "q": "宿舍有门禁、查寝和卫生检查吗？", "a": "据同学整理的上学期经验，宿舍楼晚上 10 点左右门禁；晚归可以提前向辅导员报备，周末外宿也需要告知辅导员。正式上课后可能在周二中午安排宿舍卫生检查，具体以学院、辅导员和宿管当学期要求为准。"}, {"n": 13, "cat": "宿舍", "status": "change", "q": "床位是提前选还是随机分配？", "a": "据同学整理的上学期安排，床位通常按学号分配，报到时由辅导员告知具体床铺。宿舍内部如果想调换，可以先和室友协商；是否需要报备，以辅导员要求为准。"}, {"n": 14, "cat": "宿舍", "status": "current", "q": "宿舍能养小绿植吗？", "a": "目前没听说有限制。"}, {"n": 15, "cat": "宿舍", "status": "experience", "q": "吹风机限制多少瓦以内？", "a": "宿舍插座带大功率吹风机比较容易跳闸。更推荐使用公共吹风设备或符合宿舍规定的充电式吹风机。"}, {"n": 16, "cat": "宿舍", "status": "current", "q": "宿舍楼下有充电桩吗？", "a": "有充电桩，不过目前学校不允许学生骑电动车。"}, {"n": 17, "cat": "宿舍", "status": "experience", "q": "下雨天宿舍会不会潮湿发霉？", "a": "目前住下来感觉还可以，没有特别严重。"}, {"n": 18, "cat": "宿舍", "status": "current", "q": "室友是同班同学吗？", "a": "一般是同班同学。"}, {"n": 19, "cat": "宿舍", "status": "experience", "q": "宿舍桌子够大用来学习吗？", "a": "能用，但不算大。大概就是普通学校课桌大小，放一台电脑之后剩余空间有限。"}, {"n": 20, "cat": "宿舍", "status": "current", "q": "外来人员可以进宿舍楼吗？", "a": "一般不行，除非有特殊情况。"}, {"n": 21, "cat": "吃饭", "status": "change", "q": "学校一共有几个食堂？", "a": "新学期开学后预计有两个食堂。据同学消息，新食堂可能会增加益禾堂、库迪咖啡和新疆炒米粉等档口，最终以新学期实际开业情况为准。"}, {"n": 22, "cat": "吃饭", "status": "experience", "q": "食堂一顿饭大概花多少钱？", "a": "正常吃快餐的话，10 元左右基本能吃饱。"}, {"n": 23, "cat": "吃饭", "status": "experience", "q": "食堂辣菜多吗，有没有清淡窗口？", "a": "总体口味偏重。有兰州拉面这类相对清淡一些的选择。"}, {"n": 24, "cat": "吃饭", "status": "change", "q": "外卖能到宿舍楼下吗？", "a": "可以分三种：校内外卖平台可点食堂里已开放外卖的档口，会送到宿舍一楼外卖架；校外普通外卖一般只能送到校门口；此外，据同学反馈，暑假前已有名为“小镇外卖”的小程序对接八岗镇部分商家，也能送到校门口，选择不算多但基本够用。第三方平台和商家范围可能变化，下单前以页面实际显示为准。"}, {"n": 25, "cat": "吃饭", "status": "change", "q": "学校超市物价贵不贵？", "a": "现有超市基本是普通超市正常物价，没有特别离谱。据同学消息，新学期教学楼下沉广场可能会开一家赵一鸣零食店，是否开业以到校后实际情况为准。"}, {"n": 26, "cat": "吃饭", "status": "change", "q": "校内有水果店吗？", "a": "截至上学期结束有三家：食堂里一家果切；另外两家同时卖鲜果和果切。"}, {"n": 27, "cat": "吃饭", "status": "experience", "q": "食堂早餐几点开始供应？", "a": "大概 6:30 左右就有了——至少我没起得比这个更早过。"}, {"n": 28, "cat": "吃饭", "status": "change", "q": "晚上食堂开到几点关门？", "a": "上学期基本晚上 9 点以后就没什么东西吃了。新学期学生人数增加后可能会调整。"}, {"n": 29, "cat": "吃饭", "status": "change", "q": "学校有没有奶茶店？", "a": "目前有蜜雪冰城。据同学消息，新食堂可能会增加益禾堂；具体品牌和开业时间仍可能调整，以新学期实际营业情况为准。"}, {"n": 30, "cat": "吃饭", "status": "current", "q": "食堂可以用微信直接付款吗？", "a": "可以。微信、支付宝、云闪付付款码都能用。"}, {"n": 31, "cat": "吃饭", "status": "experience", "q": "学校附近小吃摊多不多？", "a": "周末校门口会有一些摊。个人比较推荐葱饼、螺蛳粉、肠粉、生煎、串串香/烩面、雪花酪、福鼎肉片（后来好像没来了😭）。"}, {"n": 32, "cat": "吃饭", "status": "change", "q": "有没有清真就餐窗口？", "a": "目前有兰州拉面窗口；是否属于正式清真窗口，请以现场的“清真”标识和档口说明为准。"}, {"n": 33, "cat": "吃饭", "status": "current", "q": "能自己在宿舍简单煮东西吗？", "a": "宿舍规定层面不建议使用电煮锅等发热类电器。即使小功率设备可能不会跳闸，也不代表符合宿舍用电规定。"}, {"n": 34, "cat": "吃饭", "status": "change", "q": "校园里面有没有咖啡店？", "a": "目前有幸运咖。据同学消息，新食堂可能会增加库迪咖啡；是否开业以及具体位置，以新学期实际情况为准。"}, {"n": 35, "cat": "吃饭", "status": "change", "q": "节假日食堂正常营业吗？", "a": "会留值班窗口，但可选择的东西会明显变少。"}, {"n": 36, "cat": "学习", "status": "current", "q": "大一需要上早晚自习吗？", "a": "大一不需要统一上早晚自习，时间自己安排。期末或考证前多数同学会自觉去图书馆或自习室。"}, {"n": 37, "cat": "学习", "status": "current", "q": "早上第一节课几点上课？", "a": "正式上课 8:40，一般 8:20 左右预备。"}, {"n": 38, "cat": "学习", "status": "change", "q": "图书馆几点开门关门？", "a": "目前校图书馆官网标注的开馆时间为 6:00—22:00；节假日或临时调整以当天通知为准。"}, {"n": 39, "cat": "学习", "status": "current", "q": "图书馆可以占座学习吗？", "a": "老校区有预约系统，但新校区暂时还没上线。能坐当然可以坐，但不建议长期用东西占座、霸座。"}, {"n": 40, "cat": "学习", "status": "experience", "q": "图书馆里面有充电插座吗？", "a": "有，不过部分位置插座可能没电。"}, {"n": 41, "cat": "学习", "status": "current", "q": "大一怎么选选修课？", "a": "我们大一基本都是统一安排的通识课，没有常规意义上的自由选修；大一下比较明显的一次选课就是体育课。"}, {"n": 42, "cat": "学习", "status": "current", "q": "挂科之后一定要重修吗？", "a": "不是。一般流程是：挂科 → 补考 → 补考还没过 → 重修。"}, {"n": 43, "cat": "学习", "status": "experience", "q": "补考容易通过吗？", "a": "目前来看，补考和第一次考试甚至可能是同一份卷子。"}, {"n": 44, "cat": "学习", "status": "current", "q": "教室上课需要提前占位置吗？", "a": "没有固定座位，可以自己选，但没必要专门长期占座。"}, {"n": 45, "cat": "学习", "status": "change", "q": "绩点对毕业影响大吗？", "a": "会。毕业和学位授予需要满足培养方案及学校相关规定；具体绩点要求请以入学后最新版学生手册、培养方案和学位授予办法为准，不建议只记一个固定数字。"}, {"n": 46, "cat": "学习", "status": "change", "q": "大一可以考四级吗？", "a": "按我们这一届及目前校内安排，大一不能报名四级；每次报名资格可能调整，以当次教务处通知和报名系统资格为准。"}, {"n": 47, "cat": "学习", "status": "current", "q": "自习室是全天开放的吗？", "a": "不是，不能通宵。"}, {"n": 48, "cat": "学习", "status": "experience", "q": "上课迟到会被记名字吗？", "a": "目前学校考勤比较严格，所以最好别赌。"}, {"n": 49, "cat": "学习", "status": "experience", "q": "作业多不多，课余时间充裕吗？", "a": "看专业。正常情况下下午 4:20 放学之后就没有统一课程安排，自己的时间其实还是挺多的。"}, {"n": 50, "cat": "学习", "status": "experience", "q": "专业课难度大不大？", "a": "这个因专业和个人基础而异。"}, {"n": 51, "cat": "校园", "status": "current", "q": "饭卡在哪里办理和充值？", "a": "没有传统意义上的饭卡，直接手机付款就行。"}, {"n": 52, "cat": "校园", "status": "current", "q": "饭卡丢了怎么挂失补办？", "a": "学校没有实体饭卡，因此不存在挂失补办；食堂日常直接使用手机付款。"}, {"n": 53, "cat": "校园", "status": "change", "q": "水卡需要单独办理吗，洗澡等怎么收费？", "a": "不用实体水卡。根据同学整理的上学期经验，水龙头凉水免费；饮用热水、洗澡、公共吹风机和洗衣机等按个人使用计费，可通过“助理生活”或现场二维码等入口充值，一学期大约 100—150 元。具体缴费入口和收费标准可能调整，以新学期现场说明为准。"}, {"n": 54, "cat": "校园", "status": "change", "q": "快递地址该怎么填写？", "a": "可写：姓名 + 电话 + 河南省郑州市中牟县航空港区豫州大道郑州财经学院（航空港校区）快递驿站。当前暑期旧驿站已取消，新快递驿站正在建设。"}, {"n": 55, "cat": "校园", "status": "change", "q": "快递驿站营业时间是多久？", "a": "上学期大约是 8:00—20:00。"}, {"n": 56, "cat": "校园", "status": "current", "q": "医务室在哪里，看病收费贵吗？", "a": "在 D6 北面、靠近食堂的位置。可以走医保，总体还可以。"}, {"n": 57, "cat": "校园", "status": "change", "q": "学生证什么时候发放？", "a": "一般国庆放假前后就会开始办理。"}, {"n": 58, "cat": "校园", "status": "change", "q": "学生证景区打折能用吗？", "a": "看具体景区政策，不是所有景区都一样。"}, {"n": 59, "cat": "校园", "status": "current", "q": "打印店在校内哪个位置？", "a": "目前校内两家：D4 北面、D6 北面。"}, {"n": 60, "cat": "校园", "status": "current", "q": "打印黑白一张多少钱？", "a": "单面黑白 0.3 元/张。"}, {"n": 61, "cat": "校园", "status": "current", "q": "澡堂是隔间公共浴室吗？", "a": "没有公共大澡堂，每间宿舍自己有独立浴室。"}, {"n": 62, "cat": "校园", "status": "change", "q": "澡堂开放时间段是什么？", "a": "冷水全天都有；热水按学校规定的时间段供应。上学期早、中、晚基本都有，新学期可能调整。"}, {"n": 63, "cat": "校园", "status": "experience", "q": "校内理发店靠谱吗？", "a": "男生剪头大概 20 元，正常水平，基本能接受。"}, {"n": 64, "cat": "校园", "status": "unknown", "q": "身份证丢了学校能帮忙开证明吗？", "a": "暂时没遇到过，不确定。"}, {"n": 65, "cat": "校园", "status": "current", "q": "校园门禁刷脸还是刷卡？", "a": "刷脸。"}, {"n": 66, "cat": "出行", "status": "change", "q": "校园很大吗，需要买电动车吗？", "a": "上学期绕学校跑一圈大概 2 公里出头；新学期新区域开放后可能接近 3 公里。不过目前学生不能骑电动车。"}, {"n": 67, "cat": "出行", "status": "experience", "q": "校内共享单车多不多？", "a": "还可以，日常基本够，但高峰期不一定。"}, {"n": 68, "cat": "出行", "status": "change", "q": "校门离公交站远不远？", "a": "校门口就能坐公交。部分线路可能会等乘客接近坐满后再发车，也可以先到郑州航空港站再换乘地铁；线路和发车方式可能调整，以实时导航和现场信息为准。"}, {"n": 69, "cat": "出行", "status": "change", "q": "去八岗镇和市区方便吗？", "a": "八岗镇离学校约 5 公里，据同学整理，网约车通常约 6—10 元，适合和朋友拼车，但镇上可逛可吃的选择不算多。去郑州市区则不算方便，公共交通加地铁通常要 2 小时以上；价格、耗时和线路都会变化，出发前以实时导航为准。"}, {"n": 70, "cat": "出行", "status": "change", "q": "学校附近有没有大型商场？", "a": "较近的两个商圈是锦荣悦汇城和绿悠悦享天地，据同学整理都在约 15 公里左右。锦荣悦汇城业态更全，绿悠悦享天地相对更新；距离和交通费用以实时导航为准。"}, {"n": 71, "cat": "出行", "status": "change", "q": "周边有没有电影院？", "a": "有，锦荣悦汇城有电影院。其他商圈的影院和营业情况可能调整，出发前建议在购票平台确认。"}, {"n": 72, "cat": "出行", "status": "change", "q": "周末出城交通便利吗？", "a": "长途出行反而还可以，附近有郑州航空港站和新郑机场。据同学整理，打车到航空港站通常约 10—20 元，再转高铁进市区或继续出行，总耗时约 40 分钟以上；车次、票价和耗时以实时查询为准。"}, {"n": 73, "cat": "出行", "status": "change", "q": "校门口打车好打吗？", "a": "基本还行，一般不用等很久。据同学整理的经验，拼车去市区人均约 20 元，单独网约车约 60 元起；价格会随时段和车型波动，以平台实时价为准。"}, {"n": 74, "cat": "出行", "status": "current", "q": "校园里面可以骑自行车吗？", "a": "可以。学校还有公共自行车可以租，价格挺便宜，不过数量不算多。"}, {"n": 75, "cat": "出行", "status": "unknown", "q": "周边租房价格大概多少？", "a": "暂时不了解，目前学校也没有大规模开放外宿。"}, {"n": 76, "cat": "活动", "status": "change", "q": "社团什么时候统一招新？", "a": "去年大概是 9 月底。今年因为新生开学时间有所变化，可能也会往后调整。"}, {"n": 77, "cat": "活动", "status": "experience", "q": "哪些社团性价比更高值得进？", "a": "别光看名字。很多社团主要是娱乐和社交；如果宣传里能看到过去真的和学校合作办过活动、做过志愿服务、比赛或实际项目，一般会更有东西。建议先看他们过去一年真正做了什么。"}, {"n": 78, "cat": "活动", "status": "experience", "q": "学生会日常事情多不多？", "a": "看我几个在学生会的朋友，忙的时候确实挺焦头烂额。"}, {"n": 79, "cat": "活动", "status": "current", "q": "社团会费一般要交多少？", "a": "目前没怎么听说有统一收会费。"}, {"n": 80, "cat": "活动", "status": "current", "q": "学校会举办漫展这类活动吗？", "a": "目前没有。"}, {"n": 81, "cat": "活动", "status": "change", "q": "军训一共持续多少天？", "a": "去年通知是 21 天，实际上大概训了 18 天左右。今年以通知为准。"}, {"n": 82, "cat": "活动", "status": "experience", "q": "军训强度大不大，可以休息吗？", "a": "正常大学军训强度。如果真的身体不舒服，该报告就报告，不要硬扛。"}, {"n": 83, "cat": "活动", "status": "change", "q": "军训服装需要自己购买吗？", "a": "学校通常会要求统一购买军训服，但每年款式、颜色和发放方式都可能调整。今年具体样式目前没有可靠内部消息，不建议提前购买往届旧款或仅凭“差不多”自行购买，以免款式、尺码不合。去年还出现过临时缺货、部分尺码不合适的情况，新生优先等当年通知和现场试穿安排。"}, {"n": 84, "cat": "活动", "status": "experience", "q": "学校晚会活动多不多？", "a": "去年新校区一整年比较大型的大概就两次：一次新生相关活动，一次社团之夜，所以不算特别多。"}, {"n": 85, "cat": "活动", "status": "current", "q": "大一可以参加竞赛吗？", "a": "可以。学校会推荐一些比赛，自己在外面找比赛报名通常也没有限制。"}, {"n": 86, "cat": "活动", "status": "current", "q": "周末学校会组织集体活动吗？", "a": "目前基本没有。"}, {"n": 87, "cat": "活动", "status": "change", "q": "社团退社麻烦吗？", "a": "看具体社团自己的管理方式。"}, {"n": 88, "cat": "生活", "status": "experience", "q": "大一每月多少生活费够用？", "a": "因为学校离市区比较远，实际能花钱的地方反而没那么多。1500 元/月正常够用；2000 元/月会过得比较舒服，当然还是看个人消费习惯。"}, {"n": 89, "cat": "生活", "status": "experience", "q": "校内有什么靠谱兼职？", "a": "校内兼职的性价比普遍比较一般，我个人不是很推荐。"}, {"n": 90, "cat": "生活", "status": "experience", "q": "兼职会不会耽误上课学习？", "a": "如果时间安排不好，肯定会有一定影响。"}, {"n": 91, "cat": "生活", "status": "experience", "q": "校园网网速稳定吗？", "a": "属于“勉强能用”的水平，有时候稳定性和体验比较看运气。"}, {"n": 92, "cat": "生活", "status": "current", "q": "宿舍宽带需要单独办理吗？", "a": "不需要，也不允许自己单独拉宽带。"}, {"n": 93, "cat": "生活", "status": "change", "q": "校园电话卡的流量套餐划算吗？", "a": "如果本身流量需求较大，套餐通常还可以；具体资费和合约期以办理时运营商公示为准。"}, {"n": 94, "cat": "生活", "status": "current", "q": "校园电话卡可以不开通吗？", "a": "可以。这里说的是运营商校园电话卡，不是学生身份或校园支付凭证；不开通基本不会影响正常校园生活。"}, {"n": 95, "cat": "生活", "status": "current", "q": "手机热点能连电脑上网吗？", "a": "可以，只要电脑支持 Wi‑Fi 就行。"}, {"n": 96, "cat": "生活", "status": "unknown", "q": "校内兼职薪资大概一小时多少？", "a": "目前没有可靠、统一的时薪范围，不同岗位差别较大；已知部分岗位的时薪性价比不高，报名时一定先问清工作时长和结算方式。"}, {"n": 97, "cat": "生活", "status": "change", "q": "节假日可以留校兼职吗？", "a": "节假日能否留校，需要看当次放假和宿舍管理通知；即使允许留校，校内兼职岗位也比较少，不能默认留校就有工作。"}, {"n": 98, "cat": "生活", "status": "unknown", "q": "校园电话卡能开副卡给家人使用吗？", "a": "目前不清楚学校营业厅提供的校园电话卡套餐是否支持副卡，建议办理前直接询问对应运营商。"}, {"n": 99, "cat": "生活", "status": "change", "q": "不用的校园电话卡注销流程麻烦吗？", "a": "目前可以到学校 A5 楼的运营商营业厅咨询并办理注销；是否需要携带身份证、是否存在合约期，以对应运营商要求为准。"}, {"n": 100, "cat": "生活", "status": "current", "q": "学校有游泳馆吗？", "a": "目前没有。"}];
+const STATUS = {
+  current: ["✓ 当前明确","current"],
+  change: ["◷ 可能变化","change"],
+  experience: ["◉ 个人体验","experience"],
+  unknown: ["? 暂不确定","unknown"]
+};
+const cats = [["全部", "✨"], ["宿舍", "🏠"], ["吃饭", "🍚"], ["学习", "📚"], ["校园", "🏫"], ["出行", "🚲"], ["活动", "🎉"], ["生活", "💰"]];
+let activeCat = "全部";
+let query = "";
+
+const content = document.getElementById("content");
+const empty = document.getElementById("empty");
+const search = document.getElementById("search");
+const resultCount = document.getElementById("resultCount");
+const chips = document.getElementById("chips");
+const toggleAll = document.getElementById("toggleAll");
+const toast = document.getElementById("toast");
+const backToTop = document.getElementById("backToTop");
+const openCampusMap = document.getElementById("openCampusMap");
+const campusMapDialog = document.getElementById("campusMapDialog");
+const campusMapImage = document.getElementById("campusMapImage");
+const mapLoading = document.getElementById("mapLoading");
+const mapError = document.getElementById("mapError");
+const cards = [];
+const sections = [];
+let toastTimer = 0;
+let mapReturnFocus = null;
+
+function openMap() {
+  mapReturnFocus = document.activeElement;
+  campusMapDialog.hidden = false;
+  document.body.classList.add("modal-open");
+  if (!campusMapImage.getAttribute("src")) {
+    campusMapImage.src = campusMapImage.dataset.src;
+  }
+  campusMapDialog.querySelector(".map-close").focus();
+}
+
+function closeMap() {
+  if (campusMapDialog.hidden) return;
+  campusMapDialog.hidden = true;
+  document.body.classList.remove("modal-open");
+  if (mapReturnFocus && typeof mapReturnFocus.focus === "function") mapReturnFocus.focus();
+}
+
+openCampusMap.addEventListener("click", openMap);
+campusMapDialog.querySelectorAll("[data-map-close]").forEach(el => el.addEventListener("click", closeMap));
+campusMapImage.addEventListener("load", () => {
+  mapLoading.hidden = true;
+  mapError.hidden = true;
+  campusMapImage.classList.add("ready");
+});
+campusMapImage.addEventListener("error", () => {
+  mapLoading.hidden = true;
+  campusMapImage.classList.remove("ready");
+  mapError.hidden = false;
+});
+campusMapDialog.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    e.preventDefault();
+    closeMap();
+    return;
+  }
+  if (e.key !== "Tab") return;
+  const focusable = [...campusMapDialog.querySelectorAll("button:not([disabled]),a[href]")]
+    .filter(el => !el.hidden && el.offsetParent !== null);
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+});
+
+cats.forEach(([name, icon]) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "chip" + (name === "全部" ? " active" : "");
+  b.textContent = `${icon} ${name}`;
+  b.onclick = () => setCat(name);
+  chips.appendChild(b);
+});
+function setCat(name) {
+  activeCat = name;
+  [...chips.children].forEach(x => x.classList.remove("active"));
+  const idx = cats.findIndex(([n]) => n === name);
+  if (idx >= 0) chips.children[idx].classList.add("active");
+  applyFilter();
+  syncHash();
+}
+
+function esc(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function highlight(text, q) {
+  const terms = [...new Set(q.trim().split(/\s+/).filter(Boolean))]
+    .sort((a, b) => b.length - a.length)
+    .map(x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (!terms.length) return esc(text);
+  const re = new RegExp(`(${terms.join("|")})`, "ig");
+  return text.split(re)
+    .map((part, i) => i % 2 ? `<mark>${esc(part)}</mark>` : esc(part))
+    .join("");
+}
+
+// 构建一次 DOM，之后只切换显隐 + 更新高亮 —— 卡片开合状态由 <details> 原生持有，不会因搜索/筛选丢失
+function build() {
+  const grouped = {};
+  DATA.forEach(x => (grouped[x.cat] ||= []).push(x));
+  for (const [cat, icon] of cats.slice(1)) {
+    const items = grouped[cat];
+    if (!items || !items.length) continue;
+    const sec = document.createElement("section");
+    sec.className = "section";
+    sec.dataset.cat = cat;
+    const h = document.createElement("h2");
+    h.className = "section-title";
+    h.innerHTML = `<span>${icon} ${cat}</span> <span class="section-count" data-count></span>`;
+    sec.appendChild(h);
+    items.forEach(item => {
+      const [label, cls] = STATUS[item.status];
+      const d = document.createElement("details");
+      d.className = "qa-card";
+      d.dataset.n = item.n;
+      d.innerHTML = `
+        <summary>
+          <div class="num">${String(item.n).padStart(2,"0")}</div>
+          <div class="qwrap">
+            <div class="qtext"></div>
+            <div class="qmeta"><span class="badge ${cls}">${label}</span></div>
+          </div>
+          <div class="chev" aria-hidden="true"><span class="hint hint-closed">展开</span><span class="hint hint-open">收起</span><span class="arrow">⌄</span></div>
+        </summary>
+        <div class="answer">
+          <p class="ans-text"></p>
+          <div class="answer-actions">
+            <button class="copy-btn" type="button">复制本条</button>
+            <button class="share-btn" type="button">分享本条</button>
+          </div>
+        </div>`;
+      d.querySelector(".qtext").textContent = item.q;
+      d.querySelector(".ans-text").textContent = item.a;
+      d._item = item;
+      d.addEventListener("toggle", updateToggleLabel);
+      d.querySelector(".copy-btn").addEventListener("click", async (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const btn = e.currentTarget;
+        try {
+          await navigator.clipboard.writeText(`${item.n}. ${item.q}\n${item.a}`);
+          btn.textContent = "已复制";
+        } catch {
+          btn.textContent = "复制失败";
+        }
+        setTimeout(() => btn.textContent = "复制本条", 1200);
+      });
+      d.querySelector(".share-btn").addEventListener("click", async (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const btn = e.currentTarget;
+        const url = makeQuestionUrl(item.n);
+        const shareData = {
+          title: `新生100问｜${item.q}`,
+          text: `${item.n}. ${item.q}\n${item.a}`,
+          url
+        };
+        try {
+          if (navigator.share && location.protocol !== "file:") {
+            await navigator.share(shareData);
+          } else {
+            await navigator.clipboard.writeText(url);
+            btn.textContent = "链接已复制";
+            setTimeout(() => btn.textContent = "分享本条", 1400);
+          }
+        } catch (err) {
+          if (err && err.name === "AbortError") return;
+          try {
+            await navigator.clipboard.writeText(url);
+            btn.textContent = "链接已复制";
+          } catch {
+            btn.textContent = "复制失败";
+          }
+          setTimeout(() => btn.textContent = "分享本条", 1400);
+        }
+      });
+      sec.appendChild(d);
+      cards.push(d);
+    });
+    content.appendChild(sec);
+    sections.push(sec);
+  }
+}
+
+// 过滤：只切显隐 + 刷新高亮，绝不重建 DOM
+function applyFilter() {
+  const terms = query.trim() ? query.trim().toLowerCase().split(/\s+/).filter(Boolean) : [];
+  let visible = 0;
+  cards.forEach(d => {
+    const item = d._item;
+    let match = activeCat === "全部" || item.cat === activeCat;
+    if (match && terms.length) {
+      const hay = `${item.n} ${item.q} ${item.a} ${item.cat}`.toLowerCase();
+      match = terms.every(t => hay.includes(t));
+    }
+    d.hidden = !match;
+    if (match) {
+      visible++;
+      d.querySelector(".qtext").innerHTML = highlight(item.q, query);
+      d.querySelector(".ans-text").innerHTML = highlight(item.a, query);
+    }
+  });
+  sections.forEach(sec => {
+    const vis = sec.querySelectorAll(".qa-card:not([hidden])").length;
+    sec.hidden = vis === 0;
+    const c = sec.querySelector("[data-count]");
+    if (c) c.textContent = `${vis} 条`;
+  });
+  resultCount.textContent = `${visible} 条`;
+  empty.style.display = visible ? "none" : "block";
+  updateToggleLabel();
+}
+
+// 「展开/收起全部」只作用于当前可见卡片，按钮文案随实际状态走
+function updateToggleLabel() {
+  const vis = cards.filter(d => !d.hidden);
+  const allOpen = vis.length > 0 && vis.every(d => d.open);
+  toggleAll.textContent = allOpen ? "收起全部" : "展开全部";
+}
+
+toggleAll.addEventListener("click", () => {
+  const vis = cards.filter(d => !d.hidden);
+  if (!vis.length) return;
+  const allOpen = vis.every(d => d.open);
+  vis.forEach(d => d.open = !allOpen);
+  updateToggleLabel();
+});
+
+search.addEventListener("input", e => {
+  query = e.target.value;
+  applyFilter();
+  syncHash();
+});
+
+// 筛选/搜索状态写进 URL，便于复制和分享
+function syncHash() {
+  const params = new URLSearchParams();
+  if (activeCat !== "全部") params.set("cat", activeCat);
+  if (query.trim()) params.set("q", query.trim());
+  const h = params.toString();
+  const base = location.pathname + location.search;
+  try { history.replaceState(null, "", h ? `${base}#${h}` : base); } catch (e) {}
+}
+
+function makeQuestionUrl(n) {
+  const base = location.href.split("#")[0];
+  return `${base}#id=${encodeURIComponent(n)}`;
+}
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function focusQuestion(n, writeHash = true) {
+  const card = cards.find(d => Number(d.dataset.n) === Number(n));
+  if (!card) {
+    console.warn(`[新生100问] 未找到问题 #${n}，请检查快捷入口或分享链接中的题号。`);
+    const label = String(n).slice(0, 24);
+    showToast(`没有找到第 ${label} 条，已显示全部问题。`);
+    activeCat = "全部";
+    query = "";
+    search.value = "";
+    [...chips.children].forEach((x, i) => x.classList.toggle("active", i === 0));
+    applyFilter();
+    const base = location.pathname + location.search;
+    try { history.replaceState(null, "", base); } catch (e) {}
+    return false;
+  }
+
+  // 直达某题时清空筛选，确保目标一定可见
+  activeCat = "全部";
+  query = "";
+  search.value = "";
+  [...chips.children].forEach((x, i) => x.classList.toggle("active", i === 0));
+  applyFilter();
+
+  card.open = true;
+  if (writeHash) {
+    const base = location.pathname + location.search;
+    try { history.replaceState(null, "", `${base}#id=${encodeURIComponent(n)}`); } catch (e) {}
+  }
+  requestAnimationFrame(() => {
+    if (typeof card.scrollIntoView === "function") {
+      try {
+        card.scrollIntoView({behavior:"smooth", block:"center"});
+      } catch (e) {
+        card.scrollIntoView();
+      }
+    }
+    card.classList.remove("flash");
+    void card.offsetWidth;
+    card.classList.add("flash");
+  });
+  return true;
+}
+function loadHash() {
+  const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const id = params.get("id");
+  if (id) return { id };
+
+  const cat = params.get("cat");
+  activeCat = cat && cats.some(([n]) => n === cat) ? cat : "全部";
+
+  query = params.get("q") || "";
+  search.value = query;
+
+  [...chips.children].forEach(x => x.classList.remove("active"));
+  const idx = cats.findIndex(([n]) => n === activeCat);
+  if (idx >= 0) chips.children[idx].classList.add("active");
+
+  return {};
+}
+
+document.querySelectorAll("[data-jump]").forEach(btn => {
+  btn.addEventListener("click", () => focusQuestion(btn.dataset.jump));
+});
+
+backToTop.addEventListener("click", () => {
+  if (typeof window.scrollTo !== "function") return;
+  try {
+    window.scrollTo({top:0, behavior:"smooth"});
+  } catch (e) {
+    window.scrollTo(0, 0);
+  }
+});
+
+window.addEventListener("hashchange", () => {
+  const state = loadHash();
+  if (state.id) {
+    focusQuestion(state.id, false);
+    return;
+  }
+  applyFilter();
+});
+
+// 打印/PDF：临时展开全部，打印完恢复原状
+window.addEventListener("beforeprint", () => {
+  cards.forEach(d => { d.dataset.po = d.open ? "1" : "0"; d.open = true; });
+});
+window.addEventListener("afterprint", () => {
+  cards.forEach(d => { d.open = d.dataset.po === "1"; });
+});
+
+build();
+const initialState = loadHash();
+applyFilter();
+if (initialState.id) {
+  setTimeout(() => focusQuestion(initialState.id, false), 80);
+}
+</script>
+</body>
+</html>
