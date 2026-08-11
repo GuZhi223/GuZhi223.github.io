@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420" font-family="system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#eaf0ff"/>
+      <stop offset="1" stop-color="#f6f7fb"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#315efb"/>
+      <stop offset="1" stop-color="#6f9bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="420" fill="url(#bg)"/>
+
+  <!-- hero header -->
+  <rect x="0" y="0" width="640" height="70" fill="#ffffff" opacity="0.92"/>
+  <rect x="24" y="19" width="32" height="32" rx="9" fill="url(#bar)"/>
+  <text x="40" y="42" font-size="18" text-anchor="middle" fill="#fff">🎓</text>
+  <text x="70" y="34" font-size="19" font-weight="700" fill="#1b2330">新生100问</text>
+  <text x="70" y="54" font-size="12" fill="#6b7480">郑州财经学院 · 航空港校区</text>
+
+  <!-- search bar mock -->
+  <rect x="24" y="92" width="592" height="36" rx="18" fill="#ffffff" stroke="#dfe4ee"/>
+  <circle cx="46" cy="110" r="7" fill="none" stroke="#9aa3b2" stroke-width="2"/>
+  <line x1="51" y1="115" x2="56" y2="120" stroke="#9aa3b2" stroke-width="2"/>
+  <text x="66" y="115" font-size="13" fill="#9aa3b2">搜索：空调 / 四级 / 快递 / 生活费……</text>
+
+  <!-- category chips -->
+  <g font-size="12">
+    <rect x="24" y="142" width="56" height="26" rx="13" fill="#315efb"/><text x="52" y="159" fill="#fff" text-anchor="middle">全部</text>
+    <rect x="90" y="142" width="56" height="26" rx="13" fill="#fff" stroke="#dfe4ee"/><text x="118" y="159" fill="#3a4350" text-anchor="middle">宿舍</text>
+    <rect x="156" y="142" width="56" height="26" rx="13" fill="#fff" stroke="#dfe4ee"/><text x="184" y="159" fill="#3a4350" text-anchor="middle">吃饭</text>
+    <rect x="222" y="142" width="56" height="26" rx="13" fill="#fff" stroke="#dfe4ee"/><text x="250" y="159" fill="#3a4350" text-anchor="middle">学习</text>
+    <rect x="288" y="142" width="56" height="26" rx="13" fill="#fff" stroke="#dfe4ee"/><text x="316" y="159" fill="#3a4350" text-anchor="middle">出行</text>
+  </g>
+
+  <!-- Q&A cards -->
+  <g>
+    <rect x="24" y="186" width="592" height="60" rx="12" fill="#fff" stroke="#eaeef5"/>
+    <rect x="40" y="201" width="30" height="30" rx="8" fill="#eef3ff"/>
+    <text x="55" y="222" font-size="14" font-weight="700" fill="#315efb" text-anchor="middle">01</text>
+    <text x="84" y="210" font-size="14" font-weight="600" fill="#1b2330">宿舍的床多大？需要自己带被褥吗？</text>
+    <rect x="84" y="221" width="62" height="18" rx="9" fill="#e6f7ec"/>
+    <text x="115" y="234" font-size="11" fill="#1a8a4a" text-anchor="middle">✓ 当前明确</text>
+
+    <rect x="24" y="256" width="592" height="60" rx="12" fill="#fff" stroke="#eaeef5"/>
+    <rect x="40" y="271" width="30" height="30" rx="8" fill="#eef3ff"/>
+    <text x="55" y="292" font-size="14" font-weight="700" fill="#315efb" text-anchor="middle">46</text>
+    <text x="84" y="280" font-size="14" font-weight="600" fill="#1b2330">大一可以考英语四级吗？</text>
+    <rect x="84" y="291" width="70" height="18" rx="9" fill="#fff4e0"/>
+    <text x="119" y="304" font-size="11" fill="#b06a00" text-anchor="middle">◷ 可能变化</text>
+
+    <rect x="24" y="326" width="592" height="60" rx="12" fill="#fff" stroke="#eaeef5"/>
+    <rect x="40" y="341" width="30" height="30" rx="8" fill="#eef3ff"/>
+    <text x="55" y="362" font-size="14" font-weight="700" fill="#315efb" text-anchor="middle">68</text>
+    <text x="84" y="350" font-size="14" font-weight="600" fill="#1b2330">从学校去市区 / 机场怎么走？</text>
+    <rect x="84" y="361" width="62" height="18" rx="9" fill="#e6f7ec"/>
+    <text x="115" y="374" font-size="11" fill="#1a8a4a" text-anchor="middle">✓ 当前明确</text>
+  </g>
+</svg>
