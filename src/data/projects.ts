@@ -38,6 +38,19 @@ export const featuredProjects: FeaturedProject[] = [
     githubUrl: 'https://github.com/GuZhi223/chaoxing-GUI-Helper',
     status: '重构实践',
   },
+  {
+    id: 'freshman-100q',
+    title: '新生100问',
+    summary: '郑州财经学院航空港校区新生答疑手册，100 条高频问题覆盖宿舍、吃饭、学习、校园、出行、活动与生活。',
+    problem: '新生面对陌生校区，最缺的不是信息量，而是「从哪开始看」和「能不能直接搜到」的入口。',
+    contribution: '用纯静态 HTML 做零依赖问答页：搜索高亮、分类筛选、展开引导、校园地图、深色模式与可分享链接。',
+    technologies: ['HTML', 'CSS', 'JavaScript', 'Web 工具'],
+    image: '/images/projects/freshman-100q.svg',
+    imageAlt: '新生100问网页界面截图，展示搜索框、分类标签与问答卡片',
+    githubUrl: 'https://github.com/GuZhi223/GuZhi223.github.io/tree/main/projects/freshman-100q',
+    demoUrl: '/projects/freshman-100q/',
+    status: '在线体验',
+  },
 ];
 
 export const repositories: RepositoryItem[] = [
