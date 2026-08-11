@@ -144,4 +144,14 @@ export const works: WorkItem[] = [
     origin: 'original',
     technologies: ['Canvas', '原生 JS'],
   },
+  {
+    id: 'freshman-100q',
+    title: '新生100问',
+    description: '郑州财经学院航空港校区新生答疑手册，100 条高频问题支持搜索、分类筛选、校园地图与深色模式。',
+    href: '/projects/freshman-100q/',
+    category: 'tool',
+    origin: 'original',
+    technologies: ['HTML', 'CSS', 'JavaScript'],
+    image: '/images/projects/freshman-100q.svg',
+  },
 ];
